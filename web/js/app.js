@@ -356,7 +356,7 @@ function viewReport() {
       <p class="sub">Mean of the best answer per question; questions not rehearsed count as zero.</p>
       <div class="themes">${themes.map((t) => `<div><span class="led ${t.band}"></span>${esc(t.th)}<span class="tiny">${t.done}/${t.n}</span><span class="v">${t.avg ?? '-'}</span></div>`).join('')}</div>
       <h2 style="margin-top:var(--s-5)">By speaker</h2>
-      <div class="themes">${bySpk.map((s) => `<div><span class="led ${s.avg == null ? 'off' : s.avg >= 75 ? 'green' : s.avg >= 55 ? 'amber' : 'red'}"></span>${esc(company.speakers[s.s].split(',')[0])}<span class="tiny">${s.n} answers</span><span class="v">${s.avg ?? '-'}</span></div>`).join('')}</div>
+      <div class="themes">${bySpk.map((s) => `<div><span class="led ${s.avg == null ? 'off' : s.avg >= 75 ? 'green' : s.avg >= 55 ? 'amber' : 'red'}"></span>${esc(company.speakers[s.s].split(',')[0])}<span class="tiny">${s.n} answer${s.n === 1 ? '' : 's'}</span><span class="v">${s.avg ?? '-'}</span></div>`).join('')}</div>
     </section>
     <section class="panel glass">
       <h2>Riskiest questions</h2>
@@ -372,7 +372,7 @@ function buildRecs(themes, best, rc, contra) {
   R.push({ title: 'Decide on margin guidance before the call, not during it',
     body: `H1 EBITDA margin is ${f1(IMP.h1)}%. The bottom of the 13.5 to 14.5% band needs about ${f1(IMP.need)}% in H2, above the ${f1(IMP.record)}% best quarter on record. Defending the band (G2) after the August promise (S1) failed invites the hardest follow-up of the call. Recommend the board settles a revised range and files it with the results, so the CFO can point to it.` });
   if (rc.gaps.length) R.push({ title: 'Close the gaps in the prepared remarks',
-    body: `The draft is silent on: ${rc.gaps.map((g) => g.label.toLowerCase()).join('; ')}. Add the ${Math.abs(Math.round(K.mBps))} bps margin bridge and the working-capital days, and remove "${rc.risky[0]?.phrase || ''}", which reaffirms an outlook the numbers no longer support.` });
+    body: `The draft is silent on: ${rc.gaps.map((g, i) => (i ? g.label[0].toLowerCase() + g.label.slice(1) : g.label)).join('; ')}. Add the ${Math.abs(Math.round(K.mBps))} bps margin bridge and the working-capital days, and remove "${rc.risky[0]?.phrase || ''}", which reaffirms an outlook the numbers no longer support.` });
   R.push({ title: 'Own the two August statements in the opening, before an analyst quotes them',
     body: `S1 (margin back in band from Q2) and S2 (working capital normal by end of Q2) both failed. One sentence each, from the CFO, in the prepared remarks: what was said, what happened, what changes.` });
   R.push({ title: 'Disclose the discom receivables ageing proactively',

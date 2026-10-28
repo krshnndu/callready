@@ -10,7 +10,7 @@ Apply to every contributor: people, Claude Code, the Hermes agent and its subage
 
 ## How the product reasons
 
-- Rules first. Arithmetic, variances, rankings and number matching are plain code in `engine/` and `checks/`, with tests. A model never computes a figure.
+- Rules first. Arithmetic, variances, rankings and number matching are plain code in `web/js/engine.js`. A model never computes a figure.
 - Every figure shown to a user cites the pack (file plus row or line id). An uncited figure is a defect.
 - Model output is parsed against a pydantic schema. Pack text goes into prompts as quoted data, never as instructions.
 - Prompts are versioned files. Changing the judge prompt reruns the calibration set (`docs/04-SCORING.md` section 4).
@@ -18,7 +18,7 @@ Apply to every contributor: people, Claude Code, the Hermes agent and its subage
 
 ## Engineering
 
-- Python 3.12 with uv, lockfile committed; ruff and pytest. Web: Vite, React, TypeScript strict, vitest. New dependencies are named in the commit message with a reason.
+- Python 3.12 with uv, lockfile committed. Web: plain ES modules, no build step; keep it that way unless a framework clearly earns its place. After changing `web/js/pack.js` or `questions.js`, run `node scripts/export_pack.mjs` so the API coaches from the same facts. New dependencies are named in the commit message with a reason.
 - Do not build the web app or install `node_modules` on the backend host; Vercel and CI build it.
 - Commit after every task with a conventional message. Never force-push `main`.
 - When a folder changes, update the README "What is here" table and its `_Last true:_` date in the same commit.

@@ -1,16 +1,16 @@
 # 07. Pitch (90 seconds)
 
-Required by the brief: the problem, a demo of the prototype, its business value, and one key limitation. One speaker talks while another drives the demo, which is already open on the quarter summary.
+Required by the brief: the problem, a demo of the prototype, its business value, and one key limitation. One person talks while another clicks. Before going on, open https://callready-pied.vercel.app on the Quarter screen. On the Report screen, press **Clear answers** so the demo starts clean.
 
-| Time | Beat | On screen | Say (draft) |
+| Time | Beat | Click | Say |
 | --- | --- | --- | --- |
-| 0:00 to 0:12 | Problem | Quarter summary: revenue +14%, margin -258 bps, cash conversion 39% | "Revenue is up 14%, but margins fell 258 basis points and cash conversion halved. Tomorrow analysts will ask why, and they will quote last quarter's promises back to the CFO." |
-| 0:12 to 0:30 | Pressure map | Ranked pressure points, two red "broken promise" tags; implied-H2 readout 15.3% vs record 14.2% | "CallReady reads the results, guidance and past transcripts and ranks what investors will push on. Two promises are already broken. And to hit guidance, H2 needs a margin this company has never delivered." |
-| 0:30 to 0:55 | Rehearse | Question from the cash-skeptic persona; a weak answer is submitted; scorecard turns Red with a wrong figure and a missed commitment highlighted; improved answer appears | "The CFO practises. This answer quotes a figure that is not in the results and ignores the working-capital promise. CallReady flags both and shows a better answer, with every number cited to the disclosures." |
-| 0:55 to 1:12 | Recommendation | Readiness report: theme LEDs, CEO vs CFO contradiction, top recommendation | "The finance team gets a readiness report: weak themes, a contradiction between CEO and CFO, and the call to make before the call: revise the margin band rather than defend it." |
-| 1:12 to 1:22 | Value | Same screen | "Days of manual Q&A prep become an hour, every spokesperson tells the same story, and disclosure risks are caught before they are said aloud." |
-| 1:22 to 1:30 | Limitation | Same screen | "One limitation: it can only anticipate questions grounded in the disclosures. It will not foresee a question driven by tomorrow's news." |
+| 0:00 to 0:12 | Problem | Quarter screen (already open) | "Revenue is up 14%, but margins fell 258 basis points and cash conversion halved. Tomorrow analysts will ask why, and they will quote last quarter's promises back to the CFO. Those are the two red lights in the last column." |
+| 0:12 to 0:30 | Pressure map | Step 2 | "CallReady ranks what investors will push on, using plain arithmetic, no AI. Two promises are already broken. And this gauge is the hardest question of the call: to hit guidance, H2 needs 15.3% margin, and this company has never done better than 14.2%." |
+| 0:30 to 0:55 | Rehearse | Step 4 (Q01 opens), **Load a weak sample**, **Score my answer** | "The CEO practises the guidance question. The answer quotes 12.4%, which is not in the results, ignores the August promise, and gives new guidance on the fly. Red. Below it, the coach writes a stronger answer, with every number checked against the disclosures." |
+| 0:55 to 1:12 | Recommendation | Step 5, **Load demo rehearsal** | "The finance team gets a readiness report: weak themes, a contradiction between CEO and CFO on guidance, and the decision to take before the call: revise the margin band rather than defend it." |
+| 1:12 to 1:22 | Value | Same screen | "Days of manual Q&A prep become an hour. Every spokesperson tells the same story, and disclosure risks are caught before anyone says them aloud." |
+| 1:22 to 1:30 | Limitation | Same screen | "One limitation: it only anticipates questions grounded in the disclosures. It will not foresee a question driven by tomorrow's news." |
 
-Backup: if the live URL stalls, switch to demo mode (it plays from the baked cache), or to the recorded video.
+Backup: if the live coach is slow (it can take 30 seconds), keep talking. The scorecard is instant, and the reference answer appears if the coach does not answer in time. Score the weak Q01 sample once before the pitch, so the coach's answer is cached and comes back instantly.
 
-The value claim of "days to an hour" is an assumption to be stated as one; replace it with a measured figure from the team's own trial in P5 if there is time.
+"Days to an hour" is an assumption, and it should be stated as one.

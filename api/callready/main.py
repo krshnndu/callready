@@ -115,7 +115,8 @@ def parse_json(text: str) -> dict:
     out = json.loads(m.group(0))
     if not all(isinstance(out.get(k), str) and out[k].strip() for k in ("critique", "improved", "followup")):
         raise ValueError("missing keys")
-    return {k: out[k].strip() for k in ("critique", "improved", "followup")}
+    # House style: no em or en dashes in anything the UI shows.
+    return {k: re.sub(r"\s*[\u2014\u2013]\s*", ", ", out[k]).strip() for k in ("critique", "improved", "followup")}
 
 
 async def call_chain(messages: list[dict]) -> tuple[dict, str]:

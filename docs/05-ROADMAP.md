@@ -1,6 +1,8 @@
 # 05. Roadmap
 
-Dates follow the submission deadline (decision D-04). Each phase ends at a gate: the checks below pass, and a short gate report goes to the team before the next phase starts.
+**Status 2026-10-28:** the deadline (D-04) was 17:00 the same day, so P0 to P4 were compressed into one build. Shipped: the static journey, the deterministic engine, the question bank with reference answers, the live coach API, demo mode by fallback, voice input and the printable report. Not done: CI, Playwright smoke, a formal calibration set (the 12 reference answers and the weak samples serve as an informal one), bring-your-own pack.
+
+The phase plan below is kept as the path for further work.
 
 | Phase | Goal | Deliverables | Gate |
 | --- | --- | --- | --- |

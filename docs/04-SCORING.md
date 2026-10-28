@@ -21,7 +21,7 @@ Output per point: rank, score, the figures, the commitment it touches, the trans
 
 **Implied-guidance calculator** (`engine/implied.py`): for each live guidance item, the H2 run-rate needed to land inside the band, set against the historical maximum. For the sample pack this gives about 15.3% H2 EBITDA margin needed against a record of 14.2%. That one number drives the top recommendation.
 
-Expected top five for the sample pack, used as a test fixture: margin guidance (G2, S1), cash conversion and working capital (S2), consensus EBITDA miss, Energy losses vs breakeven (G3), discom receivables (D1).
+Ranking for the sample pack, as built: margin guidance (1.80), cash conversion and working capital (1.62), margin decline (1.47), discom receivables (0.88), leverage (0.84), Energy losses (0.80), consensus miss (0.73), Appliances margin (0.70), capex (0.46).
 
 ## 2. Answer scorecard
 

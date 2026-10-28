@@ -1,5 +1,7 @@
 # 02. Architecture
 
+> **As built (2026-10-28):** the deadline forced a smaller stack than the one planned below. The web app is plain ES modules with no build step and no React. The engine runs in the browser. Two Vercel functions proxy to the API and hold its origin and key. The API is one FastAPI endpoint (`/api/coach`) with a SQLite cache, using Gemini 3.8 Flash (high), Claude Sonnet 4.6 and Flash (medium) in that order. The rest of this document is the target design.
+
 ## 1. Principles
 
 1. **Rules first, model second.** Arithmetic, variances, rankings and number matching are code with tests. The LLM writes questions, critiques and recommendations, always from facts the code has already computed and cited.
