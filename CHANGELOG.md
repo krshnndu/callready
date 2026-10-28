@@ -4,6 +4,9 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Added
+- Credit line: "Made by Krishnendu" (krishnendu.me), the source on GitHub, and the demo video. It sits at the foot of the rail on laptops and in a page footer on phones. The demo link reads "coming soon" until `DEMO_VIDEO_URL` is set in `web/js/site.js`.
+
 ### Fixed
 - A non-answer ("hello, I am doing well") scored 56, because disclosure safety, consistency and accuracy gave free points when nothing was said. A relevance gate now runs first: an answer must use the question's key terms or substantive words, or give a figure on topic. Otherwise five dimensions are not assessed and the total is capped at 15 (Red, flagged as not an answer). Tests first: small talk, a polite refusal, a long off-topic answer and filler now score 6 to 9.
 

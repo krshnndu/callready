@@ -5,6 +5,7 @@ import { personas as DEFAULT_PERSONAS } from './questions.js';
 import { bars, line, waterfall, diverging, installTooltip, textW } from './charts.js';
 import { extractByRules, mergeRulesFirst, crossCheck } from './extract.js';
 import { recommendations } from './recs.js';
+import { SITE } from './site.js';
 
 // Charts are drawn after the page renders, at the measured width of their box, and redrawn on resize.
 const CHARTS = new Map();
@@ -34,6 +35,8 @@ const ICON = {
   spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
   upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>',
   download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg>',
+  github: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4 1.5-4-2-6-2.5m12 5V18a3.4 3.4 0 0 0-1-2.6c3.1-.4 6.4-1.5 6.4-6.9a5.4 5.4 0 0 0-1.5-3.7 5 5 0 0 0-.1-3.8s-1.2-.4-3.9 1.5a13.4 13.4 0 0 0-7 0C6.2 1.6 5 2 5 2a5 5 0 0 0-.1 3.8A5.4 5.4 0 0 0 3.4 9.5c0 5.4 3.3 6.5 6.4 6.9a3.4 3.4 0 0 0-1 2.6V22"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/></svg>',
   logo: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18V9M9 18V5M14 18v-6M19 18V8"/></svg>',
   sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
   moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
@@ -86,10 +89,13 @@ function shell(active, body) {
     <nav aria-label="Steps"><ol class="steps">${STEPS.map(([h, l], i) => `<li><a href="${h}" ${active === h ? 'aria-current="page"' : ''}><span class="n">${i}</span>${l}</a></li>`).join('')}</ol></nav>
     <a class="co" href="#/load"><b>${esc(p.company.short || p.company.name)}</b><span>${esc(p.company.quarter)} &middot; ${esc(kindOf(p))}</span><span class="co-change">Change company</span></a>
     ${themeSwitch()}
-    <p class="rail-foot">${p.company.synthetic ? 'Synthetic company and figures. ' : ''}Not investment or legal advice.</p>
+    <div class="rail-foot">${credit()}<p>${p.company.synthetic ? 'Synthetic company and figures. ' : ''}Not investment or legal advice.</p></div>
   </aside>
-  <main id="main">${body}</main></div>`;
+  <main id="main">${body}<footer class="site-foot">${credit()}</footer></main></div>`;
 }
+// Credit line: the author, the source, and the demo video once it exists (see js/site.js).
+const credit = () => `<p class="credit">Made by <a href="${esc(SITE.authorUrl)}" target="_blank" rel="noopener">${esc(SITE.author)}</a></p>
+  <p class="credit-links"><a href="${esc(SITE.sourceUrl)}" target="_blank" rel="noopener">${ICON.github}<span>Source</span></a>${SITE.DEMO_VIDEO_URL ? `<a href="${esc(SITE.DEMO_VIDEO_URL)}" target="_blank" rel="noopener">${ICON.play}<span>Demo video</span></a>` : `<span class="soon" title="The demo video is being recorded">${ICON.play}<span>Demo video \u00b7 coming soon</span></span>`}</p>`;
 const head = (h1, p) => `<header class="page-head"><h1>${h1}</h1>${p ? `<p>${p}</p>` : ''}</header>`;
 
 // ---------- 0. Load ----------

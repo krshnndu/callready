@@ -147,7 +147,16 @@ a { color: var(--accent-ink); text-underline-offset: 3px; }
 .steps a[aria-current='page'] { background: oklch(0.47 0.19 268 / 0.12); color: var(--accent-ink); }
 .steps .n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 0.72rem; font-weight: 600; background: var(--sunk); color: var(--ink-2); flex: none; }
 .steps a[aria-current='page'] .n { background: var(--accent); color: var(--on-accent); }
-.rail-foot { font-size: var(--fs-caption); color: var(--ink-3); padding: 0 var(--s-2); line-height: 1.45; }
+.rail-foot { font-size: var(--fs-caption); color: var(--ink-3); padding: 0 var(--s-2); line-height: 1.45; display: grid; gap: 6px; }
+.rail-foot p, .site-foot p { margin: 0; }
+.credit { color: var(--ink-2); }
+.credit a { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--line-strong); }
+.credit a:hover { color: var(--accent-ink); border-color: var(--accent); }
+.credit-links { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.credit-links a, .credit-links .soon { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-3); text-decoration: none; }
+.credit-links a:hover { color: var(--accent-ink); }
+.credit-links svg { width: 14px; height: 14px; flex: none; }
+.site-foot { display: none; }
 .co { padding: var(--s-3); border-radius: var(--r-md); background: var(--sunk); font-size: var(--fs-meta); }
 .co b { display: block; }
 .co span { color: var(--ink-3); font-size: var(--fs-caption); }
@@ -375,6 +384,8 @@ details.assume ul { margin: var(--s-3) 0 0; padding-left: 1.2em; color: var(--in
   .steps { flex-direction: row; overflow-x: auto; }
   .steps a { white-space: nowrap; }
   .rail-foot, .co { display: none; }
+  .site-foot { display: grid; gap: 6px; justify-items: center; text-align: center; padding: var(--s-4) 0 var(--s-2); font-size: var(--fs-caption); color: var(--ink-3); border-top: 1px solid var(--line); margin-top: var(--s-2); }
+  .site-foot .credit-links { justify-content: center; }
   .grid-2 { grid-template-columns: 1fr; }
   .plist li { grid-template-columns: 28px minmax(0, 1fr); }
   .score-col { grid-column: 2; text-align: left; }
