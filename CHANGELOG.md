@@ -4,6 +4,10 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-28
+
+Charts that tell the truth, one unit system, a verified coach answer, and the demo video.
+
 ### Added
 - The demo video (https://www.tella.tv/video/callready-earnings-prep-ai-1-giwu4686) is linked from the credit line in the app and from the README.
 
@@ -141,7 +145,8 @@ First working prototype.
 - Planning package: PRD, architecture, synthetic data, scoring design, roadmap, decisions and risks, and the 90-second pitch.
 - Agent rules, ops templates and the MIT license.
 
-[Unreleased]: https://github.com/krshnndu/callready/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/krshnndu/callready/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/krshnndu/callready/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/krshnndu/callready/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/krshnndu/callready/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/krshnndu/callready/compare/v0.2.0...v0.3.0

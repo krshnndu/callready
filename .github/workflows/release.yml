@@ -1,0 +1,24 @@
+name: Release
+
+# Pushing a tag vX.Y.Z creates the GitHub release from the matching CHANGELOG.md section.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create the release from the changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          v="${TAG#v}"
+          awk -v v="$v" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
+          test -s notes.md || { echo "No CHANGELOG section for $v"; exit 1; }
+          gh release create "$TAG" --title "$TAG" --notes-file notes.md --verify-tag

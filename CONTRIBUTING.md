@@ -37,6 +37,8 @@ LLM_BASE_URL=... LLM_API_KEY=... uv run uvicorn callready.main:app --port 8140
 4. If you changed a rule, add a case to `check_engine.mjs` that fails without your change.
 5. UI changes: check the screens at 375 px and 1440 px, in light and dark.
 6. Add a line under `[Unreleased]` in `CHANGELOG.md`.
+
+To release: rename `[Unreleased]` to `[x.y.z] - date` (and add a fresh empty `[Unreleased]`), commit, then push a tag `vx.y.z`. The release workflow creates the GitHub release from that changelog section.
 7. Open a pull request with the template filled in.
 
 ## Adding a test dataset
