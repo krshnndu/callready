@@ -1,6 +1,8 @@
 // Vercel function: starts an extraction job on the API (POST), or reads its status (GET ?job=).
 // Extraction takes minutes, so the browser polls instead of holding one long connection open.
 export default async function handler(req, res) {
+  // Body cap before anything is forwarded (guardrails plan, task 4).
+  if (Number(req.headers['content-length'] || 0) > 200000 || JSON.stringify(req.body || {}).length > 200000) return res.status(413).json({ error: 'request too large' });
   const origin = process.env.BACKEND_ORIGIN;
   if (!origin) return res.status(503).json({ error: 'extractor not configured' });
   const headers = { 'content-type': 'application/json', 'x-callready-key': process.env.BACKEND_KEY || '', 'x-client-ip': String(req.headers['x-forwarded-for'] || '').split(',')[0] };

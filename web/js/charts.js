@@ -48,7 +48,7 @@ export function bars({ points, title, unit = '', decimals = 0, W = 560, h = 190 
   const bw = (W - padL - padR) / points.length;
   const y = (v) => top + (h - top - bottom) * (1 - v / max);
   const showAll = points.every((p) => textW(`${fmt(p.value, decimals)}${unit}`, VAL) <= bw - 2);
-  return `<svg class="chart" viewBox="0 0 ${W} ${h}" width="${W}" role="img" aria-label="${esc(title)}: ${points.map((p) => `${p.label} ${fmt(p.value, decimals)}${unit}`).join(', ')}">
+  return `<svg class="chart" viewBox="0 0 ${W} ${h}" width="${W}" role="img" aria-label="${esc(`${title}: ${points.map((p) => `${p.label} ${fmt(p.value, decimals)}${unit}`).join(', ')}`)}">
     <line x1="${padL}" x2="${W - padR}" y1="${h - bottom}" y2="${h - bottom}" class="axis"/>
     ${points.map((p, i) => { const w = Math.min(bw * 0.6, 48), x = padL + i * bw + (bw - w) / 2, yy = y(p.value); const val = `${fmt(p.value, decimals)}${unit}`; return `
       <g class="mark" tabindex="0" data-tip="${esc(p.tip || `${p.label}: ${val}`)}">
@@ -75,7 +75,7 @@ export function line({ points, title, unit = '%', decimals = 1, band = null, W =
   const every = step ? Math.max(1, Math.ceil((widest + 10) / step)) : 1;
   const showLab = (i) => i === points.length - 1 || ((points.length - 1 - i) % every === 0);
   const bandLabel = band ? fit(band.label || 'Target', W - padL - padR - 8, LAB, 1)[0] : '';
-  return `<svg class="chart" viewBox="0 0 ${W} ${h}" width="${W}" role="img" aria-label="${esc(title)}: ${points.map((p) => `${p.label} ${fmt(p.value, decimals)}${unit}`).join(', ')}${band ? `; target ${band.low} to ${band.high}${unit}` : ''}">
+  return `<svg class="chart" viewBox="0 0 ${W} ${h}" width="${W}" role="img" aria-label="${esc(`${title}: ${points.map((p) => `${p.label} ${fmt(p.value, decimals)}${unit}`).join(', ')}${band ? `; target ${band.low} to ${band.high}${unit}` : ''}`)}">
     ${ticks.map((t) => `<line x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}" class="grid"/><text x="${padL - 6}" y="${y(t) + 4}" text-anchor="end" class="lab">${fmt(t, 1)}</text>`).join('')}
     ${band ? `<rect x="${padL}" y="${y(band.high)}" width="${W - padL - padR}" height="${Math.max(2, y(band.low) - y(band.high))}" class="band"/><text x="${W - padR - 4}" y="${y(band.high) - 5}" text-anchor="end" class="lab">${esc(bandLabel)}</text>` : ''}
     <polyline points="${points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ')}" class="line"/>
@@ -106,7 +106,7 @@ export function waterfall({ start, steps, end, title, unit = '%', decimals = 1, 
   const hi = Math.max(...cols.map((c) => Math.max(c.from, c.to)));
   let lo = Math.min(...vals, hi); lo = Math.max(0, lo - (hi - lo) * 0.6);
   const y = (v) => top + (h - top - bottom) * (1 - (v - lo) / (hi - lo || 1));
-  return `<svg class="chart" viewBox="0 0 ${W} ${h}" width="${W}" role="img" aria-label="${esc(title)}: ${cols.map((c) => `${c.label} ${valText(c, true)}`).join(', ')}">
+  return `<svg class="chart" viewBox="0 0 ${W} ${h}" width="${W}" role="img" aria-label="${esc(`${title}: ${cols.map((c) => `${c.label} ${valText(c, true)}`).join(', ')}`)}">
     <line x1="${padL}" x2="${W - padR}" y1="${h - bottom}" y2="${h - bottom}" class="axis"/>
     ${cols.map((c, i) => { const w = Math.min(bw * 0.64, 56), x = padL + i * bw + (bw - w) / 2; const y1 = y(Math.max(c.from, c.to)), y2 = c.kind === 'total' ? h - bottom : y(Math.min(c.from, c.to));
       return `<g class="mark" tabindex="0" data-tip="${esc(c.tip || `${c.label}: ${valText(c, true)}`)}"><rect class="hit" x="${padL + i * bw}" y="${top}" width="${bw}" height="${h - top - bottom}"/>
@@ -131,7 +131,7 @@ export function diverging({ rows, title, unit = ' bps', W = 560 }) {
   const zero = innerL + (innerR - innerL) * (neg / span);
   const scale = (innerR - innerL) / span;
   const h = rows.length * rowH + 8;
-  return `<svg class="chart" viewBox="0 0 ${W} ${h}" width="${W}" role="img" aria-label="${esc(title)}: ${rows.map((r) => `${r.label} ${r.value > 0 ? '+' : ''}${fmt(r.value)}${unit}`).join(', ')}">
+  return `<svg class="chart" viewBox="0 0 ${W} ${h}" width="${W}" role="img" aria-label="${esc(`${title}: ${rows.map((r) => `${r.label} ${r.value > 0 ? '+' : ''}${fmt(r.value)}${unit}`).join(', ')}`)}">
     <line x1="${zero}" x2="${zero}" y1="2" y2="${h - 4}" class="axis"/>
     ${rows.map((r, i) => { const w = Math.abs(r.value) * scale, x = r.value >= 0 ? zero : zero - w, yy = 4 + i * rowH, cy = yy + rowH / 2 + 4;
       const val = `${r.value > 0 ? '+' : ''}${fmt(r.value)}${unit}`;

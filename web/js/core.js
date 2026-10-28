@@ -11,6 +11,97 @@ export const margin = (p) => (p && num(p.revenue) && num(p.ebitda) != null ? (p.
 // ---------- validation ----------
 export const PERIOD_FIELDS = ['revenue', 'ebitda', 'ebit', 'pat', 'ocf', 'capex', 'netDebt', 'da', 'invDays', 'recDays', 'payDays'];
 
+// ---------- Layer 1: sanitise untrusted packs (uploads, AI extraction, files, saved state) ----------
+// A schema walk: every field is forced to its type, strings are length-capped, lists are count-capped,
+// and source URLs must be http(s). Nothing downstream ever sees a value of the wrong type.
+const toNum = (v) => {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  if (typeof v === 'string') { const t = v.replace(/[,\s₹%]/g, '').replace(/^\((.*)\)$/, '-$1'); return /^-?\d+(\.\d+)?$/.test(t) ? Number(t) : null; }
+  return null;
+};
+const toStr = (v, max) => (typeof v === 'string' ? v : typeof v === 'number' && Number.isFinite(v) ? String(v) : '').slice(0, max);
+const ENUMS_ = () => ({ kind: ['guidance', 'statement', 'deflection'], metric: METRICS, status: ['on-track', 'kept', 'at-risk', 'broken', 'unclear', 'deflected'], source: ['sample', 'dataset', 'upload'], difficulty: ['Hard', 'Medium', 'Easy'] });
+export function sanitizePack(raw) {
+  const fixes = [];
+  const note = (path, why) => fixes.push(`${path}: ${why}`);
+  const num = (v, path) => { const n = toNum(v); if (v != null && v !== '' && n !== v) note(path, n == null ? 'not a number, cleared' : 'converted to a number'); return v == null || v === '' ? null : n; };
+  const str = (v, max, path) => { const t = toStr(v, max); if (v != null && t !== v) note(path, typeof v === 'string' ? `cut to ${max} characters` : 'not text, cleared'); return t; };
+  const list = (v, max, path, each) => { if (v == null) return []; if (!Array.isArray(v)) { note(path, 'not a list, cleared'); return []; } if (v.length > max) note(path, `capped at ${max} items`); return v.slice(0, max).map((x, i) => each(x && typeof x === 'object' ? x : {}, `${path}.${i}`)); };
+  const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : null);
+  const en = (v, set, path) => { if (v == null || v === '') return undefined; if (set.includes(v)) return v; note(path, 'not an allowed value, cleared'); return undefined; };
+  const period = (x, path) => { x = obj(x); if (!x) return null; const o = { label: str(x.label, 40, `${path}.label`) }; if (x.period != null) o.period = str(x.period, 60, `${path}.period`); for (const f of PERIOD_FIELDS) o[f] = num(x[f], `${path}.${f}`); return o; };
+  const p = obj(raw);
+  if (!p) return { pack: { schema: SCHEMA, company: {}, periods: {} }, fixes: ['pack: not an object'] };
+  const c = obj(p.company) || {};
+  const speakers = {};
+  for (const [k, v] of Object.entries(obj(c.speakers) || {}).slice(0, 8)) speakers[toStr(k, 20)] = str(v, 80, `company.speakers.${k}`);
+  const out = {
+    schema: SCHEMA,
+    id: /^[\w-]{1,60}$/.test(p.id || '') ? p.id : (p.id != null && note('id', 'not a safe id, replaced'), `pack-${Date.now().toString(36)}`),
+    company: { name: str(c.name, 160, 'company.name'), short: str(c.short, 60, 'company.short'), quarter: str(c.quarter, 30, 'company.quarter'), period: str(c.period, 60, 'company.period'), units: str(c.units, 40, 'company.units'),
+      unitWord: str(c.unitWord, 20, 'company.unitWord'), fyLabel: str(c.fyLabel, 12, 'company.fyLabel'), resultsDate: str(c.resultsDate, 20, 'company.resultsDate'), callDate: str(c.callDate, 20, 'company.callDate'),
+      marginBasis: c.marginBasis === 'EBIT' ? 'EBIT' : undefined, synthetic: c.synthetic === true || undefined, speakers },
+    periods: { current: period(p.periods?.current, 'periods.current'), priorYear: period(p.periods?.priorYear, 'periods.priorYear'), priorQuarter: period(p.periods?.priorQuarter, 'periods.priorQuarter') },
+    history: list(p.history, 24, 'history', (x, path) => ({ label: str(x.label, 40, `${path}.label`), revenue: num(x.revenue, `${path}.revenue`), ebitda: num(x.ebitda, `${path}.ebitda`), ebit: num(x.ebit, `${path}.ebit`), ocf: num(x.ocf, `${path}.ocf`), capex: num(x.capex, `${path}.capex`) })),
+    priorFY: obj(p.priorFY) ? { label: str(p.priorFY.label, 20, 'priorFY.label'), revenue: num(p.priorFY.revenue, 'priorFY.revenue'), ebitda: num(p.priorFY.ebitda, 'priorFY.ebitda'), netDebt: num(p.priorFY.netDebt, 'priorFY.netDebt') } : null,
+    ytd: obj(p.ytd) ? { label: str(p.ytd.label, 30, 'ytd.label'), revenue: num(p.ytd.revenue, 'ytd.revenue'), ebitda: num(p.ytd.ebitda, 'ytd.ebitda'), capex: num(p.ytd.capex, 'ytd.capex'), revenuePy: num(p.ytd.revenuePy, 'ytd.revenuePy'), quartersElapsed: num(p.ytd.quartersElapsed, 'ytd.quartersElapsed') } : null,
+    ttmEbitda: num(p.ttmEbitda, 'ttmEbitda'),
+    segments: list(p.segments, 20, 'segments', (x, path) => {
+      const sp = (y, q) => (obj(y) ? { revenue: num(y.revenue, `${q}.revenue`), margin: num(y.margin, `${q}.margin`) } : null);
+      const seg = { name: str(x.name, 80, `${path}.name`), current: sp(x.current, `${path}.current`), priorYear: sp(x.priorYear, `${path}.priorYear`), priorQuarter: sp(x.priorQuarter, `${path}.priorQuarter`) };
+      if (x.key != null) seg.key = str(x.key, 12, `${path}.key`); if (x.owner != null) seg.owner = str(x.owner, 12, `${path}.owner`);
+      return seg;
+    }),
+    consensus: obj(p.consensus) ? { revenue: num(p.consensus.revenue, 'consensus.revenue'), ebitda: num(p.consensus.ebitda, 'consensus.ebitda'), pat: num(p.consensus.pat, 'consensus.pat'), source: str(p.consensus.source, 120, 'consensus.source') } : null,
+    bridge: list(p.bridge, 12, 'bridge', (x, path) => ({ driver: str(x.driver, 120, `${path}.driver`), short: x.short != null ? str(x.short, 40, `${path}.short`) : undefined, bps: num(x.bps, `${path}.bps`) })),
+    commitments: list(p.commitments, 40, 'commitments', (x, path) => {
+      const t = obj(x.target);
+      const o = { id: str(x.id, 12, `${path}.id`), kind: en(x.kind, ENUMS_().kind, `${path}.kind`), by: str(x.by, 40, `${path}.by`), said: str(x.said, 400, `${path}.said`), ref: str(x.ref, 40, `${path}.ref`),
+        why: str(x.why, 300, `${path}.why`), metric: en(x.metric, ENUMS_().metric, `${path}.metric`) || 'other', status: en(x.status, ENUMS_().status, `${path}.status`), period: str(x.period, 30, `${path}.period`),
+        date: str(x.date, 20, `${path}.date`), topic: str(x.topic, 80, `${path}.topic`), segment: x.segment != null ? str(x.segment, 80, `${path}.segment`) : undefined, askedRef: x.askedRef != null ? str(x.askedRef, 40, `${path}.askedRef`) : undefined,
+        target: t ? { low: num(t.low, `${path}.target.low`), high: num(t.high, `${path}.target.high`), value: num(t.value, `${path}.target.value`) } : undefined,
+        ack: x.ack != null ? list(x.ack, 20, `${path}.ack`, () => null).map((_, i) => toStr(x.ack[i], 40)) : undefined };
+      if (o.status === undefined) delete o.status;
+      return o;
+    }),
+    transcript: list(p.transcript, 300, 'transcript', (x, path) => ({ ref: str(x.ref, 40, `${path}.ref`), call: str(x.call, 120, `${path}.call`), speaker: str(x.speaker, 80, `${path}.speaker`), text: str(x.text, 1200, `${path}.text`) })),
+    notes: list(p.notes, 60, 'notes', (x, path) => ({ ref: str(x.ref, 20, `${path}.ref`), text: str(x.text, 1200, `${path}.text`) })),
+    remarks: str(p.remarks, 12000, 'remarks'),
+  };
+  if (p.unallocated != null) { out.unallocated = {}; for (const [k, v] of Object.entries(obj(p.unallocated) || {}).slice(0, 24)) out.unallocated[toStr(k, 30)] = num(v, `unallocated.${k}`); }
+  if (p.questions != null) out.questions = list(p.questions, 40, 'questions', (x, path) => ({ id: str(x.id, 8, `${path}.id`), pressure: x.pressure == null ? null : str(x.pressure, 30, `${path}.pressure`), theme: str(x.theme, 40, `${path}.theme`), persona: str(x.persona, 20, `${path}.persona`), owner: str(x.owner, 12, `${path}.owner`),
+    difficulty: en(x.difficulty, ENUMS_().difficulty, `${path}.difficulty`) || 'Medium', text: str(x.text, 900, `${path}.text`), trap: str(x.trap, 400, `${path}.trap`), cites: list(x.cites, 6, `${path}.cites`, () => null).map((_, i) => toStr(x.cites[i], 40)),
+    mustAck: list(x.mustAck, 8, `${path}.mustAck`, () => null).map((_, i) => toStr(x.mustAck[i], 12)), terms: list(x.terms, 8, `${path}.terms`, () => null).map((_, i) => toStr(x.terms[i], 30)), keyFigures: list(x.keyFigures, 8, `${path}.keyFigures`, () => null).map((_, i) => toNum(x.keyFigures[i])).filter((v) => v != null),
+    followup: str(x.followup, 400, `${path}.followup`), model: x.model != null ? str(x.model, 1500, `${path}.model`) : undefined, weak: x.weak != null ? str(x.weak, 1500, `${path}.weak`) : undefined, generated: x.generated === true || undefined }));
+  if (p.personas != null) { out.personas = {}; for (const [k, v] of Object.entries(obj(p.personas) || {}).slice(0, 12)) { const o = obj(v) || {}; out.personas[toStr(k, 20)] = { name: str(o.name, 60, `personas.${k}.name`), firm: str(o.firm, 60, `personas.${k}.firm`), style: str(o.style, 120, `personas.${k}.style`) }; } }
+  const pv = obj(p.provenance) || {};
+  const urls = list(pv.urls, 10, 'provenance.urls', () => null).map((_, i) => toStr(pv.urls[i], 400));
+  const safeUrls = urls.filter((u) => /^https?:\/\/[^\s"'<>]+$/i.test(u));
+  if (safeUrls.length !== urls.length) note('provenance.urls', `${urls.length - safeUrls.length} non-http link(s) dropped`);
+  out.provenance = { source: en(pv.source, ENUMS_().source, 'provenance.source') || 'upload', urls: safeUrls };
+  for (const k of ['extractedBy', 'at', 'caveats', 'note']) if (pv[k] != null) out.provenance[k] = str(pv[k], k === 'caveats' ? 600 : 120, `provenance.${k}`);
+  if (pv.extractedSeconds != null) out.provenance.extractedSeconds = num(pv.extractedSeconds, 'provenance.extractedSeconds');
+  if (pv.files != null) out.provenance.files = list(pv.files, 10, 'provenance.files', () => null).map((_, i) => toStr(pv.files[i], 120));
+  if (pv.unverified != null) out.provenance.unverified = list(pv.unverified, 50, 'provenance.unverified', () => null).map((_, i) => toStr(pv.unverified[i], 120));
+  if (obj(pv.verify)) { out.provenance.verify = {}; for (const [k, v] of Object.entries(pv.verify).slice(0, 8)) out.provenance.verify[toStr(k, 20)] = toNum(v) ?? 0; }
+  for (const k of Object.keys(out.company)) if (out.company[k] === undefined) delete out.company[k];
+  return { pack: out, fixes };
+}
+
+// Upload limits: what the browser will read and send for conversion.
+export const UPLOAD = { maxFiles: 5, maxFileBytes: 20e6, maxTotalBytes: 40e6, types: /\.(pdf|txt|md)$/i };
+export function uploadAllowed(files) {
+  const fs = [...(files || [])];
+  if (!fs.length) return { ok: false, reason: 'Choose at least one file, or paste text.' };
+  if (fs.length > UPLOAD.maxFiles) return { ok: false, reason: `At most ${UPLOAD.maxFiles} files at a time.` };
+  const bad = fs.find((f) => !UPLOAD.types.test(f.name || ''));
+  if (bad) return { ok: false, reason: `${bad.name} is not a PDF or text file.` };
+  const big = fs.find((f) => f.size > UPLOAD.maxFileBytes);
+  if (big) return { ok: false, reason: `${big.name} is over ${UPLOAD.maxFileBytes / 1e6} MB.` };
+  if (fs.reduce((t, f) => t + f.size, 0) > UPLOAD.maxTotalBytes) return { ok: false, reason: `The files together are over ${UPLOAD.maxTotalBytes / 1e6} MB.` };
+  return { ok: true };
+}
+
 // Some companies report operating profit (EBIT) and no EBITDA. The margin checks then run on EBIT,
 // and the pack says so, rather than the pack being rejected.
 export function normalizePack(p) {
@@ -43,6 +134,24 @@ export function validatePack(p) {
     for (const f of ['revenue', 'ebitda']) if (num(per[f]) == null) errors.push(`periods.${k}.${f} must be a number.`);
   }
   if (!p.periods?.priorQuarter) warnings.push('No prior quarter: quarter-on-quarter figures are skipped.');
+  // Layer 2: figures must make financial sense.
+  for (const k of ['current', 'priorYear', 'priorQuarter']) {
+    const per = p.periods?.[k]; if (!per) continue;
+    if (num(per.revenue) != null && per.revenue <= 0) errors.push(`periods.${k}.revenue must be above zero.`);
+    // A profit cannot exceed revenue; a loss can (Tejas Networks lost more than its revenue a year ago), so a
+    // very large loss is only a units warning.
+    for (const f of ['ebitda', 'ebit']) {
+      if (num(per[f]) == null || !(num(per.revenue) > 0)) continue;
+      const lab = f === 'ebit' ? 'EBIT' : 'EBITDA';
+      if (per[f] > per.revenue) errors.push(`periods.${k}.${lab} (${per[f]}) cannot be larger than revenue (${per.revenue}): check the units.`);
+      else if (per[f] < -3 * per.revenue) warnings.push(`periods.${k}.${lab} loss (${per[f]}) is over three times revenue (${per.revenue}): check the units.`);
+    }
+    for (const f of ['invDays', 'recDays', 'payDays']) if (num(per[f]) != null && (per[f] < 0 || per[f] > 730)) warnings.push(`periods.${k}.${f} of ${per[f]} days is outside 0 to 730 days.`);
+  }
+  for (const [i, sg] of (p.segments || []).entries()) for (const k of ['current', 'priorYear', 'priorQuarter']) { const m = sg?.[k]?.margin; if (num(m) != null && (m < -100 || m > 100)) errors.push(`segments.${i}.${k}.margin of ${m}% is outside -100 to 100%: margins are percentages.`); }
+  { const cur = p.periods?.current; const base = num(p.ttmEbitda) ?? (num(cur?.ebitda) ? cur.ebitda * 4 : null); if (num(cur?.netDebt) != null && base > 0 && cur.netDebt > 20 * base) warnings.push(`Net debt of ${cur.netDebt} is above 20x EBITDA: check the units.`); }
+  if (p.company?.quarter && !/^Q[1-4]\s?FY\s?\d{2,4}$/i.test(p.company.quarter.trim())) warnings.push(`The quarter label "${p.company.quarter}" is not like "Q2 FY27": period comparisons may be mislabelled.`);
+
   const cur = p.periods?.current;
   if (Array.isArray(p.segments) && p.segments.length && num(cur?.revenue)) {
     const sum = p.segments.reduce((s, x) => s + (num(x.current?.revenue) || 0), 0);

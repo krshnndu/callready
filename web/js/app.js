@@ -1,4 +1,4 @@
-import { analyze, validatePack, verifyAgainstSource, SCHEMA, METRICS } from './core.js';
+import { analyze, validatePack, verifyAgainstSource, sanitizePack, uploadAllowed, SCHEMA, METRICS } from './core.js';
 import { scoreAnswer, remarksCheck, DIM_LABELS, OWN_PAST } from './score.js';
 import { samplePack } from './sample.js';
 import { personas as DEFAULT_PERSONAS } from './questions.js';
@@ -50,13 +50,15 @@ const themeSwitch = () => { const t = get('callready.theme', 'auto'); return `<d
 
 // ---------- packs: the sample, the real-company test datasets, or the user's own ----------
 let DATASETS = null;
+let userMemo = { raw: null, pack: null };
 const dsCache = {};
 async function datasets() { if (!DATASETS) { try { DATASETS = await (await fetch('datasets/index.json', { cache: 'no-cache' })).json(); } catch { DATASETS = []; } } return DATASETS; }
 async function activePack() {
   const a = get('callready.active', { kind: 'sample' });
-  if (a.kind === 'user') { const p = get('callready.userpack'); if (p) return p; }
-  if (a.kind === 'dataset') {
-    if (!dsCache[a.slug]) { try { dsCache[a.slug] = await (await fetch(`datasets/${a.slug}.json`, { cache: 'no-cache' })).json(); } catch { /* fall back to the sample */ } }
+  // Every pack from outside the code (saved state, dataset files) passes the sanitiser before use.
+  if (a.kind === 'user') { const raw = get('callready.userpack'); if (raw) { if (userMemo.raw !== raw) userMemo = { raw, pack: sanitizePack(raw).pack }; return userMemo.pack; } }
+  if (a.kind === 'dataset' && /^[\w-]{1,60}$/.test(a.slug || '')) {
+    if (!dsCache[a.slug]) { try { dsCache[a.slug] = sanitizePack(await (await fetch(`datasets/${a.slug}.json`, { cache: 'no-cache' })).json()).pack; } catch { /* fall back to the sample */ } }
     if (dsCache[a.slug]) return dsCache[a.slug];
   }
   return samplePack;
@@ -153,6 +155,7 @@ function bindLoad() {
     const st = $('#convert-status'), btn = $('#convert');
     try {
       btn.disabled = true; st.textContent = 'Reading the documents...';
+      if (files.files.length) { const u = uploadAllowed(files.files); if (!u.ok) { st.textContent = u.reason; return; } }
       let text = '';
       for (const f of files.files) text += `=== ${f.name} ===\n` + (/\.pdf$/i.test(f.name) ? await pdfText(f) : await f.text()) + '\n\n';
       text = (text + $('#paste').value).replace(/[ \t]+/g, ' ').trim().slice(0, 148000);
@@ -175,9 +178,8 @@ function bindLoad() {
         catch (e) { if (++misses > 8) throw e; }
       }
       if (j.status !== 'done' || !j.pack) throw new Error(j.error || j.detail || 'failed');
-      j.pack.id = `user-${Date.now().toString(36)}`;
-      j.pack.provenance = { source: 'upload', extractedBy: j.model, at: new Date().toISOString(), files: [...files.files].map((f) => f.name) };
-      set('callready.draft', { pack: j.pack, sourceText: text, model: j.model });
+      const clean = sanitizePack({ ...j.pack, id: `user-${Date.now().toString(36)}`, provenance: { source: 'upload', extractedBy: j.model, at: new Date().toISOString(), files: [...files.files].map((f) => f.name) } });
+      set('callready.draft', { pack: clean.pack, fixes: clean.fixes, sourceText: text, model: j.model });
       location.hash = '#/review';
     } catch (e) {
       st.textContent = `Conversion failed (${String(e.message || e).slice(0, 120)}). The AI service may be busy: try again, or upload a pack in the JSON format.`;
@@ -186,12 +188,15 @@ function bindLoad() {
   $('#packfile').addEventListener('change', async (e) => {
     const st = $('#pack-status');
     try {
-      const p = JSON.parse(await e.target.files[0].text());
+      const f0 = e.target.files[0];
+      if (!f0 || f0.size > 2e6) { st.textContent = 'A pack file must be a .json file under 2 MB.'; return; }
+      const clean = sanitizePack(JSON.parse(await f0.text()));
+      const p = clean.pack;
       const v = validatePack(p);
       if (v.errors.length) { st.innerHTML = `<span class="down">Not used:</span> ${v.errors.map(esc).join(' ')}`; return; }
       p.id = p.id && !String(p.id).startsWith('sample') ? p.id : `user-${Date.now().toString(36)}`;
       p.provenance = { ...(p.provenance || {}), source: 'upload' };
-      set('callready.draft', { pack: p, sourceText: null, model: null });
+      set('callready.draft', { pack: p, fixes: clean.fixes, sourceText: null, model: null });
       location.hash = '#/review';
     } catch { st.textContent = 'That file is not valid JSON.'; }
   });
@@ -218,6 +223,7 @@ function viewReview() {
       <div class="readout"><div class="v">${ver.linesFound}/${ver.lines.length}</div><div class="l">transcript lines found</div></div>` : '<div class="readout"><div class="v">JSON</div><div class="l">uploaded pack: no source document to check against</div></div>'}
       ${d.model ? `<div class="readout"><div class="v small-v">${esc(d.model)}</div><div class="l">converted by</div></div>` : ''}
     </div>
+    ${d.fixes?.length ? `<div class="banner" style="margin-top:var(--s-3)"><b>The sanitiser cleaned ${d.fixes.length} field${d.fixes.length > 1 ? 's' : ''} before checking:</b> ${d.fixes.slice(0, 6).map(esc).join('; ')}${d.fixes.length > 6 ? '; ...' : ''}</div>` : ''}
     ${v.errors.length ? `<div class="risk" style="margin-top:var(--s-4)"><b>Fix before use:</b> ${v.errors.map(esc).join(' ')}</div>` : ''}
     ${v.warnings.length ? `<div class="banner" style="margin-top:var(--s-3)">${v.warnings.map(esc).join(' ')}</div>` : ''}
   </section>
@@ -267,6 +273,7 @@ function collectDraft() {
   for (const c of p.commitments || []) { if (c.status === undefined) delete c.status; if (c.target && Object.values(c.target).every((x) => x == null)) delete c.target; }
   for (const k of ['ytd', 'priorFY']) if (p[k] && Object.entries(p[k]).every(([kk, x]) => kk === 'label' || x == null || x === '')) p[k] = null;
   p.schema = SCHEMA;
+  d.pack = sanitizePack(p).pack;
   return d;
 }
 function bindReview() {
