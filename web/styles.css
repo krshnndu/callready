@@ -231,6 +231,7 @@ mark.warn { background: var(--mark-warn); color: inherit; border-radius: 3px; pa
 .flags li .led { margin-top: 5px; }
 .coach { margin-top: var(--s-5); padding-top: var(--s-4); border-top: 1px solid var(--line-strong); }
 .coach h3 { margin: 0 0 var(--s-2); font-size: 1rem; display: flex; align-items: center; gap: var(--s-2); }
+.coach h3 svg { width: 18px; height: 18px; flex: none; color: var(--accent-ink); }
 .coach p { margin: 0 0 var(--s-3); font-size: var(--fs-meta); }
 .improved { padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--ok-tint); font-size: var(--fs-meta); line-height: 1.6; }
 .followup { padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--accent-tint); font-size: var(--fs-meta); margin-top: var(--s-3); }
