@@ -109,7 +109,9 @@ Every path by which untrusted data enters (uploads, JSON packs, AI output, answe
 
 ## Key limitation
 
-CallReady anticipates questions grounded in the disclosures. A question driven by news after the results, or by a rumour, is outside what it can foresee. The rule checks can also miss a wrong claim that contains no number.
+**Data trust.** A finance team rehearses in the days before results are announced, when its figures are unpublished and price-sensitive. CallReady's AI features (converting documents the rules cannot read, and the coach) send text to outside model providers through our gateway, so a listed company's compliance team would not approve using them on unpublished results. The upload screen says so: published documents only. The rest of the product (reading results tables, every figure check, the pressure ranking, the question bank, the scorecard and the charts) runs as rules in the browser and sends nothing. The way forward is to run the models inside the company's own cloud account, or with the AI switched off, since the rules-only path already works end to end.
+
+Other limitations, in order of weight: it has not yet been proven on real calls (the scorer is calibrated on answer pairs we wrote, and the time saved is an assumption); it checks numbers, not narrative (a claim without a figure, or a question about strategy or governance, goes unchecked); and it sees only the company's own figures, not its peers'.
 
 ## Documentation
 

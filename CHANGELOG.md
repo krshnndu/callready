@@ -4,6 +4,9 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Changed
+- The pitch is now a 70-second read-aloud script with on-screen directions for each part, recorded in Tella (`docs/07-PITCH.md`). The key limitation is data trust: the AI features run on outside providers, so a finance team cannot use them on unpublished results until the models run inside the company's own cloud. README and handoff updated to match.
+
 ### Fixed
 - The margin bridge still exaggerated the fall (user screenshot): its axis started at 9%, so 11.6% was drawn at half the height of 14.2% instead of 82%. The cut was marked and captioned, but it was not needed: every step is visible from zero. Bars now start at zero, and a waterfall cuts its axis only when a step would be thinner than 2 px drawn from zero (`MIN_STEP_PX`). The chart-truth gate now fails any cut the data did not need, and was proven to catch this exact chart.
 - Chart labels and bridge tooltips write negatives with a true minus sign (U+2212), and never "-0". The gate fails a hyphen used as a minus anywhere in a chart.

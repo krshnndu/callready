@@ -61,6 +61,8 @@ House rules (also in `AGENTS.md`):
 
 ## 5. Known limitations
 
+- **Data trust (the pitched limitation):** the AI features send text to outside model providers, so unpublished results cannot go through them; the fix is models in the company's own cloud, or rules only. See the README "Key limitation".
+
 - Figures written as words ("eleven point six percent") are not detected by the scorer.
 - The rule extractor needs a header line that names at least two periods, such as `Q2 FY27 Q2 FY26`.
 - The AI gateway can be slow, at 30 to 300 s. Every path works without it.
