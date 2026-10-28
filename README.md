@@ -51,7 +51,7 @@ Real Q2 FY27 results from NSE and company filings, converted by the same pipelin
 The web app has no build step.
 
 ```sh
-cd web && python3 -m http.server 8731      # http://127.0.0.1:8731
+node scripts/serve.mjs                    # http://127.0.0.1:8731, no-store so a reload runs the code on disk
 ```
 
 Every screen works without the API: the scorecard is rules in the browser, and the coach falls back to reference answers. The upload converter and the live coach need the API:
@@ -81,9 +81,11 @@ Extraction runs as a background job that the browser polls. Coach and extraction
 | --- | --- |
 | `node scripts/check_engine.mjs` | Data-readiness and scoring-calibration gate: the pack reconciles, statuses and ranking are right, reference answers are Green, planted errors are caught |
 | `node scripts/check_bias.mjs` | The scorer does not penalise plain or Indian-English phrasing (within 10 points) |
-| `node scripts/check_guardrails.mjs` | Pack sanitiser, financial sanity rules and upload limits (37 checks) |
+| `node scripts/check_guardrails.mjs` | Pack sanitiser, financial sanity rules, units and consistency, evidence policy, upload limits (60+ checks) |
 | `node scripts/check_xss.mjs` | A hostile pack on every screen: no payload may run (detector proven by a canary) |
 | `node scripts/check_layout.mjs` | 6 screens x 7 companies x 2 sizes: no overlapping text, spills or sideways scroll |
+| `node scripts/check_content.mjs` | What a person reads on every screen: no empty options or labels, stray punctuation, straight quotes or NaN |
+| `node scripts/check_charts.mjs` | Chart truth on every screen and 1,500 random charts: every mark at its value, cut axes marked and said, round ticks with units |
 | `cd api && uv run pytest -q tests` | API guardrails: key, limits, per-client caps, output caps, retention, untrusted-input rules |
 | `node scripts/export_pack.mjs` | Exports the sample's facts for the API, so the coach and the UI use the same numbers |
 | `node scripts/make_sample_pdf.mjs` | Builds the sample company's results PDF for round-trip tests |
@@ -92,7 +94,7 @@ Extraction runs as a background job that the browser polls. Coach and extraction
 | `node scripts/screenshots.mjs` | Recaptures the screenshots from the live site |
 | `node scripts/record_demo.mjs` | Records the captioned 90-second demo video |
 
-CI runs every gate on every push: rules, guardrails, XSS and layout in headless Chrome, the API tests, and a secret scan ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
+CI runs every gate on every push: rules, guardrails, and XSS, content, layout and chart truth in headless Chrome, the API tests, and a secret scan ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
 
 ## Guardrails
 
@@ -111,6 +113,7 @@ CallReady anticipates questions grounded in the disclosures. A question driven b
 
 ## Documentation
 
+- **Continuing the project:** [docs/11-HANDOFF.md](docs/11-HANDOFF.md) (state, gates, workflow, backlog) · [Edge cases](docs/10-EDGE-CASES.md)
 - [PRD](docs/01-PRD.md) · [Architecture](docs/02-ARCHITECTURE.md) · [Data](docs/03-DATA.md) · [Scoring](docs/04-SCORING.md) · [Roadmap](docs/05-ROADMAP.md) · [Decisions and risks](docs/06-DECISIONS-RISKS.md) · [Pitch](docs/07-PITCH.md) · [Governance](docs/08-GOVERNANCE.md)
 - [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md) · [Code of Conduct](CODE_OF_CONDUCT.md) · [Agent rules](AGENTS.md)
 

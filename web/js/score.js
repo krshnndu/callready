@@ -28,14 +28,18 @@ const METRIC_CTX = [
 ];
 const tol = (x) => (x < 3 ? 0.05 : x < 100 ? Math.max(0.15, x * 0.01) : x * 0.006);
 export function matchFigure(facts, f, text = '') {
-  const hits = facts.filter((F) => Math.abs(F.v - f.v) <= tol(F.v));
+  // Basis points are said rounded (a -24.6 bps change is "25 basis points"): allow normal rounding.
+  const tolFor = (x) => (/^(bps|basis points)$/.test(f.unit) ? Math.max(1, x * 0.02) : tol(x));
+  const hits = facts.filter((F) => Math.abs(F.v - f.v) <= tolFor(F.v));
   if (!hits.length) return null;
   const fromText = (F) => /^(note|transcript|commitment)/.test(F.label);
   if (/^(x|times)$/.test(f.unit)) return hits.find((F) => /net debt|guidance/i.test(F.label) || fromText(F)) || null;
   if (f.unit === 'days') return hits.find((F) => /days|cycle|overdue/i.test(F.label) || fromText(F)) || null;
   const before = text.slice(Math.max(0, f.index - 40), f.index);
   const words = before.split(/[;:]|[,.]\s/).pop();
-  const metric = METRIC_CTX.find((m) => m.re.test(words));
+  // The metric word nearest before the figure decides what it must match ("revenue 2,480 and EBITDA 288").
+  let metric = null, at = -1;
+  for (const m of METRIC_CTX) { const re = new RegExp(m.re.source, 'gi'); let mm; while ((mm = re.exec(words))) if (mm.index > at) { at = mm.index; metric = m; } }
   if (!metric) return hits[0];
   return hits.find((F) => metric.labels.test(F.label) || fromText(F)) || null;
 }
@@ -172,4 +176,47 @@ export function remarksCheck(ctx, text) {
   });
   const risky = RISKY.flatMap((r) => { const m = text.match(r.re); return m ? [{ phrase: m[0], why: r.why }] : []; });
   return { themes, risky, gaps: themes.filter((x) => !x.covered) };
+}
+
+
+// ---------- coach output: blank what cannot be verified, never the whole answer ----------
+export function redactUnverified(ctx, q, text) {
+  const figs = extractFigures(text).map((f) => ({ ...f, match: matchFigure(ctx.facts, f, text) }));
+  const bad = figs.filter((f) => !f.match).sort((a, b) => b.index - a.index);
+  let out = text;
+  for (const f of bad) out = out.slice(0, f.index) + '[figure not in the disclosures]' + out.slice(f.index + f.raw.length);
+  return { text: out, removed: bad.map((f) => f.raw).reverse() };
+}
+
+// ---------- a rules-built ideal answer: verified figures only, brackets for what only management knows ----------
+const rr = (x) => (Math.round(x * 10) / 10).toFixed(1);
+const fmtN = (x) => Number(x).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+const unq = (t) => String(t ?? '').replace(/["“”]/g, '').trim();
+export function idealAnswer(ctx, q) {
+  const { k: K, imp, commitments: cs, segs, pack: p } = ctx;
+  const nm = Number.isFinite;
+  const u = p.company.unitWord || (p.company.units || '').split(' ').pop() || '';
+  const ml = p.company.marginBasis === 'EBIT' ? 'Operating margin' : 'EBITDA margin';
+  const owed = (q.mustAck || []).map((id) => cs.find((c) => c.id === id)).filter(Boolean);
+  const key = `${q.pressure || ''} ${q.theme || ''}`.toLowerCase();
+  const parts = [];
+  const marginLine = () => (nm(K.m) && nm(K.mPy) ? `${ml} was ${rr(K.m)}% against ${rr(K.mPy)}% a year ago${nm(K.mBps) && Math.abs(K.mBps) >= 1 ? `, ${Math.abs(Math.round(K.mBps))} basis points ${K.mBps < 0 ? 'lower' : 'higher'}` : ''}.` : '');
+  const seg = segs.find((s) => q.text.includes(s.name)) || (key.includes('seg-') ? segs.find((s) => key.includes(String(s.key).toLowerCase())) : null);
+  const said = owed.find((c) => c.kind !== 'guidance');
+  if (/^c-|candour|credibility/.test(key) && said) parts.push(`${said.why ? `${unq(said.why).replace(/\.$/, '')}.` : ''} [What we can say now, from what is already disclosed.] From now on we will disclose it every quarter.`);
+  else if (/guidance/.test(key) && imp && nm(imp.need)) parts.push(`Our ${imp.ytdLabel} ${ml.toLowerCase()} is ${rr(imp.ytd)}%. Reaching ${imp.low}% for the year would need about ${rr(imp.need)}% in the rest of the year, against our best quarter of ${rr(imp.record)}%. Any change to the range will come through a formal filing after the board reviews it, not on this call.`);
+  else if (/cash/.test(key) && nm(K.cur.ocf)) parts.push(`Operating cash flow was ${fmtN(K.cur.ocf)} ${u} against ${fmtN(K.py.ocf)} a year ago${nm(K.conv) ? `, and conversion was ${Math.round(K.conv)}% of ${ml.startsWith('Op') ? 'operating profit' : 'EBITDA'}` : ''}. [What moved working capital, in days of inventory and receivables.]`);
+  else if (/leverage|balance sheet/.test(key) && nm(K.cur.netDebt)) parts.push(K.cur.netDebt > 0 ? `Net debt is ${fmtN(K.cur.netDebt)} ${u}${nm(K.lev) ? `, ${K.lev.toFixed(2)} times ${ml.startsWith('Op') ? 'operating profit' : 'EBITDA'}` : ''}. [What has to go right to keep headroom, and what gives first if it narrows.]` : `We hold net cash of ${fmtN(-K.cur.netDebt)} ${u}. [Our priorities for it.]`);
+  else if (/consensus/.test(key) && K.vsCons) parts.push(`Revenue was ${fmtN(K.cur.revenue)} ${u} and ${ml.startsWith('Op') ? 'operating profit' : 'EBITDA'} ${fmtN(K.cur.ebitda)} ${u}. [What changed inside the quarter, in numbers.] The street modelled what we told it, so the gap is ours to explain.`);
+  else if (seg && nm(seg.m) && nm(seg.mPy)) parts.push(`${seg.name} EBIT margin was ${rr(seg.m)}% against ${rr(seg.mPy)}% a year ago${nm(seg.growth) ? `, on revenue ${seg.growth >= 0 ? 'up' : 'down'} ${rr(Math.abs(seg.growth))}%` : ''}. [Whether it is pricing, cost or mix, and what we are doing about it.]`);
+  else if (/capex|capital/.test(key) && p.ytd && nm(p.ytd.capex)) { const g = cs.find((c) => c.metric === 'capex' && c.target?.value); parts.push(`${p.ytd.label || 'Year to date'} capex was ${fmtN(p.ytd.capex)} ${u}${g ? ` against about ${fmtN(g.target.value)} for the year` : ''}. [Which projects, and our priorities between capex, debt and returns.] Any change to the full-year figure will come through a formal disclosure.`); }
+  else if (/capital/.test(key)) parts.push(`${nm(K.cur.netDebt) ? (K.cur.netDebt > 0 ? `Net debt is ${fmtN(K.cur.netDebt)} ${u}.` : `We hold net cash of ${fmtN(-K.cur.netDebt)} ${u}.`) : ''} [Our priorities between capex, debt reduction and returns to shareholders.] Any dividend or buyback is a board decision, announced through a filing.`);
+  else if (/profit/.test(key) && nm(K.cur.pat)) parts.push(`PAT was ${fmtN(K.cur.pat)} ${u} against ${fmtN(K.py.pat)} a year ago. [What sits between ${ml.startsWith('Op') ? 'operating profit' : 'EBITDA'} and PAT: depreciation, interest, tax or one-offs, and which recur.]`);
+  else if (/growth|revenue/.test(key) && nm(K.revYoY)) parts.push(`Revenue ${K.revYoY >= 0 ? 'grew' : 'fell'} ${rr(Math.abs(K.revYoY))}% to ${fmtN(K.cur.revenue)} ${u}. [The split between price and volume, only as far as our disclosures show it.]`);
+  else if (/outlook/.test(key)) parts.push(`On the outlook for next quarter, we will not give figures beyond the guidance already on record. [Demand, pricing and margins as drivers, not numbers.] Any change will come through our filings.`);
+  else parts.push(marginLine() + ' [The drivers, in basis points: input costs, pricing and mix, and which are structural.]');
+  for (const c of owed) parts.unshift(c.kind === 'deflection' ? `Fair challenge: last time we said “${unq(c.said).slice(0, 140)}”, and that was not a good answer.` : c.kind === 'statement' ? `We said “${unq(c.said).slice(0, 140)}”, and it did not hold.` : `Our guidance on record is “${unq(c.said).slice(0, 140)}”.`);
+  if (/margin/.test(key) && !parts.some((x) => x.includes(ml))) parts.push(marginLine());
+  if (!parts.some((x) => /every quarter/.test(x))) parts.push('We will report this every quarter so you can track it.');
+  return parts.filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }

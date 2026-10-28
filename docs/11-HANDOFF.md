@@ -30,10 +30,12 @@ Built and verified:
 | `node scripts/check_extract_rules.mjs [scratch]` | Rule extraction against sample and real ground truth | pass |
 | `node scripts/check_xss.mjs [url]` | Hostile pack on every screen: no payload runs | pass, local and live |
 | `node scripts/check_layout.mjs` | 6 screens x 7 companies x 2 sizes: no overlaps or spills | pass |
+| `node scripts/check_content.mjs` | What a person reads: options, labels, quotes, punctuation, no NaN | pass |
+| `node scripts/check_charts.mjs` | Chart truth: every mark at its value, cut axes marked and said, round ticks with units; real screens plus 1,500 random charts | pass |
 | `cd api && uv run pytest -q tests` | API guardrails | 13 passed |
 | `node scripts/journey.mjs <scratch> [url]` | Live end-to-end journey on real PDFs | 6 of 6 truth on both companies |
 
-The browser gates need a local server: `cd web && python3 -m http.server 8731`. They also need Chrome; set the `CHROME` environment variable on Linux. CI runs everything except the journey on every push.
+The browser gates need the local server `node scripts/serve.mjs`, which sends `Cache-Control: no-store`; they refuse to run against a local server that lets the browser cache modules, because a gate could then pass on stale code. They also need Chrome; set the `CHROME` environment variable on Linux. CI runs everything except the journey on every push.
 
 ## 3. How work is done here (keep doing it this way)
 

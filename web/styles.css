@@ -273,6 +273,7 @@ mark.warn { background: var(--mark-warn); color: inherit; border-radius: 3px; pa
 .coach h3 { margin: 0 0 var(--s-2); font-size: 1rem; display: flex; align-items: center; gap: var(--s-2); }
 .coach h3 svg { width: 18px; height: 18px; flex: none; color: var(--accent-ink); }
 .coach p { margin: 0 0 var(--s-3); font-size: var(--fs-meta); }
+.improved .fill { color: var(--accent-ink); font-style: italic; }
 .improved { padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--ok-tint); font-size: var(--fs-meta); line-height: 1.6; }
 .followup { padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--accent-tint); font-size: var(--fs-meta); margin-top: var(--s-3); }
 .spin { width: 14px; height: 14px; border: 2px solid var(--line-strong); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
@@ -321,6 +322,14 @@ mark.warn { background: var(--mark-warn); color: inherit; border-radius: 3px; pa
 .chart .dot { fill: var(--accent); stroke: var(--glass-solid); stroke-width: 2; }
 .chart .band { fill: var(--accent); opacity: 0.12; }
 .chart .hit { fill: transparent; }
+.chart .axis-break { stroke: var(--glass-solid); stroke-width: 3; fill: none; }
+.chart .bar.gap { fill: var(--ink-3); opacity: 0.55; }
+.chart .gauge-band { fill: var(--accent-tint); stroke: var(--accent); stroke-width: 1; }
+.chart .gauge-tick { stroke: var(--ink-2); stroke-width: 2; }
+.chart .gauge-dot { fill: var(--ink-2); }
+.chart .mark.bad .gauge-tick { stroke: var(--bad); stroke-width: 3; }
+.chart .mark.bad .gauge-dot { fill: var(--bad); }
+.chart .mark.bad .val { fill: var(--bad); }
 .chart .mark:hover .bar, .chart .mark:focus .bar { opacity: 1; }
 .chart .mark:focus { outline: none; }
 .chart .mark:focus-visible .hit { stroke: var(--accent); stroke-width: 2; }

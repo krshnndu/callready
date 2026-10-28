@@ -48,21 +48,23 @@ jobs:
         run: cd api && uv run pytest -q tests
 
   browser:
-    name: Browser gates (XSS, layout)
+    name: Browser gates (XSS, content, layout, chart truth)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Serve the web app
-        run: (cd web && python3 -m http.server 8731 --bind 127.0.0.1 &) && sleep 2
+      - name: Serve the web app (no-store, so the gates test the code on disk)
+        run: (node scripts/serve.mjs &) && sleep 2
       - name: XSS gate (hostile pack on every screen)
         run: CHROME=$(which google-chrome) node scripts/check_xss.mjs
       - name: Content gate (options, labels, quotes, punctuation on every screen)
         run: CHROME=$(which google-chrome) node scripts/check_content.mjs
       - name: Layout gate (6 screens x 7 companies x 2 sizes)
         run: CHROME=$(which google-chrome) node scripts/check_layout.mjs
+      - name: "Chart-truth gate (every mark at its value, on every screen and on random data)"
+        run: CHROME=$(which google-chrome) node scripts/check_charts.mjs
 
   secrets:
     name: Secret scan

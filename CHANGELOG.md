@@ -4,6 +4,16 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Fixed
+- Charts that misled (found from a user screenshot of the Quarter screen). The margin line had uneven ticks (11.4, 12.9, 14.5) with no unit; it now has round ticks with the unit (11% to 15%), and its gutter fits the widest tick. The margin-bridge waterfall cut its axis above zero without saying so, so 14.2% looked more than twice 11.6%; the cut is now marked on the bars it shortens and the caption says where the axis starts. The pressure-map gauge also had unrounded ticks; it moved into `charts.js`.
+- Root causes, closed in code: every chart now maps values through one `scale()` and records it on the drawing, and bars are drawn only by `barMark()`, which adds the break mark and caption whenever an axis cuts a bar. A waterfall whose drivers do not add up to the change shows the remainder as a "Not explained" step instead of a silent jump. Bar charts handle negative values; charts drop non-numbers and say "No figures to chart" when nothing is left. Random inputs found and fixed two more: ticks finer than 4 decimals were mislabelled, and an empty segment name printed "undefined".
+- Stale code in local testing: the Python static server let the browser cache modules, so a page ran old `charts.js` beside new `app.js`. `scripts/serve.mjs` serves `web/` with `Cache-Control: no-store`, and the browser gates refuse a local server that caches. CI uses it.
+- The coach no longer withholds its whole answer when one figure cannot be found in the disclosures: that figure is removed and named, and the rest is shown. Figures are matched to the nearest metric word, and basis points allow rounding (25 bps for a 24.6 bps change). When the AI coach is not used, a rules-built ideal answer is shown with the facts to fill in, in brackets.
+
+### Added
+- `scripts/check_charts.mjs`: the chart-truth gate. It reads every drawn mark back on every screen for every company at two widths, then on 1,500 seeded random charts, and fails if a mark is off its value by more than 0.75 px, an axis is cut without a mark and a caption, a bar chart leaves out zero, or a tick is not round, evenly spaced, labelled with its unit or placed at its value. Proven by breaking `charts.js` three ways: each break fails the gate. It runs in CI.
+- `scripts/serve.mjs`, the no-store local server. Every browser gate also has a 10-minute watchdog, so a hung Chrome fails the gate instead of hanging it.
+
 ### Added
 - Credit line: "Made by Krishnendu" (krishnendu.me), the source on GitHub, and the demo video. It sits at the foot of the rail on laptops and in a page footer on phones. The demo link reads "coming soon" until `DEMO_VIDEO_URL` is set in `web/js/site.js`.
 

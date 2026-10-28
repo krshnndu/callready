@@ -8,8 +8,11 @@ import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { assertFreshServer } from './serve.mjs';
 
 const BASE = process.argv[2] || 'http://127.0.0.1:8731';
+await assertFreshServer(BASE);
+setTimeout(() => { console.log('FAIL  gate timed out after 10 minutes (Chrome or the page hung)'); process.exit(2); }, 600000).unref();
 const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const PORT = 9336;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

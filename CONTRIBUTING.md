@@ -14,7 +14,7 @@ Thanks for helping. CallReady is a prototype built for a competition and governe
 The web app has no build step: it is plain ES modules.
 
 ```sh
-cd web && python3 -m http.server 8731     # http://127.0.0.1:8731
+node scripts/serve.mjs                   # http://127.0.0.1:8731, no-store so a reload runs the code on disk
 ```
 
 Every screen works without the API: the scorecard is rules in the browser, and the coach falls back to reference answers. To run the API you need Python 3.12 and uv, plus an OpenAI-compatible gateway:

@@ -76,6 +76,51 @@ console.log('--- Non-answers score Red (relevance gate)');
   ok(!short.flags.some((f) => f.dim === 'Relevance'), `a short but real answer is not treated as a non-answer (${short.total})`);
 }
 
+console.log('--- Coach answers: rounding, redaction, and a rules-built ideal answer');
+{
+  const { sanitizePack: sp, analyze: an } = await import('../web/js/core.js');
+  const sc = await import('../web/js/score.js');
+  const { readFileSync: rf } = await import('node:fs');
+  const w = an(sp(JSON.parse(rf(new URL('../web/datasets/wipro.json', import.meta.url)))).pack);
+  const wq = w.questions.find((x) => x.theme === 'Outlook');
+  const coachText = 'On margins, Q2 came in at 16.4%, 25 basis points below the prior year. Watch our operating cash flow, this quarter it was 53,048 million.';
+  const r = sc.scoreAnswer(w, wq, coachText);
+  ok(!r.flags.some((f) => f.dim === 'Accuracy'), `a margin change of -24.6 bps said as "25 basis points" is accepted (flags: ${r.flags.map((f) => f.text).join(', ') || 'none'})`);
+  ok(typeof sc.redactUnverified === 'function', 'redactUnverified exists');
+  if (typeof sc.redactUnverified === 'function') {
+    const q1 = questions[0];
+    const red = sc.redactUnverified(ctx, q1, 'Q2 margin was 11.6%, and we expect 12.4% next quarter.');
+    ok(red.text.includes('11.6%') && !red.text.includes('12.4') && red.text.includes('[figure not in the disclosures]'), `an unverified figure is blanked, a verified one kept: "${red.text}"`);
+    ok(red.removed.length === 1 && red.removed[0].includes('12.4'), 'the blanked figure is reported');
+  }
+  ok(typeof sc.idealAnswer === 'function', 'idealAnswer exists');
+  if (typeof sc.idealAnswer === 'function') {
+    for (const [name, c] of [['sample', ctx], ['wipro', w]]) {
+      for (const q of c.questions) {
+        const ia = sc.idealAnswer(c, q);
+        const s2 = sc.scoreAnswer(c, q, ia.replace(/\[[^\]]*\]/g, ''));
+        if (s2.figures.some((f) => !f.match) || s2.band === 'red' || ia.length < 80) { ok(false, `${name} ${q.id}: ideal answer uses only verified figures and is not Red (${s2.total} ${s2.band}; ${s2.figures.filter((f) => !f.match).map((f) => f.raw).join(', ')})`); }
+      }
+      ok(true, `${name}: a rules-built ideal answer exists for all ${c.questions.length} questions, using only verified figures`);
+    }
+  }
+}
+
+console.log('--- Charts are drawn honestly');
+{
+  const ch = await import('../web/js/charts.js');
+  ok(typeof ch.niceTicks === 'function', 'niceTicks exists');
+  if (typeof ch.niceTicks === 'function') {
+    const t = ch.niceTicks(11.4, 14.5);
+    ok(t.length >= 3 && t.length <= 6 && t.every((v) => Number.isInteger(v * 2)), `margin ticks are round numbers (${t.join(', ')})`);
+  }
+  const ln = ch.line({ W: 560, points: [{ label: 'Q1', value: 14.0 }, { label: 'Q2', value: 11.6, now: true }], title: 'm', band: { low: 13.5, high: 14.5 } });
+  const tickLabels = [...ln.matchAll(/class="lab tick"[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]);
+  ok(tickLabels.length >= 3 && tickLabels.every((x) => x.endsWith('%')), `line chart ticks carry their unit (${tickLabels.join(', ')})`);
+  const wf = ch.waterfall({ W: 560, start: { label: 'Year ago', value: 14.2 }, steps: [{ label: 'a', delta: -1.8 }, { label: 'b', delta: -0.9 }, { label: 'c', delta: 0.1 }], end: { label: 'Now', value: 11.6 }, title: 'w' });
+  ok(/axis-break/.test(wf) && /Axis starts at \d+(\.\d)?%/.test(wf), 'a waterfall whose axis does not start at zero marks the break and says where it starts');
+}
+
 console.log('--- Recommendations carry evidence');
 {
   const { recommendations } = await import('../web/js/recs.js');

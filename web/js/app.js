@@ -1,8 +1,8 @@
 import { analyze, validatePack, verifyAgainstSource, sanitizePack, uploadAllowed, applyEvidencePolicy, SCHEMA, METRICS } from './core.js';
-import { scoreAnswer, remarksCheck, DIM_LABELS, OWN_PAST } from './score.js';
+import { scoreAnswer, remarksCheck, DIM_LABELS, OWN_PAST, redactUnverified, idealAnswer } from './score.js';
 import { samplePack } from './sample.js';
 import { personas as DEFAULT_PERSONAS } from './questions.js';
-import { bars, line, waterfall, diverging, installTooltip, textW } from './charts.js';
+import { bars, line, waterfall, diverging, gauge, installTooltip } from './charts.js';
 import { extractByRules, mergeRulesFirst, crossCheck } from './extract.js';
 import { recommendations } from './recs.js';
 import { SITE } from './site.js';
@@ -25,7 +25,12 @@ const fmt = (x) => (num(x) ? Number(x).toLocaleString('en-IN', { maximumFraction
 const sign = (x, d = 1) => (num(x) ? (x > 0 ? '+' : '') + (Math.round(x * 10 ** d) / 10 ** d).toFixed(d) : '-');
 const API = '/api';
 // A quote on screen gets exactly one pair of curly quotes; straight quotes inside it are dropped.
-const quote = (t) => `\u201c${esc(String(t ?? '').replace(/["\u201c\u201d]/g, '').trim())}\u201d`;
+const quote = (t) => {
+  // One pair of curly quotes outside; quotes inside become single curly quotes, as in print.
+  let x = String(t ?? '').trim().replace(/^["\u201c]+|["\u201d]+$/g, '');
+  x = x.replace(/["\u201c]([^"\u201c\u201d]*)["\u201d]/g, '\u2018$1\u2019').replace(/["\u201c\u201d]/g, '');
+  return `\u201c${esc(x)}\u201d`;
+};
 const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/';
 
 const ICON = {
@@ -74,6 +79,8 @@ let CTX = null;
 const spk = (p, k) => (p.company.speakers?.[k] || '').trim() || ({ CEO: 'CEO', CFO: 'CFO', ENERGY: 'Segment head', management: 'Management' }[k] || k);
 const personaOf = (p, key) => (p.personas || DEFAULT_PERSONAS)[key] || DEFAULT_PERSONAS[key] || DEFAULT_PERSONAS.hawk;
 
+// Bracketed parts of a rules-built answer are prompts for the speaker, shown as such.
+const brackets = (t) => esc(t).replace(/\[([^\]]+)\]/g, '<span class="fill">[$1]</span>');
 const cite = (id) => `<button class="cite" type="button" data-tip="${esc(CTX.sources[id] || id)}">${esc(id)}</button>`;
 const attKey = () => `callready.attempts.${CTX.pack.id || 'pack'}`;
 const attempts = () => get(attKey(), []);
@@ -410,21 +417,8 @@ function viewQuarter() {
 
 // ---------- 2. Pressure ----------
 function gaugeSVG(imp, W = 640) {
-  const lo = Math.floor(Math.min(imp.ytd, imp.low, imp.record) - 1), hi = Math.ceil(Math.max(imp.need, imp.high, imp.record) + 1), pad = 14, x = (v) => pad + ((v - lo) / (hi - lo)) * (W - 2 * pad);
-  const marks = [[imp.ytd, 'var(--ink-2)', 'Year to date actual'], [imp.record, 'var(--ink-2)', 'Best quarter on record'], [imp.need, 'var(--bad)', 'Needed for the rest of the year']].sort((a, b) => a[0] - b[0]);
-  // Marker labels: a label that would touch its left neighbour drops to the next row.
-  let lastEnd = -Infinity, rows = 0;
-  const placed = marks.map(([v, col, l]) => { const t = `${f1(v)}%`, w = textW(t, 12); const cx = Math.min(W - pad - w / 2, Math.max(pad + w / 2, x(v))); const row = cx - w / 2 < lastEnd + 6 ? 1 : 0; if (!row) lastEnd = cx + w / 2; rows = Math.max(rows, row); return { v, col, l, t, cx, row }; });
-  const step = Math.max(1, Math.ceil(textW('16%') * 1.8 / ((W - 2 * pad) / (hi - lo))));
-  const ticks = []; for (let t = lo; t <= hi; t += step) ticks.push(t);
-  const H = 100 + rows * 15, band = `Guided ${imp.low} to ${imp.high}%`, bw = textW(band), bx = Math.min(W - pad - bw / 2, Math.max(pad + bw / 2, (x(imp.low) + x(imp.high)) / 2));
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="Margin needed ${f1(imp.need)} percent, against a record of ${f1(imp.record)} percent and a guided range of ${imp.low} to ${imp.high} percent">
-    <rect x="${pad}" y="40" width="${W - 2 * pad}" height="10" rx="5" fill="var(--sunk)"/>
-    <rect x="${x(imp.low)}" y="36" width="${Math.max(3, x(imp.high) - x(imp.low))}" height="18" rx="4" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1"/>
-    <text class="lab" x="${bx}" y="28" text-anchor="middle">${band}</text>
-    ${ticks.map((v) => `<text class="lab" x="${x(v)}" y="${H - 4}" text-anchor="middle">${v}%</text>`).join('')}
-    ${placed.map((m) => `<g class="mark" tabindex="0" data-tip="${m.l}: ${m.t}"><line x1="${x(m.v)}" x2="${x(m.v)}" y1="34" y2="58" stroke="${m.col}" stroke-width="${m.col.includes('bad') ? 3 : 2}"/><circle cx="${x(m.v)}" cy="45" r="${m.col.includes('bad') ? 6 : 4}" fill="${m.col}"/><text class="val" x="${m.cx}" y="${74 + m.row * 15}" text-anchor="middle" style="fill:${m.col}">${m.t}</text></g>`).join('')}
-  </svg>`;
+  return gauge({ W, title: 'Margin guidance', band: { low: imp.low, high: imp.high, label: `Guided ${imp.low} to ${imp.high}%` },
+    marks: [{ value: imp.ytd, label: 'Year to date actual' }, { value: imp.record, label: 'Best quarter on record' }, { value: imp.need, label: 'Needed for the rest of the year', bad: true }] });
 }
 function viewPressure() {
   const { pack: p, pressure: P, imp, commitments: cs } = CTX;
@@ -574,16 +568,17 @@ function renderCard(q, text, res, speaker) {
     <ul class="dims">${Object.entries(res.dims).map(([k2, d]) => { const b = d.score >= 75 ? 'green' : d.score >= 55 ? 'amber' : 'red'; const on = Math.round(d.score / 10); return `<li><span>${DIM_LABELS[k2]} <span class="tiny">${res.weights[k2]}%</span></span><span class="segs ${b}" data-tip="${esc(DIM_LABELS[k2])}: ${d.score} of 100, weight ${res.weights[k2]}%">${Array.from({ length: 10 }, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</span><span class="num" style="text-align:right">${d.score}</span></li><li><span class="why">${esc(d.why)}</span></li>`; }).join('')}</ul>
     <div class="answer-view">${markAnswer(text, res)}</div>
     ${res.flags.length ? `<ul class="flags">${res.flags.map((fl) => `<li><span class="led ${fl.kind === 'red' ? 'red' : 'amber'}"></span><div><b>${fl.dim}:</b> <q>${esc(fl.text)}</q><br><span class="muted">${esc(fl.why)}</span></div></li>`).join('')}</ul>` : '<p class="small" style="margin-top:12px">No flags. Every figure matches the disclosures.</p>'}
-    <div class="coach" id="coach">${q.model ? `<h3>${ICON.spark} Reference answer</h3><p class="tiny">Written from the disclosures and checked by the same rules. No AI was used for this scorecard.</p><div class="improved">${esc(q.model)}</div>` : '<p class="tiny">This scorecard is rules only. No AI was used.</p>'}
+    <div class="coach" id="coach">${q.model ? `<h3>${ICON.spark} Reference answer</h3><p class="tiny">Written from the disclosures and checked by the same rules. No AI was used for this scorecard.</p><div class="improved">${esc(q.model)}</div>` : `<h3>${ICON.spark} Ideal answer, built by rules</h3><p class="tiny">Every figure is from the disclosures. The [bracketed] parts are what only management knows: fill them in your own words. No AI was used.</p><div class="improved">${brackets(idealAnswer(CTX, q))}</div>`}
       <div class="row" style="margin-top:var(--s-3)"><button class="btn ghost" id="ask-coach" type="button">${ICON.spark}<span>Ask the AI coach for a critique</span></button><span class="tiny">One AI call. Its answer is checked by the rules before it is shown.</span></div></div>`;
   $('#ask-coach').addEventListener('click', () => { $('#coach').innerHTML = `<h3>${ICON.spark} Coach</h3><p class="muted small"><span class="spin"></span> Asking the coach for a critique and a stronger answer...</p>`; coach(q, text, res, speaker); });
 }
 // What an uploaded pack sends the coach: compact lines built from the same context the rules use.
 function coachFacts() {
   const { pack: p, k: K, commitments: cs, segs, imp } = CTX;
-  const per = (x, l) => x && num(x.revenue) && `${l} (${x.label || ''}): revenue ${fmt(x.revenue)}, EBITDA ${fmt(x.ebitda)} (margin ${f1((x.ebitda / x.revenue) * 100)}%)${num(x.pat) ? `, PAT ${fmt(x.pat)}` : ''}${num(x.ocf) ? `, operating cash flow ${fmt(x.ocf)}` : ''}${num(x.capex) ? `, capex ${fmt(x.capex)}` : ''}${num(x.netDebt) ? `, net debt ${fmt(x.netDebt)}` : ''}.`;
+  const basis = p.company.marginBasis === 'EBIT' ? 'operating profit (EBIT; the company reports no EBITDA)' : 'EBITDA';
+  const per = (x, l) => x && num(x.revenue) && `${l} (${x.label || ''}): revenue ${fmt(x.revenue)}, ${basis} ${fmt(x.ebitda)} (margin ${f1((x.ebitda / x.revenue) * 100)}%)${num(x.pat) ? `, PAT ${fmt(x.pat)}` : ''}${num(x.ocf) ? `, operating cash flow ${fmt(x.ocf)}` : ''}${num(x.capex) ? `, capex ${fmt(x.capex)}` : ''}${num(x.netDebt) ? `, net debt ${fmt(x.netDebt)}` : ''}.`;
   return [per(K.cur, 'This quarter'), per(K.py, 'Same quarter last year'), per(K.pq, 'Last quarter'),
-    `Revenue growth ${sign(K.revYoY)}%; EBITDA margin change ${Math.round(K.mBps)} bps.`,
+    `Revenue growth ${sign(K.revYoY)}%; ${p.company.marginBasis === 'EBIT' ? 'operating' : 'EBITDA'} margin change ${Math.round(K.mBps)} bps.`,
     num(K.lev) ? `Net debt / EBITDA ${K.lev.toFixed(2)}x.` : null,
     K.vsCons ? `Vs consensus: revenue ${sign(K.vsCons.rev)}%, EBITDA ${sign(K.vsCons.ebitda)}%.` : null,
     imp && num(imp.need) ? `Margin guidance ${imp.low} to ${imp.high}%: ${imp.ytdLabel} margin ${f1(imp.ytd)}%; the rest of the year needs about ${f1(imp.need)}% (best quarter ${f1(imp.record)}%).` : null,
@@ -596,7 +591,7 @@ async function coach(q, text, res, speaker) {
   const el = $('#coach'); const p = CTX.pack; const pe = personaOf(p, q.persona);
   const fallback = (why) => {
     el.innerHTML = q.model ? `<h3>${ICON.spark} Reference answer</h3><p class="tiny">${esc(why)}</p><div class="improved">${esc(q.model)}</div><div class="followup"><b>${esc(pe.name)} follows up:</b> ${quote(q.followup)}</div>`
-      : `<h3>${ICON.spark} Coach</h3><p class="small muted">${esc(why)} The scorecard above is complete: it is computed by rules and needs no AI.</p><div class="followup"><b>${esc(pe.name)} would follow up:</b> ${quote(q.followup)}</div>`;
+      : `<h3>${ICON.spark} Ideal answer, built by rules</h3><p class="tiny">${esc(why)} Fill the [bracketed] parts in your own words.</p><div class="improved">${brackets(idealAnswer(CTX, q))}</div><div class="followup"><b>${esc(pe.name)} would follow up:</b> ${quote(q.followup)}</div>`;
   };
   const flags = res.flags.map((fl) => `${fl.dim}: ${fl.text}: ${fl.why}`).slice(0, 20);
   const body = isSample(p)
@@ -611,15 +606,20 @@ async function coach(q, text, res, speaker) {
     if (!r.ok) throw new Error(String(r.status));
     const j = await r.json();
     if (!j.improved) throw new Error('empty');
-    const check = scoreAnswer(CTX, q, j.improved);
-    const safe = !check.figures.some((fg) => !fg.match) && check.band !== 'red';
+    // Every figure in the coach's text is checked; one the rules cannot find is blanked, never the whole answer.
+    const imp = redactUnverified(CTX, q, j.improved), fu = redactUnverified(CTX, q, j.followup || q.followup), crit = redactUnverified(CTX, q, j.critique || '');
+    const risky = scoreAnswer(CTX, q, imp.text).flags.filter((fl) => fl.dim === 'Disclosure');
+    const removed = [...imp.removed, ...fu.removed, ...crit.removed];
     el.innerHTML = `<h3>${ICON.spark} Coach <span class="pill accent">${esc(j.model || 'live')}</span>${j.cached ? '<span class="pill neutral">cached</span>' : ''}</h3>
-      <p>${esc(j.critique)}</p>
-      ${safe ? `<div class="improved">${esc(j.improved)}</div>` : q.model ? `<div class="improved">${esc(q.model)}</div><p class="tiny">The live answer used a figure not in the disclosures, so the checked reference answer is shown instead.</p>` : '<p class="tiny">The live answer used a figure the rules could not find in the disclosures, so it is withheld. The critique above still applies.</p>'}
-      <div class="followup"><b>${esc(pe.name)} follows up:</b> ${quote(j.followup || q.followup)}</div>`;
+      <p>${esc(crit.text)}</p>
+      <h3 class="h3">Ideal answer</h3>
+      <div class="improved">${esc(imp.text)}</div>
+      ${removed.length ? `<p class="tiny">Checked against the disclosures: ${removed.length} figure${removed.length === 1 ? '' : 's'} the rules could not find ${removed.length === 1 ? 'was' : 'were'} blanked (${removed.map(esc).join(', ')}). Every other figure is verified.</p>` : '<p class="tiny">Checked against the disclosures: every figure in this answer is verified.</p>'}
+      ${risky.length ? `<p class="tiny down">Before using it, review: ${risky.map((fl) => esc(fl.why)).join(' ')}</p>` : ''}
+      <div class="followup"><b>${esc(pe.name)} follows up:</b> ${quote(fu.text)}</div>`;
   } catch {
     clearTimeout(to);
-    fallback(q.model ? 'The live coach is unavailable right now, so this is the reference answer from the question bank. It passes every check above.' : 'The live coach is unavailable right now.');
+    fallback(q.model ? 'The live coach is unavailable right now, so this is the reference answer from the question bank. It passes every check above.' : 'The live coach is unavailable right now, so this is the ideal answer built by rules from the disclosures.');
   }
 }
 
@@ -660,7 +660,7 @@ function viewReport() {
   const recs = buildRecs(themes, best, rc, contra);
   const risks = P.slice(0, 5).map((x) => { const qs = questions.filter((q) => q.pressure === x.id); const r = qs.length ? Math.max(...qs.map((q) => best[q.id]?.total || 0)) : 0; return { x, readiness: r, risk: x.score * (1 - r / 100), q: qs[0] }; }).sort((a, b) => b.risk - a.risk);
   const sname = (s) => spk(p, s).split(',')[0];
-  const hb = (label, sub, avg, tip) => { const b = avg == null ? 'off' : avg >= 75 ? 'green' : avg >= 55 ? 'amber' : 'red'; return `<div class="hbar" tabindex="0" data-tip="${esc(tip)}"><span class="led ${b}"></span><span class="hl">${esc(label)} <span class="tiny">${sub}</span></span><span class="track"><i class="${b}" style="width:${avg ?? 0}%"></i></span><span class="hv">${avg ?? '-'}</span></div>`; };
+  const hb = (label, sub, avg, tip) => { const b = avg == null ? 'off' : avg >= 75 ? 'green' : avg >= 55 ? 'amber' : 'red'; return `<div class="hbar" tabindex="0" data-tip="${esc(tip)}"><span class="led ${b}"></span><span class="hl">${esc(label)} <span class="tiny">${sub}</span></span><span class="track"><i class="${b}" style="width:${Math.min(100, Math.max(0, avg ?? 0))}%"></i></span><span class="hv">${avg ?? '-'}</span></div>`; };
   return shell('#/report', `${head(`Readiness report: ${esc(p.company.short || p.company.name)} ${esc(p.company.quarter)}`, `${att.length ? `${att.length} rehearsed answer${att.length === 1 ? '' : 's'} from this browser.` : 'No answers rehearsed yet in this browser.'} A theme counts as not ready until it has been rehearsed.`)}
   <div class="row no-print">
     ${isSample(p) ? '<button class="btn ghost" id="demo">Load demo rehearsal</button>' : ''}
