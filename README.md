@@ -81,6 +81,10 @@ Extraction runs as a background job that the browser polls. Coach and extraction
 | --- | --- |
 | `node scripts/check_engine.mjs` | Data-readiness and scoring-calibration gate: the pack reconciles, statuses and ranking are right, reference answers are Green, planted errors are caught |
 | `node scripts/check_bias.mjs` | The scorer does not penalise plain or Indian-English phrasing (within 10 points) |
+| `node scripts/check_guardrails.mjs` | Pack sanitiser, financial sanity rules and upload limits (37 checks) |
+| `node scripts/check_xss.mjs` | A hostile pack on every screen: no payload may run (detector proven by a canary) |
+| `node scripts/check_layout.mjs` | 6 screens x 7 companies x 2 sizes: no overlapping text, spills or sideways scroll |
+| `cd api && uv run pytest -q tests` | API guardrails: key, limits, per-client caps, output caps, retention, untrusted-input rules |
 | `node scripts/export_pack.mjs` | Exports the sample's facts for the API, so the coach and the UI use the same numbers |
 | `node scripts/make_sample_pdf.mjs` | Builds the sample company's results PDF for round-trip tests |
 | `node scripts/test_extract.mjs <doc.txt>` | Runs a document through the live extractor and reports verification and field accuracy |
@@ -88,7 +92,11 @@ Extraction runs as a background job that the browser polls. Coach and extraction
 | `node scripts/screenshots.mjs` | Recaptures the screenshots from the live site |
 | `node scripts/record_demo.mjs` | Records the captioned 90-second demo video |
 
-CI runs the gates, an API smoke test and a secret scan on every push ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
+CI runs every gate on every push: rules, guardrails, XSS and layout in headless Chrome, the API tests, and a secret scan ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
+
+## Guardrails
+
+Every path by which untrusted data enters (uploads, JSON packs, AI output, answers, API callers) passes four layers, each with tests: sanitising on entry, financial sanity rules, escaping at render, and a Content-Security-Policy. On the API: a shared key, size limits, per-client and daily caps, output caps, 7-day retention, and prompts that treat answers and documents as untrusted data. The plan, built test-first with the [superpowers](https://github.com/obra/superpowers) methodology: [docs/superpowers/plans/2026-10-28-guardrails.md](docs/superpowers/plans/2026-10-28-guardrails.md).
 
 ## Data and assumptions
 
