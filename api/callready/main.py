@@ -116,7 +116,10 @@ def parse_json(text: str) -> dict:
     if not all(isinstance(out.get(k), str) and out[k].strip() for k in ("critique", "improved", "followup")):
         raise ValueError("missing keys")
     # House style: no em or en dashes in anything the UI shows.
-    return {k: re.sub(r"\s*[\u2014\u2013]\s*", ", ", out[k]).strip() for k in ("critique", "improved", "followup")}
+    def clean(t: str) -> str:
+        t = re.sub(r"(\d)\s*[\u2013\u2014-]\s*(\d)", r"\1 to \2", t)
+        return re.sub(r"\s*[\u2014\u2013]\s*", ", ", t).strip()
+    return {k: clean(out[k]) for k in ("critique", "improved", "followup")}
 
 
 async def call_chain(messages: list[dict]) -> tuple[dict, str]:
@@ -132,7 +135,7 @@ async def call_chain(messages: list[dict]) -> tuple[dict, str]:
                     f"{LLM_BASE_URL}/chat/completions",
                     headers={"Authorization": f"Bearer {LLM_API_KEY}"},
                     json={"model": model, "messages": messages, "temperature": 0.2, "max_tokens": 900, "stream": False},
-                    timeout=min(35, left),
+                    timeout=min(26, left),
                 )
                 count_call()
                 if r.status_code != 200:
