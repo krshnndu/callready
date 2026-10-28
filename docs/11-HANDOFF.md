@@ -52,7 +52,7 @@ House rules (also in `AGENTS.md`):
 
 ## 4. Backlog, in priority order
 
-0. **Demo video link:** when the Tella video is recorded, set `DEMO_VIDEO_URL` in `web/js/site.js` and replace "Demo video: _coming soon_" in the README. A push deploys it.
+0. ~~Demo video link~~ Done 2026-10-28: https://www.tella.tv/video/callready-earnings-prep-ai-1-giwu4686, set as `DEMO_VIDEO_URL` in `web/js/site.js` and linked from the README.
 
 1. **More rule coverage for tables the rules cannot read yet.** Nestle's garbled table text and Wipro's IFRS million layout fall back to AI today. Add row synonyms and header patterns, with a failing test from their text first.
 2. **Guidance pressure titles from rule-extracted sentences.** They use the first 60 characters of the sentence; derive a short topic instead.

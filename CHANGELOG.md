@@ -4,6 +4,9 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Added
+- The demo video (https://www.tella.tv/video/callready-earnings-prep-ai-1-giwu4686) is linked from the credit line in the app and from the README.
+
 ### Changed
 - The margin bridge is drawn as driver bars around zero in basis points, ending in a net-change row (the same form as the segment margin-change chart). A waterfall of a small change on a large margin crushed the drivers into slivers even at an honest zero baseline. Drivers that do not add up to the reported change get a "Not explained" row. Long driver labels wrap instead of truncating.
 - One unit system, in `web/js/units.js`: margin levels in percent (11.6%), every change in a percentage in signed basis points (−258 bps; cash conversion too, which was in "pts"), growth as a signed percent (+14.0%), and a true minus sign for every negative. Every formatter goes through it, and one typesetting pass on the page gives a minus sign to negatives in any text, including rule-written sentences and company quotes. `check_content.mjs` now fails a hyphen used as a minus, or a change in a percentage given in %, points or pp.

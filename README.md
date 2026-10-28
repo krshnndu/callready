@@ -2,7 +2,7 @@
 
 **Is the leadership team ready for tough investor questions?** CallReady rehearses a listed company's earnings call against the company's own disclosures. Upload the quarter's results, or pick a real company from the test datasets. CallReady ranks what investors will push on, writes the questions they will ask, and scores each rehearsed answer for accuracy, consistency with past promises, and disclosure safety. It ends in a readiness report with recommendations to act on before the call.
 
-**Live: [callreadyai.vercel.app](https://callreadyai.vercel.app)** · Demo video: _coming soon_ · Made by [Krishnendu](https://krishnendu.me) · [Changelog](CHANGELOG.md) · [Governance (PMI-CPMAI)](docs/08-GOVERNANCE.md) · [90-second pitch](docs/07-PITCH.md)
+**Live: [callreadyai.vercel.app](https://callreadyai.vercel.app)** · **[Demo video](https://www.tella.tv/video/callready-earnings-prep-ai-1-giwu4686)** · Made by [Krishnendu](https://krishnendu.me) · [Changelog](CHANGELOG.md) · [Governance (PMI-CPMAI)](docs/08-GOVERNANCE.md) · [90-second pitch](docs/07-PITCH.md)
 
 ## Screenshots
 
