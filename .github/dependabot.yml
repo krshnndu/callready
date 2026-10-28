@@ -4,7 +4,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
-  - package-ecosystem: pip
+  - package-ecosystem: uv   # updates pyproject.toml and uv.lock together
     directory: /api
     schedule:
       interval: weekly
