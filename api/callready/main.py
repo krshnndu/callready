@@ -154,6 +154,14 @@ def build_prompt(q: dict, body: CoachIn) -> list[dict]:
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
 
+OUTPUT_CAP = 1500  # characters per field of model output that reaches the browser
+
+
+def cap_output(out: dict) -> dict:
+    """Guardrail: model text is length-capped before it leaves the API, whichever model wrote it."""
+    return {k: (v[: OUTPUT_CAP - 3].rstrip() + "...") if isinstance(v, str) and len(v) > OUTPUT_CAP else v for k, v in out.items()}
+
+
 def parse_json(text: str) -> dict:
     m = re.search(r"\{.*\}", text, re.S)
     if not m:
@@ -247,7 +255,7 @@ async def coach(body: CoachIn, request: Request, x_callready_key: str = Header(d
         record("none", False, started)
         raise
     record(model.split("/")[-1], True, started, fallback=model != MODELS[0])
-    res = {**out, "model": model.split("/")[-1]}
+    res = {**cap_output(out), "model": model.split("/")[-1]}
     with db() as con:
         con.execute("INSERT OR REPLACE INTO cache VALUES(?,?,?)", (key, json.dumps(res), time.time()))
     return {**res, "cached": False}

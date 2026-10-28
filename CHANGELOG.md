@@ -4,6 +4,11 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Security
+- Guardrails in four layers, planned and built test-first with the superpowers methodology (`docs/superpowers/plans/2026-10-28-guardrails.md`). Layer 1: `sanitizePack` on every load path (types, length and list caps, http(s)-only links). Layer 2: financial sanity rules (revenue above zero, profit not above revenue, margins within -100 to 100, units warnings). Layer 3: every chart attribute escaped; the new XSS gate found and fixed unescaped chart labels. Layer 4: Content-Security-Policy, HSTS and COOP; on the live site the CSP blocks an injected inline handler.
+- Upload limits (5 files, 20 MB each, PDF or text, 2 MB packs), proxy body caps (64 KB coach, 200 KB extract), and model output capped at 1500 characters per field.
+- Tests: `check_guardrails.mjs` (37 checks), `check_xss.mjs` (canary plus 7 screens), `api/tests/test_guardrails.py` (13 tests). All run in CI with the layout gate.
+
 ### Changed
 - Repository made public. CI's secret scan can read pull requests; Dependabot updates `uv.lock` with `pyproject.toml`.
 - `docs/07-PITCH.md` is now a shot-by-shot recording script: setup checklist, clicks, spoken lines, timings and fallbacks. `scripts/record_demo.mjs` includes the any-company beat.
