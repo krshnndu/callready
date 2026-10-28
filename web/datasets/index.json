@@ -79,7 +79,7 @@
     "slug": "nestle-india",
     "company": "Nestle India Limited",
     "quarter": "Q2 FY27",
-    "units": "INR lakhs (financial statements); INR crore (press release)",
+    "units": "INR lakhs",
     "sector": "FMCG",
     "model": "claude-sonnet-4-6",
     "sources": [
@@ -117,18 +117,15 @@
       }
     ],
     "verify": {
-      "numbersFound": 33,
-      "numbersTotal": 41,
-      "quotesFound": 3,
-      "quotesTotal": 3,
-      "linesFound": 13,
-      "linesTotal": 16
+      "numbersFound": 34,
+      "numbersTotal": 34,
+      "quotesFound": 2,
+      "quotesTotal": 2,
+      "linesFound": 19,
+      "linesTotal": 22
     },
-    "errors": [
-      "periods.current.ebitda must be a number.",
-      "periods.priorYear.ebitda must be a number."
-    ],
-    "warnings": 0
+    "errors": [],
+    "warnings": 3
   },
   {
     "slug": "jindal-saw",

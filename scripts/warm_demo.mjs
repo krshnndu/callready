@@ -1,7 +1,11 @@
 // Scores the pitch-path answers exactly as the browser does and posts them to the coach,
 // so the live demo hits the cache. Usage: node scripts/warm_demo.mjs https://callreadyai.vercel.app
-import { scoreAnswer } from '../web/js/engine.js';
-import { questions } from '../web/js/questions.js';
+import { analyze } from '../web/js/core.js';
+import { scoreAnswer as score } from '../web/js/score.js';
+import { samplePack } from '../web/js/sample.js';
+const ctx = analyze(samplePack);
+const questions = ctx.questions;
+const scoreAnswer = (q, t) => score(ctx, q, t);
 const base = process.argv[2] || 'https://callreadyai.vercel.app';
 const runs = [['Q01', 'weak'], ['Q03', 'weak']];
 for (const [qid, kind] of runs) {

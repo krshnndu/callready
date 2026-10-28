@@ -358,7 +358,7 @@
     },
     {
       "id": "cash",
-      "title": "Cash conversion halved; working capital worsened",
+      "title": "Operating cash flow and conversion fell",
       "score": 1.62
     },
     {
@@ -367,34 +367,39 @@
       "score": 1.47
     },
     {
-      "id": "discom",
-      "title": "Discom receivables: the question deflected in August",
+      "id": "seg-ENE",
+      "title": "Energy Solutions losses against a breakeven promise",
+      "score": 0.96
+    },
+    {
+      "id": "c-D1",
+      "title": "A question deflected last time: discom receivables",
       "score": 0.88
     },
     {
       "id": "leverage",
-      "title": "Leverage climbing towards the 1x ceiling",
+      "title": "Leverage against the balance-sheet ceiling",
       "score": 0.84
     },
     {
-      "id": "energy",
-      "title": "Energy losses widening against a breakeven promise",
-      "score": 0.8
-    },
-    {
       "id": "consensus",
-      "title": "EBITDA missed consensus while revenue beat",
+      "title": "EBITDA 8.6% below consensus",
       "score": 0.73
     },
     {
-      "id": "appliances",
-      "title": "Home Appliances margin compressed 330 bps",
+      "id": "seg-APP",
+      "title": "Home Appliances margin down 330 bps",
       "score": 0.7
     },
     {
       "id": "capex",
-      "title": "Capex running ahead of plan",
+      "title": "Capex against plan",
       "score": 0.46
+    },
+    {
+      "id": "profit",
+      "title": "PAT down 19.1%",
+      "score": 0.32
     }
   ]
 }

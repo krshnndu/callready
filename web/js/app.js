@@ -285,6 +285,7 @@ function viewQuarter() {
   const nBroken = cs.filter((c) => c.status === 'broken').length;
   const h1 = `Revenue ${K.revYoY >= 0 ? 'up' : 'down'} ${f1(Math.abs(K.revYoY))}%. Margin ${K.mBps >= 0 ? 'up' : 'down'} ${Math.abs(Math.round(K.mBps))} bps.${nBroken ? ` ${nBroken} promise${nBroken > 1 ? 's' : ''} broken.` : ''}`;
   return shell('#/', `${head(h1, `${esc(p.company.name)} reports ${esc(p.company.quarter)}${p.company.period ? ` (${esc(p.company.period)})` : ''}. This is what analysts will have open in front of them. Figures in ${esc(p.company.units || 'reported units')}.`)}
+  ${!isSample(p) && CTX.warnings.length ? `<div class="banner" role="note"><b>Rules found ${CTX.warnings.length} thing${CTX.warnings.length > 1 ? 's' : ''} to check in this company's data:</b> ${CTX.warnings.map(esc).join(' ')}</div>` : ''}
   <section class="panel glass">
     <h2>Results against last year, the street and the company's own words</h2>
     <p class="sub">The last column is what management promised on earlier calls. That is where investors will aim.</p>
@@ -623,7 +624,7 @@ async function render() {
   const app = $('#app');
   clearInterval(timerId);
   const p = await activePack();
-  if (!CTX || CTX.pack !== p) CTX = analyze(p);
+  if (!CTX || CTX.pack !== p) { CTX = analyze(p); CTX.warnings = validatePack(p).warnings; }
   if (h.startsWith('#/load')) { app.innerHTML = await viewLoad(); bindLoad(); }
   else if (h.startsWith('#/review')) { app.innerHTML = viewReview(); bindReview(); }
   else if (h.startsWith('#/pressure')) { app.innerHTML = viewPressure(); const ta = $('#remarks-text'); ta.addEventListener('input', () => { $('#remarks-out').innerHTML = remarksOut(remarksCheck(CTX, ta.value)); }); }
@@ -633,6 +634,7 @@ async function render() {
   else app.innerHTML = viewQuarter();
   app.querySelectorAll('[data-theme-set]').forEach((b) => b.addEventListener('click', () => { set('callready.theme', b.dataset.themeSet); applyTheme(b.dataset.themeSet); app.querySelectorAll('[data-theme-set]').forEach((x) => x.setAttribute('aria-checked', String(x === b))); }));
   window.scrollTo(0, 0);
+  app.querySelector('.steps [aria-current]')?.scrollIntoView({ block: 'nearest', inline: 'center' });
 }
 installTooltip();
 window.addEventListener('hashchange', render);

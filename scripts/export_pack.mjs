@@ -2,8 +2,10 @@
 import { writeFileSync } from 'node:fs';
 import * as pack from '../web/js/pack.js';
 import { questions, personas } from '../web/js/questions.js';
-import { kpis, impliedH2, pressureMap } from '../web/js/engine.js';
-const k = kpis(), imp = impliedH2(k);
+import { analyze } from '../web/js/core.js';
+import { samplePack } from '../web/js/sample.js';
+const ctx = analyze(samplePack);
+const k = { ...ctx.k, lev: ctx.k.lev }, imp = { ...ctx.imp, h1: ctx.imp.ytd };
 const facts = [
   `Q2 FY27 revenue 2,480 crore (+${k.revYoY.toFixed(1)}% YoY, +1.6% vs consensus 2,440).`,
   `Q2 FY27 EBITDA 288 crore (${k.ebitdaYoY.toFixed(1)}% YoY; consensus 315, so 8.6% below). EBITDA margin 11.6% vs 14.2% (-258 bps). H1 margin ${imp.h1.toFixed(1)}%.`,
@@ -18,6 +20,6 @@ const facts = [
 ];
 const out = { company: pack.company, facts, commitments: pack.commitments, personas,
   questions: questions.map(({ id, theme, persona, owner, text, trap, mustAck, followup, model }) => ({ id, theme, persona, owner, text, trap, mustAck, followup, model })),
-  pressure: pressureMap().map(({ id, title, score }) => ({ id, title, score: +score.toFixed(2) })) };
+  pressure: ctx.pressure.map(({ id, title, score }) => ({ id, title, score: +score.toFixed(2) })) };
 writeFileSync(new URL('../data/pack.json', import.meta.url), JSON.stringify(out, null, 2) + '\n');
 console.log('data/pack.json:', out.questions.length, 'questions,', facts.length, 'facts');

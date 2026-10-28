@@ -1,8 +1,13 @@
 // Phrasing-bias check (docs/08-GOVERNANCE.md C9): the same substance in a different register must
 // score within 10 points of the reference answer. Registers: plain English, and Indian-English
 // business usage. Run: node scripts/check_bias.mjs
-import { scoreAnswer } from '../web/js/engine.js';
-import { questions } from '../web/js/questions.js';
+import { analyze } from '../web/js/core.js';
+import { scoreAnswer as score } from '../web/js/score.js';
+import { samplePack } from '../web/js/sample.js';
+
+const ctx = analyze(samplePack);
+const questions = ctx.questions;
+const scoreAnswer = (q, t) => score(ctx, q, t);
 
 const V = {
   Q01: {
