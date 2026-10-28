@@ -80,9 +80,9 @@ CallReady trains no model. In this domain, "model" means the scoring rules plus 
 
 ## 3. Changes
 
-Ordered by value to the submission (17:00 today), then by governance value. Effort is estimated in minutes.
+Ordered by value to the submission (20:00 today, moved from 17:00), then by governance value. Effort is estimated in minutes.
 
-| # | Change | Domain | Effort | Before 17:00? |
+| # | Change | Domain | Effort | Before the deadline? |
 | --- | --- | --- | --- | --- |
 | C1 | **AI use and privacy notice** on the Rehearse screen: what is rules and what is AI, that answers sent to the coach reach third-party model providers, not to paste real unpublished information, and that cached answers are deleted after 7 days | I | 15 | Yes |
 | C2 | **Delete cached answers after 7 days** in the API, as the plan promised | I | 10 | Yes |

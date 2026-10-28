@@ -1,6 +1,6 @@
 # 05. Roadmap
 
-**Status 2026-10-28:** the deadline (D-04) was 17:00 the same day, so P0 to P4 were compressed into one build. Shipped: the static journey, the deterministic engine, the question bank with reference answers, the live coach API, demo mode by fallback, voice input and the printable report. Not done: CI, Playwright smoke, a formal calibration set (the 12 reference answers and the weak samples serve as an informal one), bring-your-own pack.
+**Status 2026-10-28:** the deadline (D-04) was the same day, 17:00 and then 20:00, so P0 to P4 were compressed into one build. Shipped: the static journey, the deterministic engine, the question bank with reference answers, the live coach API, demo mode by fallback, voice input and the printable report. Not done: CI, Playwright smoke, a formal calibration set (the 12 reference answers and the weak samples serve as an informal one), bring-your-own pack.
 
 The phase plan below is kept as the path for further work.
 
