@@ -9,11 +9,26 @@ const r1 = (x) => Math.round(x * 10) / 10;
 export const margin = (p) => (p && num(p.revenue) && num(p.ebitda) != null ? (p.ebitda / p.revenue) * 100 : null);
 
 // ---------- validation ----------
-export const PERIOD_FIELDS = ['revenue', 'ebitda', 'pat', 'ocf', 'capex', 'netDebt', 'da', 'invDays', 'recDays', 'payDays'];
+export const PERIOD_FIELDS = ['revenue', 'ebitda', 'ebit', 'pat', 'ocf', 'capex', 'netDebt', 'da', 'invDays', 'recDays', 'payDays'];
+
+// Some companies report operating profit (EBIT) and no EBITDA. The margin checks then run on EBIT,
+// and the pack says so, rather than the pack being rejected.
+export function normalizePack(p) {
+  const per = p?.periods || {};
+  const usesEbit = ['current', 'priorYear'].every((k) => per[k] && per[k].ebitda == null && typeof per[k].ebit === 'number');
+  if (usesEbit) {
+    for (const x of [per.current, per.priorYear, per.priorQuarter, ...(p.history || [])]) if (x && x.ebitda == null && typeof x.ebit === 'number') x.ebitda = x.ebit;
+    p.company = { ...(p.company || {}), marginBasis: 'EBIT' };
+  }
+  if (typeof p?.company?.units === 'string') p.company.units = p.company.units.split(/[;(]/)[0].trim();
+  return p;
+}
 export const METRICS = ['revenueGrowth', 'ebitdaMargin', 'netDebtToEbitda', 'capex', 'segmentEbit', 'workingCapital', 'cashFlow', 'other'];
 export function validatePack(p) {
   const errors = [], warnings = [];
   if (!p || typeof p !== 'object') return { errors: ['Not a JSON object.'], warnings };
+  normalizePack(p);
+  if (p.company?.marginBasis === 'EBIT') warnings.push('The company reports operating profit (EBIT), not EBITDA: margin checks use operating margin.');
   if (p.schema !== SCHEMA) errors.push(`"schema" must be "${SCHEMA}".`);
   if (!p.company?.name) errors.push('company.name is missing.');
   if (!p.company?.quarter) errors.push('company.quarter is missing (for example "Q2 FY27").');
@@ -141,7 +156,7 @@ export function pressureMap(p, k = kpis(p), imp = implied(p, k), cs = commitment
   if (k.ocfYoY != null && (k.ocfYoY < -10 || (k.conv != null && k.convPy != null && k.conv < k.convPy - 10))) P.push({ id: 'cash', theme: 'Cash', title: 'Operating cash flow and conversion fell',
     evidence: `OCF ${k.cur.ocf} vs ${k.py.ocf} ${units} (${r1(k.ocfYoY)}%).${k.conv != null ? ` OCF/EBITDA ${Math.round(k.conv)}% vs ${Math.round(k.convPy)}%.` : ''}${k.ccc != null && k.cccPy != null ? ` Cash cycle ${k.cccPy} to ${k.ccc} days.` : ''}`,
     magnitude: clamp(-k.ocfYoY / 50), salience: 0.9, ties: byMetric('workingCapital', 'cashFlow'), kw: KW.cash, owner: 'CFO', template: 'cash' });
-  if (k.lev != null) P.push({ id: 'leverage', theme: 'Balance sheet', title: 'Leverage against the balance-sheet ceiling',
+  if (k.lev != null && k.cur.netDebt > 0) P.push({ id: 'leverage', theme: 'Balance sheet', title: 'Leverage against the balance-sheet ceiling',
     evidence: `Net debt ${k.cur.netDebt} ${units}; ${k.lev.toFixed(2)}x ${k.ttmAnnualised ? 'annualised' : 'trailing'} EBITDA${k.levBase != null ? ` vs ${k.levBase.toFixed(2)}x at year end` : ''}.${k.fcf != null ? ` FCF ${k.fcf} ${units}.` : ''}`,
     magnitude: clamp(k.lev / (cs.find((c) => c.metric === 'netDebtToEbitda')?.target?.high || 1.5)), salience: 0.85, ties: byMetric('netDebtToEbitda'), kw: KW.leverage, owner: 'CFO', template: 'leverage' });
   if (k.vsCons?.ebitda != null && k.vsCons.ebitda < -2) P.push({ id: 'consensus', theme: 'Consensus', title: `EBITDA ${r1(-k.vsCons.ebitda)}% below consensus`,
@@ -158,10 +173,20 @@ export function pressureMap(p, k = kpis(p), imp = implied(p, k), cs = commitment
   if (capex && p.ytd?.capex != null) P.push({ id: 'capex', theme: 'Capital allocation', title: 'Capex against plan',
     evidence: `${p.ytd.label || 'Year to date'} capex ${p.ytd.capex} ${units} against about ${capex.target.value} for the year (${Math.round((p.ytd.capex / capex.target.value) * 100)}%).`,
     magnitude: clamp((p.ytd.capex / capex.target.value - (p.ytd.quartersElapsed || 2) / 4) / 0.3), salience: 0.6, ties: [capex.id], kw: KW.capex, owner: 'CFO', template: 'capex' });
+  if (k.patYoY != null && k.patYoY <= -15) P.push({ id: 'profit', theme: 'Profit', title: `PAT down ${r1(-k.patYoY)}%`,
+    evidence: `PAT ${k.cur.pat} vs ${k.py.pat} ${units}${k.revYoY != null ? `, while revenue moved ${k.revYoY > 0 ? '+' : ''}${r1(k.revYoY)}%` : ''}.`,
+    magnitude: clamp(-k.patYoY / 50), salience: 0.85, ties: [], kw: ['profit', 'pat', 'tax', 'interest', 'depreciation'], owner: 'CFO', template: 'profit' });
+  if (k.mPq != null && k.m != null && (k.m - k.mPq) * 100 < -50) P.push({ id: 'margin-qoq', theme: 'Margin', title: `Margin down ${Math.round((k.mPq - k.m) * 100)} bps on last quarter`,
+    evidence: `EBITDA margin ${r1(k.m)}% vs ${r1(k.mPq)}% last quarter.`, magnitude: clamp((k.mPq - k.m) * 100 / 300) * 0.8, salience: 0.8, ties: [], kw: KW.margin, owner: 'CFO', template: 'marginQoq' });
   if (k.revYoY != null && k.revYoY < 0) P.push({ id: 'revenue', theme: 'Growth', title: `Revenue down ${r1(-k.revYoY)}%`, evidence: `Revenue ${k.cur.revenue} vs ${k.py.revenue} ${units}.`,
     magnitude: clamp(-k.revYoY / 20), salience: 0.8, ties: byMetric('revenueGrowth'), kw: KW.revenue, owner: 'CEO', template: 'revenue' });
   // Broken statements and deflections that no metric item already carries get their own item.
   const tied = new Set(P.flatMap((x) => x.ties));
+  for (const c of cs.filter((c) => c.kind === 'guidance' && c.statusSource !== 'rule' && !tied.has(c.id))) {
+    P.push({ id: `g-${c.id}`, theme: 'Guidance', title: `Guidance on record: ${c.topic || c.metricLabel || c.said.slice(0, 60)}`, evidence: c.said, magnitude: 0.5, salience: 0.8, ties: [c.id],
+      kw: (c.topic || c.said).toLowerCase().split(/\W+/).filter((w) => w.length > 4).slice(0, 4), owner: c.by === 'CEO' ? 'CEO' : 'CFO', template: 'guidanceAsk', commitment: c });
+    tied.add(c.id);
+  }
   for (const c of cs.filter((c) => (c.status === 'broken' || c.status === 'deflected') && !tied.has(c.id))) {
     P.push({ id: `c-${c.id}`, theme: c.kind === 'deflection' ? 'Candour' : 'Credibility', title: c.kind === 'deflection' ? `A question deflected last time: ${c.topic || c.metricLabel || 'it will come back'}` : `A statement that did not hold: ${c.topic || c.metricLabel || c.id}`,
       evidence: `${c.said}${c.why ? `. Now: ${c.why}` : ''}`, magnitude: 0.8, salience: 0.85, ties: [c.id], kw: (c.topic || c.said).toLowerCase().split(/\W+/).filter((w) => w.length > 4).slice(0, 4), owner: c.by === 'CEO' ? 'CEO' : 'CFO', template: c.kind === 'deflection' ? 'deflection' : 'statement', commitment: c });
@@ -218,6 +243,15 @@ export function generateQuestions(p, P, k, imp, cs) {
         text = `You have spent ${p.ytd.capex} ${u} of capex so far against guidance of about ${c.target.value} for the year. Is capex going up, and why keep spending if cash flow is weak?`;
         trap = 'Announcing a new capex number on the call.'; terms = ['capex']; keyFigures = [p.ytd.capex, c.target.value]; break;
       }
+      case 'profit':
+        text = `PAT fell ${r1(-k.patYoY)}% to ${k.cur.pat} ${u} while revenue ${k.revYoY >= 0 ? 'grew' : 'fell'} ${r1(Math.abs(k.revYoY))}%. What sits between EBITDA and PAT: depreciation, interest, tax or one-offs, and which of them will recur?`;
+        trap = 'Blaming one-offs the notes do not show, or promising a profit recovery date.'; terms = ['pat', 'profit']; keyFigures = [k.cur.pat]; break;
+      case 'marginQoq':
+        text = `EBITDA margin slipped from ${r1(k.mPq)}% last quarter to ${r1(k.m)}%. Is this seasonal, or is the trend turning?`;
+        trap = 'Calling it seasonal without the year-ago comparison to back it.'; terms = ['margin', 'quarter']; keyFigures = [r1(k.mPq), r1(k.m)]; break;
+      case 'guidanceAsk':
+        text = `You have guided to ${qt(x.commitment.said)}. What has to go right to deliver it, and what would make you change it?`;
+        trap = 'Adding precision beyond the stated guidance: that is new guidance.'; terms = ['guidance', 'deliver']; break;
       case 'revenue':
         text = `Revenue fell ${r1(-k.revYoY)}% to ${k.cur.revenue} ${u}. Is this market, share or timing, and what does it mean for the full year?`;
         trap = 'Promising a recovery date or a number that is not in the guidance.'; terms = ['revenue']; keyFigures = [k.cur.revenue]; break;
@@ -231,7 +265,19 @@ export function generateQuestions(p, P, k, imp, cs) {
     return { id, pressure: x.id, theme: x.theme, persona: PERSONA_BY[x.template] || 'hawk', owner: x.owner, difficulty: x.level === 'red' ? 'Hard' : x.level === 'amber' ? 'Medium' : 'Easy',
       text, trap, cites: [...owed.map((c) => c.ref).filter(Boolean), ...x.recurrent].slice(0, 3), mustAck: owed.map((c) => c.id), terms, keyFigures: keyFigures.filter((v) => num(v) != null),
       followup: 'What exactly will you report next quarter so we can check that?', generated: true };
-  });
+  }).concat(standardQuestions(p, k, u, Math.min(P.length, 10)));
+}
+
+// Questions every call gets, grounded in this pack's figures, so a company with few pressure points
+// still gets a full bank. They sit after the pressure-driven ones.
+function standardQuestions(p, k, u, start) {
+  const Q = [];
+  const add = (theme, persona, text, trap, terms, keyFigures = []) => Q.push({ id: `G${String(start + Q.length + 1).padStart(2, '0')}`, pressure: null, theme, persona, owner: theme === 'Outlook' ? 'CEO' : 'CFO', difficulty: 'Medium', text, trap, cites: [], mustAck: [], terms, keyFigures: keyFigures.filter((v) => num(v) != null), followup: 'What would change your view?', generated: true });
+  add('Outlook', 'hawk', 'How should we think about the next quarter: demand, pricing and margins?', 'Any number not already in guidance is new guidance given on the fly. Describe drivers, not figures.', ['next quarter', 'demand', 'outlook']);
+  if (k.revYoY != null && k.revYoY > 0) add('Growth', 'segment', `Revenue grew ${r1(k.revYoY)}%. How much of that was price and how much volume, and how sustainable is it?`, 'Quoting a price or volume split that is not in the disclosures.', ['price', 'volume', 'growth'], [r1(k.revYoY)]);
+  if (num(k.cur.netDebt) || num(k.cur.capex)) add('Capital allocation', 'governance', `${num(k.cur.netDebt) ? (k.cur.netDebt > 0 ? `Net debt is ${k.cur.netDebt} ${u}` : `You hold net cash of ${-k.cur.netDebt} ${u}`) : `Capex was ${k.cur.capex} ${u} this quarter`}. What are the priorities between capex, debt reduction and returns to shareholders?`, 'Promising a dividend or buyback the board has not approved.', ['capex', 'debt', 'dividend'], [num(k.cur.netDebt) ? k.cur.netDebt : k.cur.capex]);
+  if (k.mBps != null && k.mBps >= -25) add('Margin', 'hawk', `EBITDA margin was ${r1(k.m)}% against ${r1(k.mPy)}% a year ago. What protects it if input costs or pricing turn against you?`, 'Promising a margin floor that is not in guidance.', ['margin', 'cost', 'pricing'], [r1(k.m), r1(k.mPy)]);
+  return Q;
 }
 
 // ---------- facts: every number the pack discloses, with what it is ----------
@@ -262,6 +308,7 @@ export function factSet(p, k, imp, segs) {
 
 // ---------- the context every screen renders from ----------
 export function analyze(p) {
+  normalizePack(p);
   const k = kpis(p);
   const imp = implied(p, k);
   const cs = commitmentStatus(p, k, imp);

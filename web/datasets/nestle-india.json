@@ -1,0 +1,237 @@
+{
+  "schema": "callready.pack.v1",
+  "company": {
+    "name": "Nestlé India Limited",
+    "short": "NESTLEIND",
+    "quarter": "Q2 FY27",
+    "period": "Jul to Sep 2026",
+    "units": "INR lakhs (financial statements); INR crore (press release)",
+    "unitWord": "lakhs",
+    "fyLabel": "FY27",
+    "speakers": {
+      "CEO": "Manish Tiwary, Chairman and Managing Director",
+      "CFO": null
+    },
+    "note": "Financial statements are in INR lakhs. Press release quotes figures in INR crore. All period/history/ytd figures below use INR lakhs as per financial statements unless noted. EBITDA is as reported by the company per Note 2: derived from profit before exceptional items & tax [C], less other income [A(ii)], adding back finance costs [B(v)] and depreciation and amortisation [B(vi)]. Standalone figures used throughout unless stated. Net debt computed as total borrowings (current + non-current) less cash and cash equivalents and current investments: as at 30 Sep 2026 = (211.9+41.5) - (17053.5+700.0) = -17500.1 (net cash); as at 31 Mar 2026 = (202.9+41.5) - 13205.7 = -12961.3 (net cash). OCF from standalone H1 FY27 cash flow statement."
+  },
+  "periods": {
+    "current": {
+      "label": "Q2 FY27 (Jul–Sep 2026)",
+      "revenue": 67883.4,
+      "ebitda": 16154.8,
+      "pat": 10267.7,
+      "ocf": null,
+      "capex": null,
+      "netDebt": -17500.1,
+      "da": 3802.2,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorYear": {
+      "label": "Q2 FY26 (Jul–Sep 2025)",
+      "revenue": 56436.1,
+      "ebitda": 12327.4,
+      "pat": 7532,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": 1633.5,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorQuarter": {
+      "label": "Q1 FY27 (Apr–Jun 2026)",
+      "revenue": 63781.8,
+      "ebitda": 15381.3,
+      "pat": 9751.2,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": 3202.9,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    }
+  },
+  "history": [],
+  "priorFY": {
+    "label": "FY26 (year ended 31 Mar 2026)",
+    "revenue": 230714.6,
+    "ebitda": 53060.6,
+    "netDebt": -12961.3
+  },
+  "ytd": {
+    "label": "H1 FY27 (Apr–Sep 2026)",
+    "revenue": 131665.2,
+    "ebitda": 31536.1,
+    "capex": 4686.8,
+    "revenuePy": 107397.7,
+    "quartersElapsed": 2
+  },
+  "ttmEbitda": null,
+  "segments": [],
+  "consensus": null,
+  "commitments": [
+    {
+      "id": "S1",
+      "kind": "statement",
+      "by": "CEO",
+      "said": "I am pleased to share that the quarter saw a continuation of strong and broad-based growth across all product groups, with total sales reaching INR 6,782.2 crore, with a growth of 20.5%, that was driven by robust, double-digit volume growth.",
+      "ref": null,
+      "metric": "revenueGrowth",
+      "segment": null,
+      "target": {
+        "value": 20.5
+      },
+      "period": "Q2 FY27",
+      "topic": "Total sales double-digit volume growth",
+      "status": "kept",
+      "why": "Total sales (Revenue from Operations) for Q2 FY27 was INR 67,883.4 lakhs vs INR 56,436.1 lakhs in Q2 FY26, a growth of 20.3% (press release states 20.5% on total sales basis)."
+    },
+    {
+      "id": "S2",
+      "kind": "statement",
+      "by": "CEO",
+      "said": "EBITDA margin remained healthy at 23.8%.",
+      "ref": null,
+      "metric": "ebitdaMargin",
+      "segment": null,
+      "target": {
+        "value": 23.8
+      },
+      "period": "Q2 FY27",
+      "topic": "EBITDA margin healthy at 23.8%",
+      "status": "kept",
+      "why": "Reported EBITDA of INR 16,154.8 lakhs on revenue from operations of INR 67,883.4 lakhs equals approximately 23.8%."
+    },
+    {
+      "id": "S3",
+      "kind": "statement",
+      "by": "CEO",
+      "said": "Profit After Tax for the quarter stood at INR 1,026.8 crore, up 36.3% over the corresponding quarter.",
+      "ref": null,
+      "metric": "other",
+      "segment": null,
+      "target": {
+        "value": 36.3
+      },
+      "period": "Q2 FY27",
+      "topic": "PAT up 36.3% year-on-year",
+      "status": "kept",
+      "why": "Standalone PAT Q2 FY27 INR 10,267.7 lakhs vs Q2 FY26 INR 7,532.0 lakhs, growth of ~36.3%."
+    },
+    {
+      "id": "S4",
+      "kind": "statement",
+      "by": "CEO",
+      "said": "advertising and marketing spends up by 46%.",
+      "ref": null,
+      "metric": "other",
+      "segment": null,
+      "target": {
+        "value": 46
+      },
+      "period": "Q2 FY27",
+      "topic": "A&M spend up 46%",
+      "status": "unclear",
+      "why": "No separate advertising line item disclosed in financial statements to verify independently."
+    },
+    {
+      "id": "S5",
+      "kind": "statement",
+      "by": "CEO",
+      "said": "Rising inflation, particularly food inflation, is a reality. We remain focused on navigating these external challenges through continuous innovation and renovation, sustained investments behind our brands, and an intensified focus on productivity and operational efficiencies to mitigate commodity cost pressures.",
+      "ref": null,
+      "metric": "other",
+      "segment": null,
+      "target": null,
+      "period": "Q2 FY27",
+      "topic": "Navigating commodity cost inflation",
+      "status": "unclear",
+      "why": "Forward-looking qualitative statement; not quantitatively verifiable from this quarter's figures alone."
+    },
+    {
+      "id": "S6",
+      "kind": "statement",
+      "by": "CEO",
+      "said": "Coffee and wheat are expected to remain range-bound, while sugar and edible oils have stabilized at elevated levels. Cocoa remains volatile due to weather-driven crop concerns in key origins. Milk prices have strengthened seasonally but should ease as flush supplies arrive.",
+      "ref": null,
+      "metric": "other",
+      "segment": null,
+      "target": null,
+      "period": "FY27",
+      "topic": "Commodity outlook commentary",
+      "status": "unclear",
+      "why": "Forward-looking commodity outlook; cannot be verified from current period financials."
+    },
+    {
+      "id": "S7",
+      "kind": "statement",
+      "by": "CEO",
+      "said": "Cost of materials consumed [B(i)+B(ii)+B(iii)] as a % to sales has decreased from 45.5% to 43.1% for the quarter ended 30th September 2026.",
+      "ref": null,
+      "metric": "other",
+      "segment": null,
+      "target": {
+        "low": 43.1,
+        "high": 43.1
+      },
+      "period": "Q2 FY27",
+      "topic": "Material cost as % of sales improved",
+      "status": "kept",
+      "why": "Note 3(b) of the standalone financial results explicitly states material cost % to sales decreased from 45.5% to 43.1% for Q2 FY27."
+    }
+  ],
+  "transcript": [],
+  "notes": [
+    {
+      "ref": "N1",
+      "text": "For better understanding of the financial performance, the Company has chosen to present earnings before interest, tax, depreciation and amortisation [EBITDA] as an additional information. EBITDA is derived from profit before exceptional items & tax [C], less other income [A(ii)], adding back finance costs [B(v)] and depreciation (including impairment on property, plant, and equipment) and amortisation [B(vi)]."
+    },
+    {
+      "ref": "N2",
+      "text": "Comparisons are with reference to quarter ended 30th September 2025 unless otherwise specified: a) Total sales and domestic sales for the quarter ended 30th September 2026 increased by 20.5% and 20.4%, respectively. b) Cost of materials consumed [B(i)+B(ii)+B(iii)] as a % to sales has decreased from 45.5% to 43.1% for the quarter ended 30th September 2026."
+    },
+    {
+      "ref": "N3",
+      "text": "Based on the guiding principles given in 'Ind AS 108 - Operating Segments', the business activity falls within a single operating segment, namely Food. Accordingly, no separate segment information has been provided."
+    },
+    {
+      "ref": "N4",
+      "text": "The Company has entered into a Share Subscription and Agreement dated 27th August 2026 to acquire a 26% equity stake in Radiance KA Sunshine Seven Private Limited by subscribing to 7,612,500 equity shares of 10 each. Radiance KA is establishing a captive renewable energy power plant to meet the power requirements of one of the manufacturing facilities with the Company's commitment to increase the share of renewable energy in its operations and support its sustainability objectives."
+    },
+    {
+      "ref": "N5",
+      "text": "The statutory auditors have issued an unmodified report on the above financial results."
+    },
+    {
+      "ref": "N6",
+      "text": "THE ABOVE RESULTS AND THIS RELEASE HAVE BEEN REVIEWED BY THE AUDIT COMMITTEE OF THE BOARD AT THEIR MEETING HELD ON 14th OCTOBER 2026 AND APPROVED BY THE BOARD OF DIRECTORS AT THEIR MEETING HELD ON 15th OCTOBER 2026."
+    }
+  ],
+  "remarks": "I am pleased to share that the quarter saw a continuation of strong and broad-based growth across all product groups, with total sales reaching INR 6,782.2 crore, with a growth of 20.5%, that was driven by robust, double-digit volume growth. We continued to focus on efficiencies across our operations while significantly increasing investments behind our brands, with advertising and marketing spends up by 46%. EBITDA margin remained healthy at 23.8%. Profit After Tax for the quarter stood at INR 1,026.8 crore, up 36.3% over the corresponding quarter.\n\nRising inflation, particularly food inflation, is a reality. We remain focused on navigating these external challenges through continuous innovation and renovation, sustained investments behind our brands, and an intensified focus on productivity and operational efficiencies to mitigate commodity cost pressures. I would like to thank our teams for their extraordinary commitment, resilience, and unwavering focus on execution in this challenging environment.\n\nAt Nestlé India, food safety and quality are the foundation of consumer trust. I am proud of the unflinching commitment of our colleagues across our manufacturing units and would like to congratulate them for receiving the CII Food Safety & Quality Awards for our Sanand and Ponda factories and the Nestlé Global Quality Award for the Samalkha factory. These recognitions reaffirm our commitment to delivering safe, high-quality products to millions of consumers every day.\n\nConfectionery product group recorded another strong quarter of volume led double-digit growth, driven by continued market share gains in KITKAT® and sustained momentum across MUNCH® and MILKYBAR®.\n\nPowdered and Liquid Beverages product group delivered another quarter of strong, volume-led growth. This performance was driven by sustained household reach, enhanced affordability and continued premiumization across the coffee portfolio. Our continued investments behind the NESCAFÉ® brand, coupled with a dual focus on expanding category penetration and accelerating premiumization, continue to strengthen category relevance and reinforce our long-term growth ambitions.\n\nNESPRESSO® continued its strong growth momentum in e-commerce and retail channels fuelled by continuing premiumization and building seasonal relevance in summer through iced coffee.\n\nPrepared Dishes and Cooking Aids product group delivered strong growth. MAGGI® noodles continued to expand through rural penetration, while MAGGI® Masala-ae-Magic continued to focus on driving household penetration by unlocking regional top dish usage across the country.\n\nMilk Products and Nutrition product group saw strong, broad-based growth with investments in brand building and portfolio optimisation.\n\nPet Food business delivered strong double-digit growth, supported by sharper consumer engagement on digital platforms and focused route to market. We continued to strengthen our presence in the cat food segment through science-based nutritional solutions across mainstream and premium offerings, through FELIX® Gravy Lover, PRO PLAN® Cat and FRISKIES® wet cat. Leveraging Nestlé's research and innovation capabilities, we remain focused on delivering advanced nutrition tailored to the evolving needs of pets.\n\nNestlé Professional continued its strong momentum, delivering robust, double-digit, volume-led growth through premium offerings, customer-centric solutions and innovative applications catering to evolving needs of customers in the out-of-home space.\n\nE-commerce also continued its strong trajectory, driven by sustained shopper engagement, portfolio breadth, and focused channel-specific execution. General Trade delivered robust, double-digit growth across town classes, led by strong momentum in rural markets. Continued expansion of rural distribution touchpoints enhanced our direct reach and strengthened market coverage.\n\nDigitalization continues to strengthen execution across our business. Building on the success of NestMitra for retailers, we are now putting data-enabled digital tools directly into the hands of our sales teams, enabling faster decisions and sharper market execution. Our sales officer app equips hundreds of sales officers with near real-time market insights, helping them identify opportunities and improve engagement.\n\nDuring a recent visit to Bathri, a village adopted under our Village Development Programme near our Tahliwal factory in Himachal Pradesh, I spent time with the Gram Pradhan. As we walked through the village, he shared stories of children staying in school, families paying greater attention to nutrition and hygiene, and farmers looking to the future with renewed confidence. This was a reminder that the true measure of impact lies in helping communities believe that a brighter future is within reach.\n\nI would like to thank our Board, shareholders, employees, retailers, distributors, and partners for their continued confidence and our consumers for the trust they place in our brands.",
+  "id": "ds-nestle-india",
+  "provenance": {
+    "source": "dataset",
+    "extractedBy": "claude-sonnet-4-6",
+    "extractedSeconds": 184,
+    "urls": [
+      "https://nsearchives.nseindia.com/corporate/NESTLEIND1_15102026124531_BSENSEOutcomeResults15102026signed.pdf"
+    ],
+    "verify": {
+      "numbersFound": 18,
+      "numbersTotal": 20,
+      "quotesFound": 5,
+      "quotesTotal": 7,
+      "linesFound": 0,
+      "linesTotal": 0
+    },
+    "unverified": [
+      "periods.current.netDebt=-17500.1",
+      "priorFY.netDebt=-12961.3"
+    ],
+    "caveats": "Counter-example: no margin pressure (EBITDA margin 23.8%, cost of materials down to 43.1% of sales), though A&P spend +46%. Board outcome filing bundles standalone + consolidated Reg 33 results, review report and press release. The results TABLES extract badly (labels run together, numbers separated from their rows); the press-release section near the end is clean prose. Single segment (Food), so no segment data. No Q2 transcript found on NSE; the company posts transcripts on nestle.in."
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "schema": "callready.pack.v1",
+  "company": {
+    "name": "JK Tyre & Industries Limited",
+    "short": "JK Tyre",
+    "quarter": "Q2 FY27",
+    "period": "Jul to Sep 2026",
+    "units": "INR crore",
+    "unitWord": "crore",
+    "fyLabel": "FY27",
+    "speakers": {
+      "CEO": null,
+      "CFO": null
+    }
+  },
+  "periods": {
+    "current": {
+      "label": "Q2FY27",
+      "revenue": 4850,
+      "ebitda": 343,
+      "pat": 60,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": null,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorYear": {
+      "label": "Q2FY26",
+      "revenue": 4026,
+      "ebitda": 536,
+      "pat": 223,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": null,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorQuarter": {
+      "label": "Q1FY27",
+      "revenue": 3956,
+      "ebitda": 268,
+      "pat": 43,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": null,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    }
+  },
+  "history": [],
+  "priorFY": null,
+  "ytd": {
+    "label": "H1FY27",
+    "revenue": 8806,
+    "ebitda": 611,
+    "capex": null,
+    "revenuePy": 7916,
+    "quartersElapsed": 2
+  },
+  "ttmEbitda": null,
+  "segments": [],
+  "consensus": null,
+  "commitments": [],
+  "transcript": [],
+  "notes": [
+    {
+      "ref": "N1",
+      "text": "* EBITDA includes Other Income"
+    }
+  ],
+  "remarks": "",
+  "id": "ds-jk-tyre",
+  "provenance": {
+    "source": "dataset",
+    "extractedBy": "gemini-3.8-flash-medium",
+    "extractedSeconds": 83,
+    "urls": [
+      "https://dwzytf8fljslz.cloudfront.net/Investor_Presentation_Q2_FY_27_9030746788.pdf"
+    ],
+    "verify": {
+      "numbersFound": 12,
+      "numbersTotal": 12,
+      "quotesFound": 0,
+      "quotesTotal": 0,
+      "linesFound": 0,
+      "linesTotal": 0
+    },
+    "unverified": [],
+    "caveats": "Severe margin-pressure case: consolidated EBITDA 343 Cr vs 536 Cr (-36% YoY), margin 7.1%. EBITDA INCLUDES other income, and the headline line is Total Income, not revenue from operations. URL is the CloudFront CDN that jktyre.com/investor links to (company-hosted). The consolidated-results PDF linked on the same page was a scanned image with no text, so it was discarded. No Q2 transcript published yet (only an audio recording)."
+  }
+}

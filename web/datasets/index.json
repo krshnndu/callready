@@ -1,0 +1,161 @@
+[
+  {
+    "slug": "tejas-networks",
+    "company": "Tejas Networks Limited",
+    "quarter": "Q2 FY27",
+    "units": "INR crore",
+    "sector": "Telecom equipment",
+    "model": "gemini-3.8-flash-medium",
+    "sources": [
+      {
+        "kind": "Results",
+        "url": "https://nsearchives.nseindia.com/corporate/TEJASNET_16102026191355_Investors_Presentation_-_Intimation.pdf"
+      },
+      {
+        "kind": "Transcript",
+        "url": "https://nsearchives.nseindia.com/corporate/TEJASNET_22102026161919_Transcript_Letter.pdf"
+      }
+    ],
+    "verify": {
+      "numbersFound": 16,
+      "numbersTotal": 17,
+      "quotesFound": 5,
+      "quotesTotal": 5,
+      "linesFound": 11,
+      "linesTotal": 11
+    },
+    "errors": [],
+    "warnings": 0
+  },
+  {
+    "slug": "pitti-engineering",
+    "company": "Pitti Engineering Limited",
+    "quarter": "Q2 FY27",
+    "units": "INR crore",
+    "sector": "Engineering components",
+    "model": "gemini-3.8-flash-medium",
+    "sources": [
+      {
+        "kind": "Results",
+        "url": "https://nsearchives.nseindia.com/corporate/PITTIENG_22102026202152_INVESTORPPT.pdf"
+      }
+    ],
+    "verify": {
+      "numbersFound": 13,
+      "numbersTotal": 13,
+      "quotesFound": 1,
+      "quotesTotal": 1,
+      "linesFound": 0,
+      "linesTotal": 0
+    },
+    "errors": [],
+    "warnings": 2
+  },
+  {
+    "slug": "jk-tyre",
+    "company": "JK Tyre & Industries Limited",
+    "quarter": "Q2 FY27",
+    "units": "INR crore",
+    "sector": "Tyres",
+    "model": "gemini-3.8-flash-medium",
+    "sources": [
+      {
+        "kind": "Results",
+        "url": "https://dwzytf8fljslz.cloudfront.net/Investor_Presentation_Q2_FY_27_9030746788.pdf"
+      }
+    ],
+    "verify": {
+      "numbersFound": 12,
+      "numbersTotal": 12,
+      "quotesFound": 0,
+      "quotesTotal": 0,
+      "linesFound": 0,
+      "linesTotal": 0
+    },
+    "errors": [],
+    "warnings": 2
+  },
+  {
+    "slug": "nestle-india",
+    "company": "Nestle India Limited",
+    "quarter": "Q2 FY27",
+    "units": "INR lakhs (financial statements); INR crore (press release)",
+    "sector": "FMCG",
+    "model": "claude-sonnet-4-6",
+    "sources": [
+      {
+        "kind": "Results",
+        "url": "https://nsearchives.nseindia.com/corporate/NESTLEIND1_15102026124531_BSENSEOutcomeResults15102026signed.pdf"
+      }
+    ],
+    "verify": {
+      "numbersFound": 18,
+      "numbersTotal": 20,
+      "quotesFound": 5,
+      "quotesTotal": 7,
+      "linesFound": 0,
+      "linesTotal": 0
+    },
+    "errors": [],
+    "warnings": 1
+  },
+  {
+    "slug": "wipro",
+    "company": "Wipro Limited",
+    "quarter": "Q2 FY27",
+    "units": "INR million",
+    "sector": "IT services",
+    "model": "gemini-3.8-flash-medium",
+    "sources": [
+      {
+        "kind": "Results",
+        "url": "https://nsearchives.nseindia.com/corporate/Wipro_Secretarial_15102026155126_PressRelease.pdf"
+      },
+      {
+        "kind": "Transcript",
+        "url": "https://nsearchives.nseindia.com/corporate/Wipro_Secretarial_16102026163132_SEIntimation16102026.pdf"
+      }
+    ],
+    "verify": {
+      "numbersFound": 33,
+      "numbersTotal": 41,
+      "quotesFound": 3,
+      "quotesTotal": 3,
+      "linesFound": 13,
+      "linesTotal": 16
+    },
+    "errors": [
+      "periods.current.ebitda must be a number.",
+      "periods.priorYear.ebitda must be a number."
+    ],
+    "warnings": 0
+  },
+  {
+    "slug": "jindal-saw",
+    "company": "Jindal Saw Limited",
+    "quarter": "Q2 FY27",
+    "units": "INR million",
+    "sector": "Steel pipes",
+    "model": "gemini-3.8-flash-medium",
+    "sources": [
+      {
+        "kind": "Results",
+        "url": "https://nsearchives.nseindia.com/corporate/JINDALSAW_16102026161550_FinancialHighlightsSE.pdf"
+      },
+      {
+        "kind": "Transcript",
+        "url": "https://nsearchives.nseindia.com/corporate/JINDALSAW_22102026174041_TranscriptSE.pdf"
+      }
+    ],
+    "verify": {
+      "numbersFound": 17,
+      "numbersTotal": 17,
+      "quotesFound": 0,
+      "quotesTotal": 4,
+      "linesFound": 14,
+      "linesTotal": 16
+    },
+    "errors": [],
+    "warnings": 0
+  }
+]

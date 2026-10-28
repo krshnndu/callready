@@ -1,0 +1,291 @@
+{
+  "schema": "callready.pack.v1",
+  "company": {
+    "name": "Jindal Saw Limited",
+    "short": "Jindal Saw",
+    "quarter": "Q2 FY27",
+    "period": "Jul to Sep 2026",
+    "units": "INR million",
+    "unitWord": "million",
+    "fyLabel": "FY27",
+    "speakers": {
+      "CEO": null,
+      "CFO": "Narendra Mantri, Chief Operating and Financial Officer"
+    }
+  },
+  "periods": {
+    "current": {
+      "label": "Q2 FY27",
+      "revenue": 45231,
+      "ebitda": 3123,
+      "pat": 353,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": 1690,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorYear": {
+      "label": "Q2 FY26",
+      "revenue": 42640,
+      "ebitda": 4816,
+      "pat": 1386,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": 1555,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorQuarter": {
+      "label": "Q1 FY27",
+      "revenue": 44760,
+      "ebitda": 4204,
+      "pat": 908,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": 1637,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    }
+  },
+  "history": [
+    {
+      "label": "Q3 FY26",
+      "revenue": 49630,
+      "ebitda": 6322,
+      "ocf": null,
+      "capex": null
+    },
+    {
+      "label": "Q4 FY26",
+      "revenue": 46569,
+      "ebitda": 5042,
+      "ocf": null,
+      "capex": null
+    }
+  ],
+  "priorFY": {
+    "label": "FY26",
+    "revenue": 179869,
+    "ebitda": 23063,
+    "netDebt": null
+  },
+  "ytd": {
+    "label": "H1 FY27",
+    "revenue": 89991,
+    "ebitda": 7327,
+    "capex": null,
+    "revenuePy": 83670,
+    "quartersElapsed": 2
+  },
+  "ttmEbitda": null,
+  "segments": [],
+  "consensus": null,
+  "commitments": [
+    {
+      "id": "G1",
+      "kind": "guidance",
+      "by": "other",
+      "said": "So, overall, volumes in FY'27 should be higher than FY'26 volumes.",
+      "ref": "Page 12 of 15",
+      "metric": "other",
+      "segment": null,
+      "target": null,
+      "period": "FY27",
+      "topic": "full year volume growth expectation",
+      "status": "unclear",
+      "why": "FY27 is currently in progress with H1 pipe sales at 732,000 MT versus FY26 sales of 1,376,000 MT."
+    },
+    {
+      "id": "S1",
+      "kind": "statement",
+      "by": "other",
+      "said": "So, we can expect Q3, Q4 onward that the margins will be moved towards, you know, double-digit and we are expecting and we expect that very soon this situation will be same what we were doing few quarters back.",
+      "ref": "Page 10 of 15",
+      "metric": "ebitdaMargin",
+      "segment": null,
+      "target": {
+        "low": 10
+      },
+      "period": "H2 FY27",
+      "topic": "EBITDA margin recovery toward double-digit",
+      "status": "unclear",
+      "why": "Q2 FY27 consolidated EBITDA margin was 6.9%."
+    },
+    {
+      "id": "S2",
+      "kind": "statement",
+      "by": "other",
+      "said": "Right now, we can comment on H2 blended because things are so volatile. We are working out certain modalities to export even the job-work order also. So, we cannot comment on exact numbers as of now, but H2 should be better than H1.",
+      "ref": "Page 13 of 15",
+      "metric": "other",
+      "segment": null,
+      "target": null,
+      "period": "H2 FY27",
+      "topic": "H2 performance better than H1",
+      "status": "unclear",
+      "why": "H2 results have not yet been reported."
+    },
+    {
+      "id": "D1",
+      "kind": "deflection",
+      "by": "other",
+      "said": "Okay. So, we will not talk about the margin at this point of time.",
+      "ref": "Page 8 of 15",
+      "metric": "ebitdaMargin",
+      "segment": null,
+      "target": null,
+      "period": "FY27",
+      "topic": "margins on new export LOIs",
+      "status": "unclear",
+      "why": "Management declined to comment on margin comparability for new non-MENA LOIs."
+    }
+  ],
+  "transcript": [
+    {
+      "ref": "T-L001",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Shaurya Shah, Equirus Securities",
+      "text": "So, just wanted to know whether these whether these will kind of replace the affected MENA volumes, or the delayed MENA volumes, at comparable margins?"
+    },
+    {
+      "ref": "T-L002",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Vinay Kumar Gupta, Jindal Saw Limited",
+      "text": "Okay. So, we will not talk about the margin at this point of time. Let me discuss two things which you rightly pointed out. One is that, first of all, we have now, after announcement of – after let us say receiving the additional LOI of USD50 million, so the total LOIs other than the confirmed orders are USD625 million."
+    },
+    {
+      "ref": "T-L003",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Vinay Kumar Gupta, Jindal Saw Limited",
+      "text": "In terms of the production and dispatches, these production would start sometime in February, March, and because the LOI once we get the confirmed order in next couple of days or weeks, after that, the raw material which has been already been blocked, we expect to receive the raw material from January or February."
+    },
+    {
+      "ref": "T-L004",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Shaurya Shah, Equirus Securities",
+      "text": "The other thing I wanted to ask is that there is also some imposition of anti-dumping duty on DI pipe imports into Saudi Arabia. So, just wanted to know your exposure to Saudi region, specifically for DI pipes, and can you explain like the specific rates, if possible, as in the anti-dumping rate that could be applicable if possible, on our DI pipes exports to Saudi?"
+    },
+    {
+      "ref": "T-L005",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Rajeev Goyal, Jindal Saw Limited",
+      "text": "Yes, so basically you're right that anti-dumping duty has been imposed by Saudi Arabia government on the Indian exporters. But good thing is that since we did not export pipes from India to Saudi, so we are not into that anti-dumping duty imposition. And we are doing sale to Saudi Arabia through our Abu Dhabi subsidiary."
+    },
+    {
+      "ref": "T-L006",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Sailesh Raja, 360 ONE Capital",
+      "text": "So, how should we assess the quality and profitability of the order book? And over the next 12 months, what trajectory that do you expect for gross profit to improve, and what could it return to you know, when it will return to that the INR51 spread, which was reported in last year?"
+    },
+    {
+      "ref": "T-L007",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Rajeev Goyal, Jindal Saw Limited",
+      "text": "So, we can expect Q3, Q4 onward that the margins will be moved towards, you know, double-digit and we are expecting and we expect that very soon this situation will be same what we were doing few quarters back."
+    },
+    {
+      "ref": "T-L008",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Sailesh Raja, 360 ONE Capital",
+      "text": "Sir, our effective utilization is around 67%. Our effective capacity I'm taking 2.3 million tons. So, by when do you expect that utilization will reach 80%, sir? Either in third quarter or fourth quarter?"
+    },
+    {
+      "ref": "T-L009",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Rajeev Goyal, Jindal Saw Limited",
+      "text": "No. So, 80% utilization and all, all depends on the execution of multiple orders. So, in the best-case scenario also, our execution level was somewhere 75%, not crossing that. We achieved the highest volume somewhere in '24-'25, when we achieved 1.8 million tons. So, what we feel that reaching to that level of execution will take time. However, improvement in the execution, we are expecting Q4 onward, definitely."
+    },
+    {
+      "ref": "T-L010",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Vipulkumar Shah, Sumangal Investments",
+      "text": "Hi. So, in your presentation, you have mentioned that export volume is 41% of your total order, but value-wise, it is 28%. So, are we getting substantially reduced realization per ton in export market, or is my understanding wrong?"
+    },
+    {
+      "ref": "T-L011",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Rajeev Goyal, Jindal Saw Limited",
+      "text": "No. So, volumes are including the job-work order of roughly I6 lakh ton, where the volumes are high, however, this order is job-work order where only the job-work value is included. That's why in terms of value, it is 28%. However, in terms of quantities or volumes, it is high."
+    },
+    {
+      "ref": "T-L012",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Saket Kapoor, Kapoor & Company",
+      "text": "Sir, firstly, in terms of the tonnage s part, how are we seeing our tonnage scheduled for H2? And what kind of volume growth are we expecting comparison to what we did for FY26 in terms of the only pipe segment?"
+    },
+    {
+      "ref": "T-L013",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Rajeev Goyal, Jindal Saw Limited",
+      "text": "So, in terms of pipe segment, we are expecting some betterment in terms of volume in pipe segment specifically because till H1, volumes are higher than the previous H1 figures. So, we expect that the same momentum should continue in H2. So, overall, volumes in FY'27 should be higher than FY'26 volumes."
+    },
+    {
+      "ref": "T-L014",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Narendra Mantri, Jindal Saw Limited",
+      "text": "Okay. Saket, in pellet, the kind of mines which we have, we have high stripping ratio and low grade of iron ore. So, because of that, our margins are under pressure now. And the depth of the mine has gone up and we are working how to enhance or maintain the margins there."
+    },
+    {
+      "ref": "T-L015",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Parth Bhavsar, Investec India",
+      "text": "And sir, just on that the domestic front, we've been hearing that there are fund releases in JJ JJM, right, Jal Jeevan Mission, where, you know, INR7,000 crores has been released. So, what is happening on the ground? Are you hearing about these releases, or are there any new workflows that are new orders that are being placed?"
+    },
+    {
+      "ref": "T-L016",
+      "call": "Q2 FY27 Earnings Call",
+      "speaker": "Vinay Kumar Gupta, Jindal Saw Limited",
+      "text": "Okay, so funds release is happening in gradual manner, and that is why in our presentation, we have said release or reduction in the levels of receivable and as well as inventory. So, we have seen funds getting released, but yes, albeit the -- it's slower. It's not like cleaning of the existing payable by the government. That's one. Second thing is that for some time, the orders would not be issued under Jal Jeevan Mission scheme. It would be from the State government side."
+    }
+  ],
+  "notes": [
+    {
+      "ref": "N1",
+      "text": "Total Income, Other Expenses and Finance Costs are net of the impact of foreign exchange fluctuations. The Company follows a policy and strategy of natural hedging of foreign exchange exposures."
+    },
+    {
+      "ref": "N2",
+      "text": "Current tax expense for the quarter and half year ended September 30, 2026 is net of tax adjustments of ₹ 266.7 Million towards additional claims pertaining to earlier years adjudicated in favour of the Company by the Appellate Authority."
+    },
+    {
+      "ref": "N3",
+      "text": "Effective March 26, regional instability forced a halt on all exports to the MENA market, continuing through Q2 FY27 impacted the capacity utilization and revenue recognition."
+    },
+    {
+      "ref": "N4",
+      "text": "Shipments to the Middle East through the Strait of Hormuz have remained suspended since March 2026, and the Company has invoked the Force Majeure clause in respect of the affected orders."
+    },
+    {
+      "ref": "N5",
+      "text": "JITF was initially granted an arbitration award of ₹1,891 crores (plus interest and taxes) on January 27, 2019. However, following a challenge by NTPC, a single-judge bench of the Delhi High Court overturned the award on January 30, 2025. JITF subsequently appealed to a Division Bench, which delivered a 1:1 split verdict on September 2, 2026. Due to the deadlock, the matter has been referred to the Chief Justice and assigned to a third judge for final resolution, with the next hearing scheduled for January 22, 2027."
+    }
+  ],
+  "remarks": "",
+  "id": "ds-jindal-saw",
+  "provenance": {
+    "source": "dataset",
+    "extractedBy": "gemini-3.8-flash-medium",
+    "extractedSeconds": 45,
+    "urls": [
+      "https://nsearchives.nseindia.com/corporate/JINDALSAW_16102026161550_FinancialHighlightsSE.pdf",
+      "https://nsearchives.nseindia.com/corporate/JINDALSAW_22102026174041_TranscriptSE.pdf"
+    ],
+    "verify": {
+      "numbersFound": 17,
+      "numbersTotal": 17,
+      "quotesFound": 0,
+      "quotesTotal": 4,
+      "linesFound": 14,
+      "linesTotal": 16
+    },
+    "unverified": [],
+    "caveats": "Strong margin-pressure case: standalone EBITDA margin 6.8% vs 9.8% YoY and 9.1% QoQ; consolidated EBITDA 3,123 vs 4,816 YoY. Tax line is a credit (Rs 266.7M prior-year adjustment), which flatters PAT. 'Total Income' is net of forex. Results doc is a financial-highlights deck, not the full Reg 33 statement. Transcript is the Q2 FY27 call of 19 Oct 2026."
+  }
+}

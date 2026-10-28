@@ -1,0 +1,259 @@
+{
+  "schema": "callready.pack.v1",
+  "company": {
+    "name": "Tejas Networks Limited",
+    "short": "Tejas Networks",
+    "quarter": "Q2 FY27",
+    "period": "Jul to Sep 2026",
+    "units": "INR crore",
+    "unitWord": "crore",
+    "fyLabel": "FY27",
+    "speakers": {
+      "CEO": "Arnob Roy, Managing Director and Chief Executive Officer",
+      "CFO": "AVS Prasad, Chief Financial Officer"
+    }
+  },
+  "periods": {
+    "current": {
+      "label": "Q2 FY27",
+      "revenue": 406,
+      "ebitda": -108,
+      "pat": -207,
+      "ocf": null,
+      "capex": null,
+      "netDebt": 4384,
+      "da": 91,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorYear": {
+      "label": "Q2 FY26",
+      "revenue": 262,
+      "ebitda": -293,
+      "pat": -307,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": 101,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorQuarter": {
+      "label": "Q1 FY27",
+      "revenue": 402,
+      "ebitda": -99,
+      "pat": -202,
+      "ocf": null,
+      "capex": null,
+      "netDebt": 4277,
+      "da": 95,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    }
+  },
+  "history": [],
+  "priorFY": null,
+  "ytd": {
+    "label": "H1 FY27",
+    "revenue": 808,
+    "ebitda": -207,
+    "capex": null,
+    "revenuePy": 464,
+    "quartersElapsed": 2
+  },
+  "ttmEbitda": null,
+  "segments": [],
+  "consensus": null,
+  "commitments": [
+    {
+      "id": "S1",
+      "kind": "statement",
+      "by": "CFO",
+      "said": "The high levels of inventory, we expect a significant portion of the inventories would be utilized in executing the BSNL 4G order in the coming quarters, for which the deliveries have already started in Q2 FY27.",
+      "ref": "Transcript page 3",
+      "metric": "workingCapital",
+      "segment": null,
+      "target": null,
+      "period": "upcoming quarters",
+      "topic": "inventory utilization BSNL order",
+      "status": "unclear",
+      "why": "Inventory slightly decreased to INR 2,314 crore in Q2 FY27 from INR 2,358 crore in Q1 FY27, with deliveries having just started."
+    },
+    {
+      "id": "S2",
+      "kind": "statement",
+      "by": "CEO",
+      "said": "Achieve quarterly positive EBITDA financial performance",
+      "ref": "Presentation slide 11",
+      "metric": "ebitdaMargin",
+      "segment": null,
+      "target": null,
+      "period": "upcoming quarters",
+      "topic": "quarterly positive EBITDA target",
+      "status": "unclear",
+      "why": "EBITDA in Q2 FY27 was negative INR 108 crore."
+    },
+    {
+      "id": "D1",
+      "kind": "deflection",
+      "by": "CEO",
+      "said": "So I cannot specify the exact number, but it is going to substantially reduce our receivables.",
+      "ref": "Transcript page 7",
+      "metric": "workingCapital",
+      "segment": null,
+      "target": null,
+      "period": "Q3 FY27",
+      "topic": "BSNL dues recovery amount",
+      "status": "unclear",
+      "why": "Management declined to quantify the exact payment collection expected from BSNL."
+    },
+    {
+      "id": "D2",
+      "kind": "deflection",
+      "by": "CEO",
+      "said": "I don't think I can share the exact details of the order book wins from customers here and there.",
+      "ref": "Transcript page 7",
+      "metric": "other",
+      "segment": null,
+      "target": null,
+      "period": "Q2 FY27",
+      "topic": "non-BSNL order book breakdown",
+      "status": "unclear",
+      "why": "Management declined to share specific customer breakdowns of the INR 2,315 crore order book."
+    },
+    {
+      "id": "D3",
+      "kind": "deflection",
+      "by": "CEO",
+      "said": "Yes. So, I mean, I cannot give exact numbers. But as you know, a significant part of the inventory that we have been carrying for many quarters is for this BSNL expansion order.",
+      "ref": "Transcript page 10",
+      "metric": "workingCapital",
+      "segment": null,
+      "target": null,
+      "period": "next 6 to 9 months",
+      "topic": "quantum of inventory reduction",
+      "status": "unclear",
+      "why": "Management declined to give specific percentage or quantum of expected inventory reduction."
+    }
+  ],
+  "transcript": [
+    {
+      "ref": "T-L001",
+      "call": "Q2 FY27",
+      "speaker": "Analyst, Peace Wealth|Tushar Khurana",
+      "text": "If you just can comment on how much dues we have recovered from the BSNL in particular and how much are still due that we have to receive from BSNL? And by when do we expect that payment to come in?"
+    },
+    {
+      "ref": "T-L002",
+      "call": "Q2 FY27",
+      "speaker": "CEO",
+      "text": "So I think from BSNL now we have come to the timelines for the milestone deliveries. We have met the milestone delivery requirements. And this is the quarter when we will see a significant amount of collections coming from BSNL, which are connected to the milestones that we have achieved. So I cannot specify the exact number, but it is going to substantially reduce our receivables."
+    },
+    {
+      "ref": "T-L003",
+      "call": "Q2 FY27",
+      "speaker": "Analyst, Peace Wealth|Tushar Khurana",
+      "text": "And sir, the order book that we have mentioned this time, INR2,300 crores, does it also include this BSNL order for INR1,500 crores we got from TCS."
+    },
+    {
+      "ref": "T-L004",
+      "call": "Q2 FY27",
+      "speaker": "CEO",
+      "text": "A part of it because we have received the LOI for the entire amount. But right now, as and when we get the POs, the purchase orders are all connected to the sites and the bands and the circle readiness and the identification. So as we keep on getting the POs, they come into our order book, and that's what we ship. So all of INR1,500 crores is not there in the order book yet, but they will come -- most of it, we expect to come by the end of this quarter."
+    },
+    {
+      "ref": "T-L005",
+      "call": "Q2 FY27",
+      "speaker": "Analyst, Peace Wealth|Tushar Khurana",
+      "text": "Okay. I just want to figure out, sir, because last quarter, our order book was INR1,500 crores. So out of this INR2,300 crores, can we just know what amount has come from outside BSNL?"
+    },
+    {
+      "ref": "T-L006",
+      "call": "Q2 FY27",
+      "speaker": "CEO",
+      "text": "I don't think I can share the exact details of the order book wins from customers here and there. But all I can say is that all of BSNL INR1,500 crores that we announced is not in this order book. I mean it's a portion of it, a substantial portion of it and the rest of it has come from non -BSNL customers."
+    },
+    {
+      "ref": "T-L007",
+      "call": "Q2 FY27",
+      "speaker": "Analyst, Niveshaay|Keyurkumar Vadaliya",
+      "text": "So in the recent quarter, we have mentioned that like INR145 crores regarding the contract manufacturing process losses was included in the COGS. So if you can provide like what was this? And is it like a part of the recurring nature? Or is it only onetime basis if that is the case? So will that lead to the gross margin improvement in the next few quarters?"
+    },
+    {
+      "ref": "T-L008",
+      "call": "Q2 FY27",
+      "speaker": "CFO",
+      "text": "It's September 2025. There is no provisioning of that sort in the current quarter."
+    },
+    {
+      "ref": "T-L009",
+      "call": "Q2 FY27",
+      "speaker": "Analyst, Niveshaay|Keyurkumar Vadaliya",
+      "text": "So I'm asking like the BSNL PO that we are receiving right now, how much it will in terms of percentage or if you can provide any quantum, it will reduce our inventory portion and the debt portion that we have right now, the gross debt what kind of reductions as a management we are planning in next 6 to 9 months, sir?"
+    },
+    {
+      "ref": "T-L010",
+      "call": "Q2 FY27",
+      "speaker": "CEO",
+      "text": "Yes. So, I mean, I cannot give exact numbers. But as you know, a significant part of the inventory that we have been carrying for many quarters is for this BSNL expansion order. And so over the next few quarters, we certainly should see a significant reduction of this inventory."
+    },
+    {
+      "ref": "T-L011",
+      "call": "Q2 FY27",
+      "speaker": "CEO",
+      "text": "Yes, it will be a similar story in the sense that with the shipment of the new sites, even the collection. So the inventory is going to get collected -- converted into collectibles. So with that and with the collection of the past from the initial order, as I said, we've completed some of the important milestones and those are due, which whatever comes in, significant amount is going to come in. Again, from a debt point of view, we're going to see a significant reduction, right?"
+    }
+  ],
+  "notes": [
+    {
+      "ref": "N1",
+      "text": "1EBIT = PBT – Other Income + Finance Cost including Net forex loss"
+    },
+    {
+      "ref": "N2",
+      "text": "2EBITDA = EBIT + Depreciation & Amortisation"
+    },
+    {
+      "ref": "N3",
+      "text": "1Net working capital taken as Current Assets (excluding Cash & Cash Equivalents) net of Current Liabilities (excluding Borrowings and lease liabilities)"
+    },
+    {
+      "ref": "N4",
+      "text": "2Cash and cash equivalents includes investment in liquid mutual funds, deposits, other Bank balances"
+    },
+    {
+      "ref": "N5",
+      "text": "Net Working Capital is lower at 4,235 Cr vs 4,478 Cr in Q1FY27 due to decreased Trade Receivables on account of collections, non-recourse discounting and Customer advance settlements."
+    },
+    {
+      "ref": "N6",
+      "text": "Net Debt increased to 4,384 Cr vs 4,277 Cr in Q1FY27 on account of increased operational and capex funding."
+    }
+  ],
+  "remarks": "",
+  "id": "ds-tejas-networks",
+  "provenance": {
+    "source": "dataset",
+    "extractedBy": "gemini-3.8-flash-medium",
+    "extractedSeconds": 94,
+    "urls": [
+      "https://nsearchives.nseindia.com/corporate/TEJASNET_16102026191355_Investors_Presentation_-_Intimation.pdf",
+      "https://nsearchives.nseindia.com/corporate/TEJASNET_22102026161919_Transcript_Letter.pdf"
+    ],
+    "verify": {
+      "numbersFound": 16,
+      "numbersTotal": 17,
+      "quotesFound": 5,
+      "quotesTotal": 5,
+      "linesFound": 11,
+      "linesTotal": 11
+    },
+    "unverified": [
+      "periods.priorYear.da=101"
+    ],
+    "caveats": "Loss-making with negative EBITDA, worsened QoQ ((99) Cr in Q1). Net debt rose to INR 4,384 Cr (from 4,277 Cr), stated in the transcript only. Order book INR 2,315 Cr. Presentation is short (13 slides, ~9.5k chars). Transcript is the Q2 FY27 call of 16 Oct 2026."
+  }
+}

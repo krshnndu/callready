@@ -1,0 +1,119 @@
+{
+  "schema": "callready.pack.v1",
+  "company": {
+    "name": "Pitti Engineering Limited",
+    "short": "Pitti Engineering",
+    "quarter": "Q2 FY27",
+    "period": "Jul to Sep 2026",
+    "units": "INR crore",
+    "unitWord": "crore",
+    "fyLabel": "FY27",
+    "speakers": {
+      "CEO": "Akshay S Pitti, MD & Chief Executive Officer",
+      "CFO": "M Pavan Kumar, Chief Financial Officer"
+    }
+  },
+  "periods": {
+    "current": {
+      "label": "Q2 FY27",
+      "revenue": 578.4,
+      "ebitda": 88.9,
+      "pat": 33.9,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": 29.4,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorYear": {
+      "label": "Q2 FY26",
+      "revenue": 477.7,
+      "ebitda": 77.7,
+      "pat": 40.1,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": 25.8,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorQuarter": null
+  },
+  "history": [],
+  "priorFY": {
+    "label": "FY26",
+    "revenue": 1912.8,
+    "ebitda": 315.5,
+    "netDebt": null
+  },
+  "ytd": {
+    "label": "H1 FY27",
+    "revenue": 1107.5,
+    "ebitda": 175.3,
+    "capex": null,
+    "revenuePy": 934.3,
+    "quartersElapsed": 2
+  },
+  "ttmEbitda": null,
+  "segments": [],
+  "consensus": null,
+  "commitments": [
+    {
+      "id": "S1",
+      "kind": "statement",
+      "by": "other",
+      "said": "Phased investments of ~INR 740 crore to expand manufacturing capacity and support growing demand across key end-markets",
+      "ref": null,
+      "metric": "capex",
+      "target": {
+        "value": 740
+      },
+      "period": "FY31",
+      "topic": "phased manufacturing capacity expansion capex",
+      "status": "unclear",
+      "why": "Target investment of ~INR 740 crore is scheduled in a phased manner through FY31."
+    }
+  ],
+  "transcript": [],
+  "notes": [
+    {
+      "ref": "N1",
+      "text": "In September 2026, Company merged its two subsidiaries – Pitti Industries Private Limited and Dakshin Foundry Private Limited with their parent entity, Pitti Engineering Limited. Accordingly, financial results for Q2 & H1FY27 are reported on a standalone basis, whereas previous period numbers are restated"
+    },
+    {
+      "ref": "N2",
+      "text": "Total Income includes other Income"
+    },
+    {
+      "ref": "N3",
+      "text": "Adjusted EBDITA excluding other income & ESOP cost"
+    },
+    {
+      "ref": "N4",
+      "text": "Adj PAT - ESOP expenses added back for IT computation, however on the same DTA is calculated, hence there is no Tax impact on E SOP for addback"
+    }
+  ],
+  "remarks": "",
+  "id": "ds-pitti-engineering",
+  "provenance": {
+    "source": "dataset",
+    "extractedBy": "gemini-3.8-flash-medium",
+    "extractedSeconds": 89,
+    "urls": [
+      "https://nsearchives.nseindia.com/corporate/PITTIENG_22102026202152_INVESTORPPT.pdf"
+    ],
+    "verify": {
+      "numbersFound": 13,
+      "numbersTotal": 13,
+      "quotesFound": 1,
+      "quotesTotal": 1,
+      "linesFound": 0,
+      "linesTotal": 0
+    },
+    "unverified": [],
+    "caveats": "Margin-pressure case with full P&L, balance sheet and abridged cash flow (H1 CFO 323.0 Cr vs 95.4). Adjusted EBITDA margin 15.8% vs 16.8%; EBIT -15.9% YoY. Reports both 'Adjusted' (ex-ESOP) and 'Reported' EBITDA, both excluding other income. No transcript: call held 23 Oct 2026, transcript not yet filed."
+  }
+}

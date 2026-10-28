@@ -1,0 +1,369 @@
+{
+  "schema": "callready.pack.v1",
+  "company": {
+    "name": "Wipro Limited",
+    "short": "WIPRO",
+    "quarter": "Q2 FY27",
+    "period": "Jul to Sep 2026",
+    "units": "INR million",
+    "unitWord": "million",
+    "fyLabel": "FY27",
+    "speakers": {
+      "CEO": "Srini Pallia, Chief Executive Officer and Managing Director",
+      "CFO": "Aparna Iyer, Chief Financial Officer"
+    }
+  },
+  "periods": {
+    "current": {
+      "label": "Q2 FY27",
+      "revenue": 247527,
+      "ebitda": null,
+      "pat": 31997,
+      "ocf": 53048,
+      "capex": 4261,
+      "netDebt": null,
+      "da": null,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorYear": {
+      "label": "Q2 FY26",
+      "revenue": 226973,
+      "ebitda": null,
+      "pat": 32624,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": null,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    },
+    "priorQuarter": {
+      "label": "Q1 FY27",
+      "revenue": 245565,
+      "ebitda": null,
+      "pat": null,
+      "ocf": null,
+      "capex": null,
+      "netDebt": null,
+      "da": null,
+      "invDays": null,
+      "recDays": null,
+      "payDays": null
+    }
+  },
+  "history": [],
+  "priorFY": {
+    "label": "FY26",
+    "revenue": 928093,
+    "ebitda": null,
+    "netDebt": null
+  },
+  "ytd": {
+    "label": "H1 FY27",
+    "revenue": 492313,
+    "ebitda": null,
+    "capex": 7640,
+    "revenuePy": 448319,
+    "quartersElapsed": 2
+  },
+  "ttmEbitda": null,
+  "segments": [
+    {
+      "name": "IT Services - Americas 1",
+      "current": {
+        "revenue": 84985,
+        "margin": 18.84
+      },
+      "priorYear": {
+        "revenue": 80556,
+        "margin": 21.43
+      },
+      "priorQuarter": {
+        "revenue": 86087,
+        "margin": 19.39
+      }
+    },
+    {
+      "name": "IT Services - Americas 2",
+      "current": {
+        "revenue": 63194,
+        "margin": 17.76
+      },
+      "priorYear": {
+        "revenue": 61276,
+        "margin": 18.43
+      },
+      "priorQuarter": {
+        "revenue": 62119,
+        "margin": 15.9
+      }
+    },
+    {
+      "name": "IT Services - Europe",
+      "current": {
+        "revenue": 67546,
+        "margin": 16.74
+      },
+      "priorYear": {
+        "revenue": 59531,
+        "margin": 11.7
+      },
+      "priorQuarter": {
+        "revenue": 66569,
+        "margin": 13.59
+      }
+    },
+    {
+      "name": "IT Services - APMEA",
+      "current": {
+        "revenue": 30945,
+        "margin": 13.97
+      },
+      "priorYear": {
+        "revenue": 25042,
+        "margin": 13.21
+      },
+      "priorQuarter": {
+        "revenue": 29754,
+        "margin": 14.66
+      }
+    },
+    {
+      "name": "IT Products",
+      "current": {
+        "revenue": 1512,
+        "margin": -4.76
+      },
+      "priorYear": {
+        "revenue": 1126,
+        "margin": 8.97
+      },
+      "priorQuarter": {
+        "revenue": 1036,
+        "margin": 1.54
+      }
+    }
+  ],
+  "consensus": null,
+  "commitments": [
+    {
+      "id": "G1",
+      "kind": "guidance",
+      "by": "CFO",
+      "said": "We expect revenue from our IT Services business segment to be in the range of $2,571 million to $2,625 million*. This translates to sequential guidance of (-)1.5% to (+)0.5% in constant currency terms.",
+      "ref": "Page 2",
+      "metric": "revenueGrowth",
+      "segment": null,
+      "target": {
+        "low": -1.5,
+        "high": 0.5,
+        "value": null
+      },
+      "period": "Q3 FY27",
+      "topic": "IT Services revenue guidance Q3",
+      "status": "unclear",
+      "why": "Guidance applies to the quarter ending December 31, 2026."
+    },
+    {
+      "id": "S1",
+      "kind": "statement",
+      "by": "CFO",
+      "said": "We will work towards improving the margins even as we create headspace for growth.",
+      "ref": "T-L001",
+      "metric": "ebitdaMargin",
+      "segment": null,
+      "target": {
+        "low": null,
+        "high": null,
+        "value": null
+      },
+      "period": "FY27",
+      "topic": "Operating margin improvement endeavor",
+      "status": "kept",
+      "why": "Operating margin expanded 0.5% sequentially to 16.5%."
+    },
+    {
+      "id": "D1",
+      "kind": "deflection",
+      "by": "CEO",
+      "said": "As far as we are concerned, we don't call out that specific number, Ashwin. We just give the overall health numbers.",
+      "ref": "T-L002",
+      "metric": "other",
+      "segment": null,
+      "target": {
+        "low": null,
+        "high": null,
+        "value": null
+      },
+      "period": "Q2 FY27",
+      "topic": "Health exchange enrollment business size",
+      "status": "unclear",
+      "why": "Management declined to quantify health exchange enrollment business size."
+    }
+  ],
+  "transcript": [
+    {
+      "ref": "T-L001",
+      "call": "Q2 FY27",
+      "speaker": "Girish Pai, BOB Capital Markets",
+      "text": "I wanted to ask about the TCV number, which is down quarter-on-quarter quite a bit both from large deal and the total TCV perspective. Were these numbers up to your expectations? If not, what exactly transpired in the quarter?"
+    },
+    {
+      "ref": "T-L002",
+      "call": "Q2 FY27",
+      "speaker": "CEO",
+      "text": "As far as our TCV of quarter two is concerned, we had few deals where the contract could not be signed on time, because of which they're slipping to this quarter. And both the deals that we could not sign will get signed. As far as we are concerned, the pipeline is very robust. And in addition to this deal -- these two deals, we have a very strong pipeline for quarter three itself."
+    },
+    {
+      "ref": "T-L003",
+      "call": "Q2 FY27",
+      "speaker": "Girish Pai, BOB Capital Markets",
+      "text": "Lastly, when is the salary increase going to happen?"
+    },
+    {
+      "ref": "T-L004",
+      "call": "Q2 FY27",
+      "speaker": "CFO",
+      "text": "Girish, you would note we just gave a salary increase effective 1st March 2025 -- sorry, 2026. So it's been just a few months since we rolled out. So right now, it's not under consideration."
+    },
+    {
+      "ref": "T-L005",
+      "call": "Q2 FY27",
+      "speaker": "Sudheer Guntupalli, Kotak Mahindra AMC",
+      "text": "So any thoughts of using our net cash balance sheet this time around, which could be a source of your competitive advantage?"
+    },
+    {
+      "ref": "T-L006",
+      "call": "Q2 FY27",
+      "speaker": "CEO",
+      "text": "So, Sudheer, if you look at broadly, our growth strategy is both organic and inorganic. As far as the inorganic play is concerned, we look for opportunities which can enhance our strategy, which is consulting-led and AI-powered, within the sectors -- our priority sectors and the markets that we go after."
+    },
+    {
+      "ref": "T-L007",
+      "call": "Q2 FY27",
+      "speaker": "Sandeep Shah, Equirus Securities",
+      "text": "And just the last question, you also said that going forward margins may keep increasing despite investment. So do you believe we may again by Q4 be in the target range of 17, 17.5?"
+    },
+    {
+      "ref": "T-L008",
+      "call": "Q2 FY27",
+      "speaker": "CFO",
+      "text": "Sandeep, we our endeavor is to continuously improve margins from where we are. Like I said, we rolled out a hike, and therefore the margins had come down, and the operational improvements will continue to kick in through the quarters, and that does help the margins go up. We'll also have to invest for growth."
+    },
+    {
+      "ref": "T-L009",
+      "call": "Q2 FY27",
+      "speaker": "Girish Pai, BOB Capital Markets",
+      "text": "And the question on deflation, where are we in the cycle?"
+    },
+    {
+      "ref": "T-L010",
+      "call": "Q2 FY27",
+      "speaker": "CFO",
+      "text": "Typically, our contracts are about 2 to 2.5 years in terms of the average tenor, right? And we've been in this cycle for at least last 2 years and or thereabouts, 1.5 to 2 years. So in some sense, a lot of the contracts that we've had have been refreshed and renewed. So in some sense that we should be at that inflection curve in a few quarters."
+    },
+    {
+      "ref": "T-L011",
+      "call": "Q2 FY27",
+      "speaker": "Ashwin Mehta, Ambit Capital",
+      "text": "So you've seen health exchange enrollments drop by almost 18% in June. We typically used to do this business, so just want to get a sense on how big is this business in our healthcare vertical, and how do you see this playing out in the December quarter, because typically that's where the peak enrollment season kicks in?"
+    },
+    {
+      "ref": "T-L012",
+      "call": "Q2 FY27",
+      "speaker": "CEO",
+      "text": "As far as we are concerned, we don't call out that specific number, Ashwin. We just give the overall health numbers. And like I said, that we had we did have an impact because of some of the policy-related changes that happened to some of the payer US payers."
+    },
+    {
+      "ref": "T-L013",
+      "call": "Q2 FY27",
+      "speaker": "Ashwin Mehta, Ambit Capital",
+      "text": "And just a follow-up, in terms of the head count cuts this quarter, what was the driver for that?"
+    },
+    {
+      "ref": "T-L014",
+      "call": "Q2 FY27",
+      "speaker": "Saurabh Govil, Chief Human Resources Officer",
+      "text": "From the headcount, if you look at it, year-on-year it's flattish. So and particularly in this year this quarter, if you look at it, first half, we didn't go on campus. So, that's the thing. We will be going to campuses to hire given the volume growth in the second half. So I think it'll even out as we move forward. We're also driving productivity from AI projects."
+    },
+    {
+      "ref": "T-L015",
+      "call": "Q2 FY27",
+      "speaker": "Dipesh Mehta, Emkay Global",
+      "text": "Second question is about the two deal which you referred, which got delayed in terms of signing. Whether we close both the deal in terms of signing this quarter or it is yet to be signed kind of thing?"
+    },
+    {
+      "ref": "T-L016",
+      "call": "Q2 FY27",
+      "speaker": "CFO",
+      "text": "Like Srini said, they are in the process of being signed, and we're confident of securing both the deals, and we will share that with you when we meet next in January."
+    }
+  ],
+  "notes": [
+    {
+      "ref": "N1",
+      "text": "Gross revenue at ₹ 247.5 billion ($2,583.0 million1), an increase of 1.1% QoQ and 9.1% YoY."
+    },
+    {
+      "ref": "N2",
+      "text": "IT services segment revenue was at $2611.5 million, decrease of 0.1% QoQ and increase of 0.3% YoY."
+    },
+    {
+      "ref": "N3",
+      "text": "Non-GAAP constant currency 2 IT Services segment revenue was flat sequentially and increase of 0.6% YoY."
+    },
+    {
+      "ref": "N4",
+      "text": "Total Bookings3 was at $2,595 million, down by 22.9% QoQ in constant currency2. Large deal bookings4 was at $674 million, decrease of 58.6% QoQ in constant currency2."
+    },
+    {
+      "ref": "N5",
+      "text": "IT services operating margin5 for Q2’27 was at 16.5%, up by 0.5% QoQ and down by 0.2% YoY."
+    },
+    {
+      "ref": "N6",
+      "text": "Operating cash flows of ₹ 53.0 billion ($553.6 million1), increase of 61.3% QoQ and at 165.8% of net income for the quarter."
+    },
+    {
+      "ref": "N7",
+      "text": "Effective April 1, 2026, the customers across Latin America and Canada are aligned with the respective industry sectors in Americas 1 and Americas 2. Additionally, Hi -tech sector and airports as a sub -sector for Americas are now subsumed under existing sectors of Americas 1. Prior period comparables are readjusted to reflect this change."
+    },
+    {
+      "ref": "N8",
+      "text": "We expect revenue from our IT Services business segment to be in the range of $2,571 million to $2,625 million*. This translates to sequential guidance of (-)1.5% to (+)0.5% in constant currency terms."
+    }
+  ],
+  "remarks": "Srini Pallia, CEO and Managing Director, said, “The strategic investments we have been making are beginning to deliver results. They are enhancing our ability to win in new markets, add new clients, and grow existing relationships. At the same time, our consulting -led, AI- powered strategy is helping us create larger transformation opportunities. W e see AI as a long-term growth driver that will expand the addressable market for technology and business transformation. We are already seeing its potential reflected in the momentum across our AI-Native Unit and AI offerings portfolio”.\n\nAparna Iyer, Chief Financial Officer, said, “Our operating margin for the quarter was 16.5%, an expansion of 0.5% sequentially. We have delivered this improvement even while continuing to invest in our business and people. We remain relentless in driving cash flow conversion. Q2 is yet another quarter where our operating cash flow has been robust and stood at 166% of net income.”",
+  "id": "ds-wipro",
+  "provenance": {
+    "source": "dataset",
+    "extractedBy": "gemini-3.8-flash-medium",
+    "extractedSeconds": 29,
+    "urls": [
+      "https://nsearchives.nseindia.com/corporate/Wipro_Secretarial_15102026155126_PressRelease.pdf",
+      "https://nsearchives.nseindia.com/corporate/Wipro_Secretarial_16102026163132_SEIntimation16102026.pdf"
+    ],
+    "verify": {
+      "numbersFound": 33,
+      "numbersTotal": 41,
+      "quotesFound": 3,
+      "quotesTotal": 3,
+      "linesFound": 13,
+      "linesTotal": 16
+    },
+    "unverified": [
+      "segments.0.priorYear.margin=21.43",
+      "segments.0.priorQuarter.margin=19.39",
+      "segments.1.current.margin=17.76",
+      "segments.1.priorQuarter.margin=15.9",
+      "segments.2.priorYear.margin=11.7",
+      "segments.2.priorQuarter.margin=13.59",
+      "segments.3.priorYear.margin=13.21",
+      "segments.4.priorYear.margin=8.97"
+    ],
+    "caveats": "IFRS, not Ind AS. Reports operating margin (16.5%), not EBITDA. Segments (IT Services by SMU/sector) and Q3 revenue guidance ($2,571-2,625M) present. Operating cash flow 165.8% of net income. Transcript is the Q2 FY27 call of 15 Oct 2026 (same quarter)."
+  }
+}
