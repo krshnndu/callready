@@ -4,5 +4,5 @@ export const SITE = {
   author: 'Krishnendu',
   authorUrl: 'https://krishnendu.me',
   sourceUrl: 'https://github.com/krshnndu/callready',
-  DEMO_VIDEO_URL: 'https://www.tella.tv/video/callready-earnings-prep-ai-1-giwu4686',
+  DEMO_VIDEO_URL: 'https://www.tella.tv/video/callready-earnings-prep-ai-dujq80qu',
 };
