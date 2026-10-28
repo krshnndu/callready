@@ -8,7 +8,7 @@ Each has a default. **Blocking** ones must be answered before the phase named.
 | --- | --- | --- | --- |
 | D-01 | Product name | CallReady | P0 |
 | D-02 | GitHub account that owns the public repo, and the repo name | **Decided 2026-10-28:** `krshnndu/callready`, pushed from the VPS clone. Created private; made public when the team is ready | done |
-| D-03 | Public origin for the API | A new site on the host's existing public reverse proxy, path-allowlisted. Alternatives: the host's tunnel service (its last free public port is already reserved for another app) or a separate tunnel to a custom domain | P0 |
+| D-03 | Public origin for the API | **Decided 2026-10-28:** a public port on the host's tunnel service. The planned reverse-proxy site could not work: the host's public address takes no inbound traffic. The API requires a shared key that only the Vercel function holds | done |
 | D-04 | Submission deadline and demo date | **Decided 2026-10-28:** 17:00 the same day | done |
 | D-05 | Model ids for `MODEL_STRONG`, `MODEL_FAST` and the fallback chain | A Claude-family model for strong, a Flash-class model for fast; confirmed by a live probe on the gateway before P2 | P2 |
 | D-06 | Voice answers (F13) in scope | Yes, in P4, text stays the primary path | P4 |

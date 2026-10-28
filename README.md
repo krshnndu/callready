@@ -39,7 +39,7 @@ CallReady anticipates questions grounded in the disclosures. A question driven b
 
 ```
 Browser -> Vercel: static site (plain ES modules, no build) + two functions (/api/coach, /api/health)
-             '-> API on a VPS (FastAPI, loopback, behind a reverse proxy, shared key)
+             '-> API on a VPS (FastAPI on loopback, published through a tunnel, shared key)
                    '-> OpenAI-compatible LLM gateway: Gemini 3.8 Flash (high), Claude Sonnet 4.6 fallback, Flash (medium)
 ```
 
