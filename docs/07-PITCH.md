@@ -1,6 +1,6 @@
 # 07. Pitch (90 seconds)
 
-Required by the brief: the problem, a demo of the prototype, its business value, and one key limitation. One person talks while another clicks. Before going on, open https://callready-pied.vercel.app on the Quarter screen. On the Report screen, press **Clear answers** so the demo starts clean.
+Required by the brief: the problem, a demo of the prototype, its business value, and one key limitation. One person talks while another clicks. Before going on, open https://callreadyai.vercel.app on the Quarter screen. On the Report screen, press **Clear answers** so the demo starts clean.
 
 | Time | Beat | Click | Say |
 | --- | --- | --- | --- |

@@ -2,7 +2,7 @@
 
 **Is the leadership team ready for tough investor questions?** CallReady helps a listed company's leadership rehearse its quarterly earnings call. It reads the quarter's results, segments, guidance and earlier call transcripts, ranks what investors will push on, and generates the questions they are likely to ask. Executives answer those questions and get a score checked against the company's own disclosures. The output is a readiness report with recommendations to act on before the call.
 
-**Live prototype:** https://callready-pied.vercel.app. All data is synthetic.
+**Live prototype:** https://callreadyai.vercel.app. All data is synthetic.
 
 ## The journey: sample inputs to a recommendation
 

@@ -14,7 +14,7 @@ Each has a default. **Blocking** ones must be answered before the phase named.
 | D-06 | Voice answers (F13) in scope | Yes, in P4, text stays the primary path | P4 |
 | D-07 | Access control on the public URL | Open, with caps (`02-ARCHITECTURE.md` section 6). Alternative: a shared demo passcode | P0 |
 | D-08 | License | MIT | P0 |
-| D-09 | Custom domain | None; the Vercel subdomain is enough for judging | P5 |
+| D-09 | Custom domain | **Decided 2026-10-28:** `callreadyai.vercel.app` (`callready.vercel.app` belongs to an unrelated site). Set as a project domain, so every production deploy lands there | done |
 
 ## Risks
 
