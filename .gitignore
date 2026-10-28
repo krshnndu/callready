@@ -27,3 +27,4 @@ logs/
 # macOS
 .DS_Store
 ._*
+api/callready.db*

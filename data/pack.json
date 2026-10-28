@@ -1,0 +1,400 @@
+{
+  "company": {
+    "name": "Meridian Arc Industries Ltd",
+    "short": "Meridian Arc",
+    "ticker": "MERIDARC (fictional)",
+    "quarter": "Q2 FY27",
+    "period": "Jul to Sep 2026",
+    "resultsDate": "2026-11-04",
+    "callDate": "2026-11-05",
+    "units": "INR crore",
+    "speakers": {
+      "CEO": "Meera Kulkarni, CEO",
+      "CFO": "Arjun Sethi, CFO",
+      "ENERGY": "Priya Nair, President, Energy Solutions"
+    }
+  },
+  "facts": [
+    "Q2 FY27 revenue 2,480 crore (+14.3% YoY, +1.6% vs consensus 2,440).",
+    "Q2 FY27 EBITDA 288 crore (-6.5% YoY; consensus 315, so 8.6% below). EBITDA margin 11.6% vs 14.2% (-258 bps). H1 margin 11.5%.",
+    "Margin bridge -258 bps: gross margin -180 (copper, steel, Appliances price competition), Energy losses -90, employee cost -28 (new plant), operating leverage +40.",
+    "PAT 123 crore vs 152 (-19.1%); consensus 150.",
+    "OCF 112 crore vs 265; OCF/EBITDA 39% vs 86%. Inventory days 61 to 78, receivable days 52 to 64, payable days 58 to 55. FCF -103 crore.",
+    "Net debt 940 crore (640 at March); 0.79x TTM EBITDA of 1,195 crore (0.52x at March). Final dividend 75 crore paid in September.",
+    "H1 capex 410 crore (mainly new Home Appliances plant) vs FY27 guidance of around 600.",
+    "Segments Q2 FY27 (vs Q2 FY26): Home Appliances 1,190 crore +6.3%, EBIT margin 7.1% (10.4%); Industrial Motion 960 +17.1%, 15.2% (14.6%); Energy Solutions 330 +43.5%, -8.5% (-3.0%; Q1 FY27 -10.2%).",
+    "Notes: 210 crore due from state distribution companies overdue beyond 180 days (Energy); expected credit loss provision 18 crore.",
+    "FY27 guidance (Q4 FY26 call): mid-teens revenue growth; EBITDA margin 13.5 to 14.5%; capex around 600 crore; net debt/EBITDA below 1x; Energy EBIT breakeven by Q4 FY27. Bottom of band needs about 15.3% in H2; best quarter on record 14.2%."
+  ],
+  "commitments": [
+    {
+      "id": "G1",
+      "ref": "Q4FY26-L024",
+      "by": "CFO",
+      "said": "FY27 revenue growth \"mid-teens\"",
+      "metric": "FY27 revenue growth",
+      "status": "on-track",
+      "why": "H1 revenue +14.1%",
+      "ack": [
+        "mid-teens",
+        "revenue growth",
+        "guid"
+      ]
+    },
+    {
+      "id": "G2",
+      "ref": "Q4FY26-L024",
+      "by": "CFO",
+      "said": "FY27 EBITDA margin \"13.5 to 14.5 percent\"",
+      "metric": "FY27 EBITDA margin",
+      "status": "at-risk",
+      "why": "H1 11.5%; H2 would need about 15.3%, above the 14.2% record",
+      "ack": [
+        "band",
+        "guidance",
+        "guided",
+        "13.5",
+        "range",
+        "full-year margin",
+        "full year margin"
+      ]
+    },
+    {
+      "id": "G3",
+      "ref": "Q4FY26-L038",
+      "by": "CEO",
+      "said": "Energy Solutions \"EBIT breakeven by the fourth quarter of FY27\"",
+      "metric": "Energy EBIT",
+      "status": "at-risk",
+      "why": "EBIT margin -8.5% vs -3.0% a year ago",
+      "ack": [
+        "breakeven",
+        "break-even",
+        "break even"
+      ]
+    },
+    {
+      "id": "G4",
+      "ref": "Q4FY26-L031",
+      "by": "CFO",
+      "said": "FY27 capex \"around 600 crore\"",
+      "metric": "Capex",
+      "status": "at-risk",
+      "why": "H1 capex 410 crore",
+      "ack": [
+        "600",
+        "capex guidance",
+        "around 600"
+      ]
+    },
+    {
+      "id": "G5",
+      "ref": "Q4FY26-L031",
+      "by": "CFO",
+      "said": "Net debt to EBITDA \"below 1x\"",
+      "metric": "Leverage",
+      "status": "at-risk",
+      "why": "0.79x and rising, from 0.52x at year end",
+      "ack": [
+        "below 1x",
+        "below one times",
+        "1x",
+        "below 1 times",
+        "commitment"
+      ]
+    },
+    {
+      "id": "S1",
+      "ref": "Q1FY27-L019",
+      "by": "CFO",
+      "said": "\"Back within our guided band from Q2\"",
+      "metric": "EBITDA margin",
+      "status": "broken",
+      "why": "Q2 margin 11.6%, below the 13.5% floor",
+      "ack": [
+        "we said",
+        "i said",
+        "we told",
+        "in august",
+        "last quarter",
+        "we expected",
+        "did not happen",
+        "we were wrong",
+        "we were not",
+        "not back",
+        "transitory"
+      ]
+    },
+    {
+      "id": "S2",
+      "ref": "Q1FY27-L027",
+      "by": "CFO",
+      "said": "Working capital \"should normalise by the end of Q2\"",
+      "metric": "Working capital",
+      "status": "broken",
+      "why": "Inventory days 61 to 78, receivable days 52 to 64",
+      "ack": [
+        "we said",
+        "i said",
+        "in august",
+        "last quarter",
+        "did not",
+        "normalise",
+        "normalize",
+        "got worse",
+        "worsened"
+      ]
+    },
+    {
+      "id": "D1",
+      "ref": "Q1FY27-L034",
+      "by": "CEO",
+      "said": "Discom receivables: \"more detail at the right time\"",
+      "metric": "Receivables",
+      "status": "deflected",
+      "why": "Q2 notes show 210 crore overdue beyond 180 days",
+      "ack": [
+        "right time",
+        "in august",
+        "last quarter",
+        "should have",
+        "fair challenge",
+        "not a good answer",
+        "from now on"
+      ]
+    }
+  ],
+  "personas": {
+    "auditor": {
+      "name": "Guidance auditor",
+      "firm": "Halden Securities",
+      "style": "Quotes your own words back to you"
+    },
+    "hawk": {
+      "name": "Margin hawk",
+      "firm": "Northgate Capital",
+      "style": "Builds the EBITDA bridge line by line"
+    },
+    "cash": {
+      "name": "Cash skeptic",
+      "firm": "Brightwater AMC",
+      "style": "Trusts cash, not earnings"
+    },
+    "credit": {
+      "name": "Credit analyst",
+      "firm": "Tamarind Research",
+      "style": "Reads the notes to accounts first"
+    },
+    "segment": {
+      "name": "Segment specialist",
+      "firm": "Northgate Capital",
+      "style": "Asks which business deserves the capital"
+    },
+    "governance": {
+      "name": "Governance voice",
+      "firm": "Brightwater AMC",
+      "style": "Tests tone, candour and capital allocation"
+    }
+  },
+  "questions": [
+    {
+      "id": "Q01",
+      "theme": "Guidance",
+      "persona": "auditor",
+      "owner": "CFO",
+      "text": "In August you told us the margin dip was transitory and that you would be back in the 13.5 to 14.5% band from Q2. You delivered 11.6%. H1 is 11.5%, which implies more than 15% in H2 to reach even the bottom of the band, a level you have never reported. Are you withdrawing the margin guidance?",
+      "trap": "Defending the band invites a follow-up you cannot win. Giving a new range on the call is new guidance without a filing.",
+      "mustAck": [
+        "S1",
+        "G2"
+      ],
+      "followup": "So should we take the 13.5% floor out of our models today, or wait for your filing?",
+      "model": "You are right, and I will not defend the band. In August I said we would be back in it from Q2, and we were not: Q2 EBITDA margin was 11.6% and H1 is 11.5%. Reaching 13.5% for the year would need about 15.3% in H2, above our best quarter of 14.2%. So we do not expect to reach the band this year. Any revised range will come through a formal filing after the board reviews it, not on this call. What we control in H2 is the 180 bps gross-margin hit in Appliances and the 90 bps from Energy losses, and we will report progress on both every quarter."
+    },
+    {
+      "id": "Q02",
+      "theme": "Margin",
+      "persona": "hawk",
+      "owner": "CFO",
+      "text": "Revenue grew 14% but EBITDA fell in absolute terms. Can you walk us through the 258 basis point margin decline, and how much of it is structural rather than temporary?",
+      "trap": "A vague \"input costs\" answer. The analyst has already built the bridge and will check yours against it.",
+      "mustAck": [
+        "S1"
+      ],
+      "followup": "Of the 180 bps in gross margin, how much is price competition you cannot get back?",
+      "model": "Of the 258 basis points, 180 came from gross margin: copper and steel costs and price competition in Home Appliances. 90 came from Energy Solutions losses, and 28 from staffing the new plant ahead of volumes. Operating leverage gave back 40. In August we said this was transitory; part of it is not. The plant cost fades as volumes come through, and Energy losses are ours to fix. The Appliances price competition is the structural part, which is why that segment margin is 7.1% against 10.4% a year ago. We will show this bridge every quarter."
+    },
+    {
+      "id": "Q03",
+      "theme": "Cash",
+      "persona": "cash",
+      "owner": "CFO",
+      "text": "Operating cash flow was 112 crore against 265 a year ago, and cash conversion fell to 39%. In August you said working capital would normalise by the end of Q2. It got worse. What happened, and why should we believe the next date?",
+      "trap": "Giving a new date. The last one already failed; a second missed date is worse than none.",
+      "mustAck": [
+        "S2"
+      ],
+      "followup": "How much of the inventory build is finished goods sitting with your channel partners?",
+      "model": "We said working capital would normalise by the end of Q2, and it did not. Inventory days went from 61 to 78 and receivable days from 52 to 64, so operating cash flow was 112 crore against 265, and conversion fell to 39% of EBITDA. Two causes: channel inventory in Appliances did not unwind after the summer, and Energy receivables from state discoms lengthened. I will not give you a new date on this call. Instead we will report inventory and receivable days every quarter, so you can judge the trend yourselves."
+    },
+    {
+      "id": "Q04",
+      "theme": "Receivables",
+      "persona": "credit",
+      "owner": "CEO",
+      "text": "Last quarter you declined to quantify receivables from state distribution companies. The Q2 notes now show 210 crore overdue beyond 180 days. Why was this not shared in August, and what is your provisioning?",
+      "trap": "Repeating the deflection, or arguing the August answer was fine.",
+      "mustAck": [
+        "D1"
+      ],
+      "followup": "Is any of the 210 crore under dispute, or is it purely slow payment?",
+      "model": "Fair challenge. In August I said we would share more at the right time, and that was not a good answer. The notes to this quarter's accounts show 210 crore due from state distribution companies overdue beyond 180 days, in Energy Solutions. We have made an expected credit loss provision of 18 crore against it. From now on we will disclose the discom ageing every quarter, so you will not have to ask."
+    },
+    {
+      "id": "Q05",
+      "theme": "Consensus",
+      "persona": "hawk",
+      "owner": "CFO",
+      "text": "EBITDA came in about 9% below consensus while revenue beat. Was the street simply wrong on margins, or did something change inside the quarter?",
+      "trap": "Blaming the analysts. They modelled what management told them in August.",
+      "mustAck": [
+        "S1"
+      ],
+      "followup": "What should we assume for gross margin in H2?",
+      "model": "Revenue was 2,480 crore, 1.6% above consensus, but EBITDA of 288 crore was 8.6% below. Something did change: input costs and price competition took 180 bps off gross margin, and Energy losses deepened. The street had modelled a recovery, partly because we told you in August to expect one. That one is on us, not on the street. We will give you the full bridge each quarter so the models start from the same facts we do."
+    },
+    {
+      "id": "Q06",
+      "theme": "Segments",
+      "persona": "segment",
+      "owner": "ENERGY",
+      "text": "Energy Solutions lost 8.5% at the EBIT level this quarter against minus 3% a year ago. You promised breakeven by Q4 FY27. Is that still realistic, and how much more capital will this business consume?",
+      "trap": "Reaffirming breakeven to protect the segment. The trend says otherwise.",
+      "mustAck": [
+        "G3"
+      ],
+      "followup": "At what point would you stop pricing for share in charger tenders?",
+      "model": "Breakeven in Q4 FY27 is now at risk, and I will not pretend otherwise. Revenue grew 43.5% to 330 crore, but the EBIT margin was minus 8.5% against minus 3.0% a year ago, because we priced for share in charger tenders, as I said in August. It did improve from minus 10.2% in Q1. We will report the segment EBIT every quarter against the breakeven commitment, and if the date moves, we will say so in a formal update rather than on a call."
+    },
+    {
+      "id": "Q07",
+      "theme": "Balance sheet",
+      "persona": "credit",
+      "owner": "CFO",
+      "text": "Net debt rose from 640 to 940 crore in six months, 0.79 times trailing EBITDA. With negative free cash flow and capex ahead of plan, will you breach your below-1x commitment?",
+      "trap": "A flat \"no\" without showing what has to go right.",
+      "mustAck": [
+        "G5"
+      ],
+      "followup": "Would you cut the dividend before you let leverage go above 1x?",
+      "model": "Net debt is 940 crore, 0.79 times trailing EBITDA of 1,195 crore, so we are inside the below 1x commitment today, but the headroom has narrowed from 0.52 times at year end. Free cash flow was negative 103 crore this quarter, and we paid the 75 crore final dividend. Staying below 1x depends on working capital releasing cash in H2. We will track it every quarter and tell you early if the commitment is at risk."
+    },
+    {
+      "id": "Q08",
+      "theme": "Capital allocation",
+      "persona": "governance",
+      "owner": "CEO",
+      "text": "You have spent 410 crore of capex in H1 against guidance of around 600 for the year. Is capex going up, and why keep spending while cash flow is this weak?",
+      "trap": "Announcing a new capex number on the call.",
+      "mustAck": [
+        "G4"
+      ],
+      "followup": "Which projects would you defer first?",
+      "model": "H1 capex was 410 crore against around 600 for the year, mainly the new Home Appliances plant, which is front-loaded. We are reviewing the H2 programme against cash flow, and if the full-year figure changes we will disclose it formally. Our priority order is unchanged: keep net debt below 1x EBITDA first, then fund growth. We will report capex against the plan every quarter."
+    },
+    {
+      "id": "Q09",
+      "theme": "Segments",
+      "persona": "segment",
+      "owner": "CEO",
+      "text": "Home Appliances margin fell from 10.4% to 7.1%. Are you losing pricing power, and is this business still core?",
+      "trap": "Claiming share gains that are not in the disclosures.",
+      "mustAck": [],
+      "followup": "What margin would make you reconsider the segment?",
+      "model": "Appliances margin fell from 10.4% to 7.1% because copper and steel costs rose while competitors held prices, and we chose to protect volume rather than pass costs on. Revenue still grew 6.3% to 1,190 crore. It is core: it is our largest segment and carries the brand. But we will not chase volume at any margin, and we will report the segment margin trend every quarter."
+    },
+    {
+      "id": "Q10",
+      "theme": "Segments",
+      "persona": "segment",
+      "owner": "CEO",
+      "text": "Industrial Motion is the bright spot, with 17% growth and a 15.2% margin. Why not put more capital there instead of Energy?",
+      "trap": "Over-praising one segment and sounding like you are abandoning another.",
+      "mustAck": [],
+      "followup": "How much of Industrial growth is one-off orders?",
+      "model": "Industrial Motion grew 17.1% to 960 crore, with EBIT margin up to 15.2% from 14.6%. It earns its capital and we will keep funding it. Energy is a longer bet with a breakeven commitment we are now at risk of missing, so it has to earn its next rupee of capital by showing margin progress each quarter. We will report both segments against those tests."
+    },
+    {
+      "id": "Q11",
+      "theme": "Candour",
+      "persona": "governance",
+      "owner": "CEO",
+      "text": "Your prepared remarks lead with record revenue. Margins and cash both moved the wrong way, and two of your August statements did not hold. Why should investors trust the narrative?",
+      "trap": "Defending the press release. Candour is the only answer that works.",
+      "mustAck": [
+        "S1",
+        "S2"
+      ],
+      "followup": "What will you do differently on the next call?",
+      "model": "You should judge us on what we said and what happened. In August we said margins would be back in the band from Q2 and working capital would normalise; neither happened. Margin was 11.6% and operating cash flow 112 crore. Revenue growth is real, but it is not the whole story, and we should have led with all of it. From now on we will report the margin bridge, working-capital days and discom ageing every quarter."
+    },
+    {
+      "id": "Q12",
+      "theme": "Capital allocation",
+      "persona": "cash",
+      "owner": "CFO",
+      "text": "With free cash flow negative, was paying a 75 crore final dividend in September prudent?",
+      "trap": "Promising the dividend will continue, which is a forward commitment the board has not made.",
+      "mustAck": [],
+      "followup": "Is the interim dividend at risk?",
+      "model": "The 75 crore final dividend was for FY26, approved by shareholders on that year's cash flow. This quarter free cash flow was negative 103 crore, so we understand the question. Future dividends are a board decision taken against cash flow and our below 1x leverage commitment, and we will announce any decision through the usual filing."
+    }
+  ],
+  "pressure": [
+    {
+      "id": "guidance",
+      "title": "FY27 margin guidance is out of reach",
+      "score": 1.8
+    },
+    {
+      "id": "cash",
+      "title": "Cash conversion halved; working capital worsened",
+      "score": 1.62
+    },
+    {
+      "id": "margin",
+      "title": "EBITDA margin down 258 bps despite 14% growth",
+      "score": 1.47
+    },
+    {
+      "id": "discom",
+      "title": "Discom receivables: the question deflected in August",
+      "score": 0.88
+    },
+    {
+      "id": "leverage",
+      "title": "Leverage climbing towards the 1x ceiling",
+      "score": 0.84
+    },
+    {
+      "id": "energy",
+      "title": "Energy losses widening against a breakeven promise",
+      "score": 0.8
+    },
+    {
+      "id": "consensus",
+      "title": "EBITDA missed consensus while revenue beat",
+      "score": 0.73
+    },
+    {
+      "id": "appliances",
+      "title": "Home Appliances margin compressed 330 bps",
+      "score": 0.7
+    },
+    {
+      "id": "capex",
+      "title": "Capex running ahead of plan",
+      "score": 0.46
+    }
+  ]
+}
