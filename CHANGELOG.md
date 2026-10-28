@@ -6,7 +6,7 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ### Changed
 - Repository made public. CI's secret scan can read pull requests; Dependabot updates `uv.lock` with `pyproject.toml`.
-- Backup demo video re-recorded with the any-company beat (Load screen, test datasets).
+- `docs/07-PITCH.md` is now a shot-by-shot recording script: setup checklist, clicks, spoken lines, timings and fallbacks. `scripts/record_demo.mjs` includes the any-company beat.
 
 ### Fixed
 - Persona line spacing, the "1 rehearsed answers" plural, and chart labels too small to read on phones.
