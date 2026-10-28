@@ -25,8 +25,9 @@ COMMITMENTS = {c["id"]: c for c in PACK["commitments"]}
 
 LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "")
 LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
-# Effort tiers: the coach writes fact-bearing text, so it starts on the high tier.
-MODELS = [m for m in os.environ.get("MODEL_CHAIN", "ag/gemini-3.8-flash-high,ag/gemini-3.8-flash-medium,ag/gemini-3.8-flash-low").split(",") if m]
+# Effort tiers: the coach writes fact-bearing text, so it starts on the high tier;
+# Sonnet 4.6 is the fallback. The gateway streams unless told not to.
+MODELS = [m for m in os.environ.get("MODEL_CHAIN", "ag/gemini-3.8-flash-high,ag/claude-sonnet-4-6,ag/gemini-3.8-flash-medium").split(",") if m]
 DB_PATH = os.environ.get("DB_PATH", str(ROOT / "api" / "callready.db"))
 BACKEND_KEY = os.environ.get("BACKEND_KEY", "")
 DAILY_CAP = int(os.environ.get("LLM_DAILY_CAP", "400"))
@@ -118,7 +119,7 @@ def parse_json(text: str) -> dict:
 
 
 async def call_chain(messages: list[dict]) -> tuple[dict, str]:
-    deadline = time.time() + 45
+    deadline = time.time() + 50
     last = "no model configured"
     async with httpx.AsyncClient() as client:
         for model in MODELS:
@@ -129,8 +130,8 @@ async def call_chain(messages: list[dict]) -> tuple[dict, str]:
                 r = await client.post(
                     f"{LLM_BASE_URL}/chat/completions",
                     headers={"Authorization": f"Bearer {LLM_API_KEY}"},
-                    json={"model": model, "messages": messages, "temperature": 0.2, "max_tokens": 900},
-                    timeout=min(30, left),
+                    json={"model": model, "messages": messages, "temperature": 0.2, "max_tokens": 900, "stream": False},
+                    timeout=min(35, left),
                 )
                 count_call()
                 if r.status_code != 200:

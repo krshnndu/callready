@@ -9,7 +9,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-callready-key': process.env.BACKEND_KEY || '', 'x-client-ip': String(req.headers['x-forwarded-for'] || '').split(',')[0] },
       body: JSON.stringify(req.body || {}),
-      signal: AbortSignal.timeout(50000),
+      signal: AbortSignal.timeout(56000),
     });
     res.status(r.status).setHeader('content-type', 'application/json').send(await r.text());
   } catch {

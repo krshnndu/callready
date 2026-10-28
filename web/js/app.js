@@ -281,7 +281,7 @@ async function coach(q, text, res, speaker) {
   const fallback = (why) => {
     el.innerHTML = `<h3>${ICON.spark} Reference answer</h3><p class="tiny">${esc(why)}</p><div class="improved">${esc(q.model)}</div><div class="followup"><b>${personas[q.persona].name} follows up:</b> "${esc(q.followup)}"</div>`;
   };
-  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 45000);
+  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 58000);
   try {
     const r = await fetch(`${API}/coach`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl.signal,
       body: JSON.stringify({ qid: q.id, answer: text, speaker, total: res.total, flags: res.flags.map((f) => `${f.dim}: ${f.text}: ${f.why}`) }) });
