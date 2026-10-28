@@ -369,6 +369,15 @@ table.edit td { padding: 6px 6px; } table.edit td:first-child { white-space: now
 .said { margin: 6px 0; font-family: var(--font-display); }
 
 /* new version bar */
+/* first-open welcome card */
+.welcome { position: fixed; left: 16px; bottom: 16px; z-index: 80; width: min(360px, calc(100vw - 32px)); padding: var(--s-4) var(--s-4) var(--s-4); border-radius: var(--r-lg); }
+.welcome h2 { font: 600 1.05rem/1.2 var(--font-display); margin: 0 28px 6px 0; }
+.welcome p { margin: 0 0 var(--s-3); color: var(--ink-2); font-size: var(--fs-meta); line-height: 1.5; }
+.welcome-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.welcome-actions .btn { display: inline-flex; align-items: center; gap: 6px; }
+.welcome-actions svg { width: 16px; height: 16px; }
+.welcome-x { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: var(--ink-3); font-size: 1.25rem; line-height: 1; cursor: pointer; }
+.welcome-x:hover { background: var(--sunk); color: var(--ink); }
 #new-version { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 90; display: flex; gap: 12px; align-items: center; padding: 10px 12px 10px 18px; border-radius: var(--r-pill); background: var(--ink); color: var(--bg); font-size: var(--fs-meta); box-shadow: var(--glass-shadow); max-width: calc(100vw - 32px); }
 
 /* evidence policy on Review */

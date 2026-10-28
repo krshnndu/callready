@@ -8,6 +8,7 @@
 //   - NaN, Infinity, undefined or null in visible text
 //   - a hyphen used as a minus sign, or a change in a percentage given in %, points or pp instead of
 //     bps (the unit rules in web/js/units.js)
+//   - first open: the welcome card links to the demo video and the GitHub source, shows once, and closes
 // Run: node scripts/check_content.mjs [base-url]   (default http://127.0.0.1:8731, a local web/ server)
 import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
@@ -59,6 +60,33 @@ const packs = [{ kind: 'sample' }, ...JSON.parse(readFileSync(new URL('../web/da
 const routes = ['#/load', '#/', '#/pressure', '#/questions', '#/rehearse', '#/report'];
 let fails = 0;
 await send('Page.navigate', { url: `${BASE}/#/` }); await sleep(1500);
+
+// First open: the welcome card points to the demo video and the source on GitHub, once.
+{
+  const site = await js(`import('/js/site.js').then((m) => m.SITE)`);
+  const probe = `(() => { const w = document.getElementById('welcome'); if (!w) return null; const r = w.getBoundingClientRect(); const a = [...w.querySelectorAll('a')].map((x) => ({ href: x.href, target: x.target, rel: x.rel, text: x.textContent.trim() })); return { links: a, inView: r.width > 0 && r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight, closeLabel: w.querySelector('button')?.getAttribute('aria-label') || '' }; })()`;
+  for (const [w, h, mobile] of [[375, 812, true], [1440, 900, false]]) {
+    await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
+    await js(`localStorage.clear(); location.reload();`); await sleep(1500);
+    const first = await js(probe);
+    const hrefs = (first?.links || []).map((l) => l.href);
+    const bad = [];
+    if (!first) bad.push('no welcome card on first open');
+    else {
+      if (!hrefs.includes(site.sourceUrl)) bad.push('welcome card does not link to the GitHub source');
+      if (site.DEMO_VIDEO_URL && !hrefs.includes(site.DEMO_VIDEO_URL)) bad.push('welcome card does not link to the demo video');
+      if (first.links.some((l) => l.target !== '_blank' || !/noopener/.test(l.rel))) bad.push('welcome links must open in a new tab with rel=noopener');
+      if (!first.inView) bad.push('welcome card is not fully inside the screen');
+      if (!first.closeLabel) bad.push('welcome card has no labelled close button');
+    }
+    await js(`location.reload()`); await sleep(1500);
+    if (await js(probe)) bad.push('welcome card shown again on the second open');
+    await js(`localStorage.clear(); location.reload()`); await sleep(1500);
+    await js(`document.querySelector('#welcome button')?.click()`);
+    if (await js(`!!document.getElementById('welcome')`)) bad.push('close button does not dismiss the welcome card');
+    if (bad.length) { fails += bad.length; console.log(`FAIL ${w}px first open`); for (const b of bad) console.log('    ' + b); }
+  }
+}
 for (const [w, h, mobile] of [[375, 812, true], [1440, 900, false]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
   for (const pk of packs) for (const r of routes) {

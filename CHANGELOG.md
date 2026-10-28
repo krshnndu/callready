@@ -4,6 +4,9 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Added
+- A welcome card on the first open of the app, with buttons for the demo video and the source on GitHub. It is not a modal, so it never blocks the app; it shows once per browser (marked seen as soon as it appears), closes with the button, a link click or Escape, and is hidden when printing. The content gate tests it on a phone and a laptop: both links present and opening in a new tab, fully inside the screen, shown once, and dismissable.
+
 ### Changed
 - Pitch script rewritten as a product demo that covers every point of the brief: the problem, the working journey from sample inputs to a recommendation, earlier commitments compared, synthetic data and assumptions stated, business value, and one key limitation (`docs/07-PITCH.md`, with a compliance table).
 

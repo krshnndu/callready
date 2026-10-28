@@ -730,6 +730,25 @@ async function render() {
 }
 installTooltip();
 
+// First open: a small card (not a modal, so it never blocks the app) pointing to the demo video and the
+// source. It is marked as seen the moment it is shown, so it appears once per browser. Without
+// localStorage it shows again after a reload, which is acceptable.
+function showWelcome() {
+  if (get('callready.welcomed') || document.getElementById('welcome')) return;
+  set('callready.welcomed', true);
+  const card = document.createElement('aside'); card.id = 'welcome'; card.className = 'welcome glass no-print'; card.setAttribute('role', 'region'); card.setAttribute('aria-label', 'Welcome to CallReady');
+  card.innerHTML = `<button class="welcome-x" type="button" aria-label="Close the welcome message">\u00d7</button>
+    <h2>Welcome to CallReady</h2>
+    <p>New here? Take a minute to watch the demo, or look at the open source code on GitHub.</p>
+    <div class="welcome-actions">${SITE.DEMO_VIDEO_URL ? `<a class="btn primary small-btn" href="${esc(SITE.DEMO_VIDEO_URL)}" target="_blank" rel="noopener">${ICON.play}<span>Watch the demo</span></a>` : ''}<a class="btn ghost small-btn" href="${esc(SITE.sourceUrl)}" target="_blank" rel="noopener">${ICON.github}<span>View the source</span></a></div>`;
+  const close = () => card.remove();
+  card.querySelector('.welcome-x').addEventListener('click', close);
+  card.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); }, { once: true });
+  document.body.appendChild(card);
+}
+showWelcome();
+
 // Typesetting, for every screen and every partial update: one observer gives every negative number a
 // true minus sign, whatever produced the text (rules, packs, company quotes, the coach). A new template
 // therefore cannot bring a hyphen back. Typed answers in form fields are never touched.
