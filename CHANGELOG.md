@@ -4,6 +4,14 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Changed
+- Repository made public. CI's secret scan can read pull requests; Dependabot updates `uv.lock` with `pyproject.toml`.
+- Backup demo video re-recorded with the any-company beat (Load screen, test datasets).
+
+### Fixed
+- Persona line spacing, the "1 rehearsed answers" plural, and chart labels too small to read on phones.
+- The upload retries and keeps polling through slow or dropped requests (seen during a Tailscale Funnel incident).
+
 ## [0.5.0] - 2026-10-28
 
 Load any company, not just the sample.

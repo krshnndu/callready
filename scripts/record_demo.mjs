@@ -51,11 +51,16 @@ await send('Page.startScreencast', { format: 'jpeg', quality: 82, maxWidth: W, m
 
 // 0:00 Problem
 await caption('Revenue is up 14.3%, but EBITDA margin fell 258 bps and cash conversion halved. Analysts will quote last quarter\'s promises back to the CFO.');
-await sleep(5000); await scrollTo(240, 2200); await sleep(4500);
-// 0:12 Pressure map
+await sleep(4000); await scrollTo(240, 1800); await sleep(2500);
+// 0:10 Any company
+await go('#/load');
+await caption('Any company: upload the results PDF. AI converts it, rules check every figure against the document (48 of 48 on our test). Six real NSE filings ship as test datasets.');
+await sleep(7500);
+await js(`localStorage.setItem('callready.active', '{"kind":"sample"}')`);
+// 0:18 Pressure map
 await go('#/pressure');
 await caption('Step 2. Plain arithmetic ranks what investors will push on. To keep the margin promise, H2 needs 15.3%; the best quarter ever was 14.2%.');
-await sleep(6000); await scrollToSel('.plist', 2400); await sleep(5500); await scrollToSel('#remarks', 2000); await sleep(4500);
+await sleep(5000); await scrollToSel('.plist', 2000); await sleep(4500); await scrollToSel('#remarks', 1800); await sleep(3000);
 // 0:30 Rehearse
 await go('#/rehearse/Q01');
 await caption('Step 4. The CFO rehearses the guidance question with a weak answer.');
@@ -72,9 +77,9 @@ await sleep(8000);
 await go('#/report');
 await js(`document.getElementById('demo').click()`); await sleep(800);
 await caption('Step 5. The readiness report: the decision to take before the call is to revise the margin band, not defend it.');
-await sleep(6500); await scrollToSel('#bc-out', 2200);
+await sleep(6000); await scrollToSel('#bc-out', 2000);
 await caption('On stated, editable assumptions: about 50 prep hours and Rs 1.65 lakh a quarter, for Rs 2,600 of running cost.');
-await sleep(6000); await scrollTo(99999, 2500);
+await sleep(5500); await scrollTo(99999, 2000);
 await caption('Readiness by theme and speaker, the riskiest questions, and the CEO/CFO contradiction on guidance.');
 await sleep(5500);
 await caption('Limitation: CallReady anticipates questions grounded in the disclosures, not ones driven by tomorrow\'s news.');
