@@ -41,10 +41,10 @@ export const consensus = { q: 'Q2 FY27', revenue: 2440, ebitda: 315, margin: 12.
 
 // Margin bridge Q2 FY26 to Q2 FY27, in bps.
 export const bridge = [
-  { driver: 'Gross margin: copper and steel costs, Appliances price competition', bps: -180 },
-  { driver: 'Energy Solutions losses', bps: -90 },
-  { driver: 'Employee cost: new plant ramp-up', bps: -28 },
-  { driver: 'Operating leverage on other costs', bps: 40 },
+  { driver: 'Gross margin: copper and steel costs, Appliances price competition', short: 'Gross margin', bps: -180 },
+  { driver: 'Energy Solutions losses', short: 'Energy losses', bps: -90 },
+  { driver: 'Employee cost: new plant ramp-up', short: 'Employee cost', bps: -28 },
+  { driver: 'Operating leverage on other costs', short: 'Operating leverage', bps: 40 },
 ];
 
 // Commitments on record. status: on-track | at-risk | broken | deflected

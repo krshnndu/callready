@@ -291,11 +291,14 @@ mark.warn { background: var(--mark-warn); color: inherit; border-radius: 3px; pa
 .co:hover { background: var(--line); }
 
 /* charts */
+.chartbox { width: 100%; min-height: 40px; }
 .chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart-note { margin: 4px 0 0; }
 .chart .axis { stroke: var(--line-strong); stroke-width: 1; }
 .chart .grid { stroke: var(--line); stroke-width: 1; }
 .chart .lab { font: 500 11px var(--font-ui); fill: var(--ink-3); }
 .chart .lab.strong { fill: var(--ink-2); font-size: 12px; }
+.chart .lab.sm { font-size: 9.5px; }
 .chart .val { font: 600 12px var(--font-ui); fill: var(--ink); font-variant-numeric: tabular-nums; }
 .chart .bar { fill: var(--accent); opacity: 0.45; }
 .chart .bar.now { opacity: 1; }
@@ -372,7 +375,7 @@ details.assume ul { margin: var(--s-3) 0 0; padding-left: 1.2em; color: var(--in
   .rail .seg-switch { grid-column: 2; grid-row: 1; }
   .seg-switch button span { display: none; }
   .seg-switch button { padding: 6px 8px; }
-  .steps { gap: 4px; scrollbar-width: none; }
+  .steps { gap: 4px; scrollbar-width: none; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 20px), transparent 100%); mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 20px), transparent 100%); padding: 0 8px; }
   .steps::-webkit-scrollbar { display: none; }
   .steps a { padding: 8px 12px; font-size: var(--fs-meta); }
 }
@@ -395,10 +398,11 @@ details.assume ul { margin: var(--s-3) 0 0; padding-left: 1.2em; color: var(--in
   table { font-size: 0.8rem; }
   td, th { padding: 8px 5px; }
   .brand small { display: none; }
-  /* SVG text scales with the chart; give it more user units so it stays readable on a phone */
-  .chart .lab { font-size: 19px; }
-  .chart .lab.strong { font-size: 20px; }
-  .chart .val { font-size: 21px; }
+  .rail { padding: 10px 16px 8px; gap: 8px; }
+  .brand-mark { width: 30px; height: 30px; border-radius: 9px; }
+  .brand b { font-size: 1.05rem; }
+  .steps a { padding: 6px 10px; }
+  .steps .n { width: 20px; height: 20px; }
 }
 @media print {
   body::before { display: none; }

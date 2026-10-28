@@ -2,7 +2,17 @@ import { analyze, validatePack, verifyAgainstSource, SCHEMA, METRICS } from './c
 import { scoreAnswer, remarksCheck, DIM_LABELS, OWN_PAST } from './score.js';
 import { samplePack } from './sample.js';
 import { personas as DEFAULT_PERSONAS } from './questions.js';
-import { bars, line, waterfall, diverging, installTooltip } from './charts.js';
+import { bars, line, waterfall, diverging, installTooltip, textW } from './charts.js';
+
+// Charts are drawn after the page renders, at the measured width of their box, and redrawn on resize.
+const CHARTS = new Map();
+let chartSeq = 0;
+const chart = (draw, cls = '') => { const id = `c${++chartSeq}`; CHARTS.set(id, draw); return `<div class="chartbox ${cls}" data-chart="${id}"></div>`; };
+function drawCharts() {
+  document.querySelectorAll('[data-chart]').forEach((box) => { const draw = CHARTS.get(box.dataset.chart); if (draw) box.innerHTML = draw(Math.max(240, Math.floor(box.clientWidth))); });
+}
+let resizeT = null, lastW = window.innerWidth;
+window.addEventListener('resize', () => { if (Math.abs(window.innerWidth - lastW) < 8) return; lastW = window.innerWidth; clearTimeout(resizeT); resizeT = setTimeout(drawCharts, 150); });
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -11,6 +21,8 @@ const f1 = (x) => (num(x) ? (Math.round(x * 10) / 10).toFixed(1) : '-');
 const fmt = (x) => (num(x) ? Number(x).toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '-');
 const sign = (x, d = 1) => (num(x) ? (x > 0 ? '+' : '') + (Math.round(x * 10 ** d) / 10 ** d).toFixed(d) : '-');
 const API = '/api';
+// A quote on screen gets exactly one pair of curly quotes; straight quotes inside it are dropped.
+const quote = (t) => `\u201c${esc(String(t ?? '').replace(/["\u201c\u201d]/g, '').trim())}\u201d`;
 const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/';
 
 const ICON = {
@@ -232,7 +244,7 @@ function viewReview() {
     <p class="sub">Guidance and statements management made, and questions they deflected. Rules compute status from the figures where the metric allows; for the rest, set it here.</p>
     ${(p.commitments || []).length ? p.commitments.map((c, i) => `<div class="commit">
       <div class="row"><b>${esc(c.id)}</b>${d.sourceText ? `<span class="pill ${qfound[c.id] ? 'ok' : 'warn'}">${qfound[c.id] ? 'Quote found in document' : 'Quote not found: check wording'}</span>` : ''}</div>
-      <p class="said">"${esc(c.said)}"</p>
+      <p class="said">${quote(c.said)}</p>
       <div class="form-grid tight">
         <label><span>Kind</span><select data-path="commitments.${i}.kind">${['guidance', 'statement', 'deflection'].map((k) => `<option ${c.kind === k ? 'selected' : ''}>${k}</option>`).join('')}</select></label>
         <label><span>Metric</span><select data-path="commitments.${i}.metric">${METRICS.map((m) => `<option ${c.metric === m ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
@@ -303,21 +315,21 @@ function viewQuarter() {
     </table></div>
   </section>
   ${tp.length >= 2 ? `<div class="grid-2 even">
-    <section class="panel glass"><h2>Revenue by quarter</h2><p class="sub">${esc(p.company.units || '')}. Hover or tap a bar for the figure.</p>${bars({ points: tp.map((x) => ({ label: x.label, value: x.revenue, now: x.now })), title: 'Revenue by quarter' })}</section>
-    <section class="panel glass"><h2>EBITDA margin by quarter</h2><p class="sub">${mg ? `The shaded band is the guided ${mg.target.low} to ${mg.target.high ?? mg.target.low}% range.` : 'Percent of revenue.'}</p>${line({ points: tp.map((x) => ({ label: x.label, value: x.margin, now: x.now })), title: 'EBITDA margin by quarter', band: mg ? { low: mg.target.low, high: mg.target.high ?? mg.target.low, label: `Guided ${mg.target.low} to ${mg.target.high ?? mg.target.low}%` } : null })}</section>
+    <section class="panel glass"><h2>Revenue by quarter</h2><p class="sub">${esc(p.company.units || '')}. Hover or tap a bar for the figure.</p>${chart((W) => bars({ W, points: tp.map((x) => ({ label: x.label, value: x.revenue, now: x.now })), title: 'Revenue by quarter' }))}</section>
+    <section class="panel glass"><h2>EBITDA margin by quarter</h2><p class="sub">${mg ? `The shaded band is the guided ${mg.target.low} to ${mg.target.high ?? mg.target.low}% range.` : 'Percent of revenue.'}</p>${chart((W) => line({ W, points: tp.map((x) => ({ label: x.label, value: x.margin, now: x.now })), title: 'EBITDA margin by quarter', band: mg ? { low: mg.target.low, high: mg.target.high ?? mg.target.low, label: `Guided ${mg.target.low} to ${mg.target.high ?? mg.target.low}%` } : null }))}</section>
   </div>` : ''}
   <div class="grid-2">
     <section class="panel glass">
       ${segs.length ? `<h2>Segments</h2><p class="sub">Revenue growth and EBIT margin against a year ago.</p>
       <div class="table-wrap"><table><thead><tr><th>Segment</th><th class="n">Revenue</th><th class="n">Growth</th><th class="n">Margin</th></tr></thead>
         <tbody>${segs.map((s) => `<tr><td>${esc(s.name)}</td><td class="n">${fmt(s.rev)}</td><td class="n ${s.growth >= 0 ? 'up' : 'down'}">${num(s.growth) ? sign(s.growth) + '%' : '-'}</td><td class="n">${f1(s.m)}%</td></tr>`).join('')}</tbody></table></div>
-      ${segs.some((s) => num(s.bps)) ? `<h3 class="h3">Margin change, bps</h3>${diverging({ rows: segs.filter((s) => num(s.bps)).map((s) => ({ label: s.name, value: Math.round(s.bps), tip: `${s.name}: EBIT margin ${f1(s.mPy)}% to ${f1(s.m)}%` })), title: 'Segment margin change' })}` : ''}` : '<h2>Segments</h2><p class="small muted">The document reports no segments.</p>'}
-      ${p.bridge?.length ? `<h2 style="margin-top:var(--s-5)">Margin bridge</h2><p class="sub">${f1(K.mPy)}% to ${f1(K.m)}%, year on year.</p>${waterfall({ start: { label: 'Year ago', value: K.mPy }, steps: p.bridge.map((b) => ({ label: b.driver.split(':')[0], delta: b.bps / 100, tip: `${b.driver}: ${b.bps > 0 ? '+' : ''}${b.bps} bps` })), end: { label: 'This quarter', value: K.m }, title: 'EBITDA margin bridge' })}` : ''}
+      ${segs.some((s) => num(s.bps)) ? `<h3 class="h3">Margin change, bps</h3>${chart((W) => diverging({ W, rows: segs.filter((s) => num(s.bps)).map((s) => ({ label: s.name, value: Math.round(s.bps), tip: `${s.name}: EBIT margin ${f1(s.mPy)}% to ${f1(s.m)}%` })), title: 'Segment margin change' }))}` : ''}` : '<h2>Segments</h2><p class="small muted">The document reports no segments.</p>'}
+      ${p.bridge?.length ? `<h2 style="margin-top:var(--s-5)">Margin bridge</h2><p class="sub">${f1(K.mPy)}% to ${f1(K.m)}%, year on year.</p>${chart((W) => waterfall({ W, start: { label: 'Year ago', value: K.mPy }, steps: p.bridge.map((b) => ({ label: b.short || b.driver.split(':')[0], delta: b.bps / 100, tip: `${b.driver}: ${b.bps > 0 ? '+' : ''}${b.bps} bps` })), end: { label: 'This quarter', value: K.m }, title: 'EBITDA margin bridge' }))}` : ''}
     </section>
     <section class="panel glass">
       <h2>Commitments on record</h2>
       <p class="sub">Status is computed by rules from the figures where the metric allows (marked "rule"). Hover a reference to read the line.</p>
-      ${cs.length ? `<table><tbody>${cs.map((c) => `<tr><td style="width:44px"><b>${esc(c.id)}</b></td><td>"${esc(c.said)}"<div class="tiny">${esc(c.why || '')}</div></td><td class="n"><span class="pill ${(st[c.status] || st.unclear)[0]}">${(st[c.status] || st.unclear)[1]}</span><div class="tiny" style="margin-top:4px">${c.statusSource === 'rule' ? 'rule' : c.statusSource === 'stated' ? 'stated' : ''}</div>${c.ref && CTX.sources[c.ref] ? `<div style="margin-top:6px">${cite(c.ref)}</div>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="small muted">No commitments in this pack, so the consistency checks are off.</p>'}
+      ${cs.length ? `<table><tbody>${cs.map((c) => `<tr><td style="width:44px"><b>${esc(c.id)}</b></td><td>${quote(c.said)}<div class="tiny">${esc(c.why || '')}</div></td><td class="n"><span class="pill ${(st[c.status] || st.unclear)[0]}">${(st[c.status] || st.unclear)[1]}</span><div class="tiny" style="margin-top:4px">${c.statusSource === 'rule' ? 'rule' : c.statusSource === 'stated' ? 'stated' : ''}</div>${c.ref && CTX.sources[c.ref] ? `<div style="margin-top:6px">${cite(c.ref)}</div>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="small muted">No commitments in this pack, so the consistency checks are off.</p>'}
     </section>
   </div>
   <section class="panel glass">
@@ -335,16 +347,21 @@ function viewQuarter() {
 }
 
 // ---------- 2. Pressure ----------
-function gaugeSVG(imp) {
-  const lo = Math.floor(Math.min(imp.ytd, imp.low, imp.record) - 1), hi = Math.ceil(Math.max(imp.need, imp.high, imp.record) + 1), W = 640, x = (v) => 20 + ((v - lo) / (hi - lo)) * (W - 40);
-  const marks = [[imp.ytd, 'var(--ink-2)', 'Year to date actual'], [imp.record, 'var(--ink-2)', 'Best quarter on record'], [imp.need, 'var(--bad)', 'Needed for the rest of the year']];
-  const ticks = []; for (let t = lo; t <= hi; t++) ticks.push(t);
-  return `<svg class="chart" viewBox="0 0 ${W} 96" role="img" aria-label="Margin needed ${f1(imp.need)} percent, against a record of ${f1(imp.record)} percent and a guided range of ${imp.low} to ${imp.high} percent">
-    <rect x="20" y="40" width="${W - 40}" height="10" rx="5" fill="var(--sunk)"/>
+function gaugeSVG(imp, W = 640) {
+  const lo = Math.floor(Math.min(imp.ytd, imp.low, imp.record) - 1), hi = Math.ceil(Math.max(imp.need, imp.high, imp.record) + 1), pad = 14, x = (v) => pad + ((v - lo) / (hi - lo)) * (W - 2 * pad);
+  const marks = [[imp.ytd, 'var(--ink-2)', 'Year to date actual'], [imp.record, 'var(--ink-2)', 'Best quarter on record'], [imp.need, 'var(--bad)', 'Needed for the rest of the year']].sort((a, b) => a[0] - b[0]);
+  // Marker labels: a label that would touch its left neighbour drops to the next row.
+  let lastEnd = -Infinity, rows = 0;
+  const placed = marks.map(([v, col, l]) => { const t = `${f1(v)}%`, w = textW(t, 12); const cx = Math.min(W - pad - w / 2, Math.max(pad + w / 2, x(v))); const row = cx - w / 2 < lastEnd + 6 ? 1 : 0; if (!row) lastEnd = cx + w / 2; rows = Math.max(rows, row); return { v, col, l, t, cx, row }; });
+  const step = Math.max(1, Math.ceil(textW('16%') * 1.8 / ((W - 2 * pad) / (hi - lo))));
+  const ticks = []; for (let t = lo; t <= hi; t += step) ticks.push(t);
+  const H = 100 + rows * 15, band = `Guided ${imp.low} to ${imp.high}%`, bw = textW(band), bx = Math.min(W - pad - bw / 2, Math.max(pad + bw / 2, (x(imp.low) + x(imp.high)) / 2));
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="Margin needed ${f1(imp.need)} percent, against a record of ${f1(imp.record)} percent and a guided range of ${imp.low} to ${imp.high} percent">
+    <rect x="${pad}" y="40" width="${W - 2 * pad}" height="10" rx="5" fill="var(--sunk)"/>
     <rect x="${x(imp.low)}" y="36" width="${Math.max(3, x(imp.high) - x(imp.low))}" height="18" rx="4" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1"/>
-    <text class="lab" x="${(x(imp.low) + x(imp.high)) / 2}" y="28" text-anchor="middle">Guided ${imp.low} to ${imp.high}%</text>
-    ${ticks.map((v) => `<text class="lab" x="${x(v)}" y="92" text-anchor="middle">${v}%</text>`).join('')}
-    ${marks.map(([v, col, l], i) => `<g class="mark" tabindex="0" data-tip="${l}: ${f1(v)}%"><line x1="${x(v)}" x2="${x(v)}" y1="34" y2="58" stroke="${col}" stroke-width="${i === 2 ? 3 : 2}"/><circle cx="${x(v)}" cy="45" r="${i === 2 ? 6 : 4}" fill="${col}"/><text class="val" x="${x(v)}" y="74" text-anchor="middle" style="fill:${col}">${f1(v)}%</text></g>`).join('')}
+    <text class="lab" x="${bx}" y="28" text-anchor="middle">${band}</text>
+    ${ticks.map((v) => `<text class="lab" x="${x(v)}" y="${H - 4}" text-anchor="middle">${v}%</text>`).join('')}
+    ${placed.map((m) => `<g class="mark" tabindex="0" data-tip="${m.l}: ${m.t}"><line x1="${x(m.v)}" x2="${x(m.v)}" y1="34" y2="58" stroke="${m.col}" stroke-width="${m.col.includes('bad') ? 3 : 2}"/><circle cx="${x(m.v)}" cy="45" r="${m.col.includes('bad') ? 6 : 4}" fill="${m.col}"/><text class="val" x="${m.cx}" y="${74 + m.row * 15}" text-anchor="middle" style="fill:${m.col}">${m.t}</text></g>`).join('')}
   </svg>`;
 }
 function viewPressure() {
@@ -355,7 +372,7 @@ function viewPressure() {
   ${imp && num(imp.need) ? `<section class="panel glass">
     <h2>Margin guidance: can it still be met?</h2>
     <p class="sub">The bottom of the range across the guided revenue growth (${imp.rows.map((r) => `${r.growth}% growth: ${f1(r.need)}%`).join('; ')}).</p>
-    <div class="gauge">${gaugeSVG(imp)}</div>
+    ${chart((W) => gaugeSVG(imp, W), 'gauge')}
     <div class="readouts">
       <div class="readout"><div class="v">${f1(imp.ytd)}%</div><div class="l">${esc(imp.ytdLabel)} EBITDA margin</div></div>
       <div class="readout ${imp.need > imp.record ? 'bad' : ''}"><div class="v">${f1(imp.need)}%</div><div class="l">needed for the rest of the year</div></div>
@@ -419,7 +436,7 @@ function viewRehearse(qid) {
     <section class="panel glass">
       <div class="row"><label class="small muted" for="qpick">Question</label><select id="qpick">${questions.map((x) => `<option value="${x.id}" ${x.id === q.id ? 'selected' : ''}>${x.id} ${esc(x.theme)}: ${esc(x.text.slice(0, 44))}...</option>`).join('')}</select></div>
       <div class="qmeta" style="margin-top:var(--s-4)"><span><b style="color:var(--ink-2)">${esc(pe.name)}</b>${pe.firm ? `, ${esc(pe.firm)}` : ''}</span>. ${esc(pe.style || '')}</div>
-      <p class="question-block">"${esc(q.text)}"</p>
+      <p class="question-block">${quote(q.text)}</p>
       <div class="row" style="margin-bottom:var(--s-3)">
         <label class="small muted" for="speaker">Answering as</label>
         <select id="speaker">${speakers.map(([k2, v]) => `<option value="${esc(k2)}" ${k2 === q.owner ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
@@ -513,8 +530,8 @@ function coachFacts() {
 async function coach(q, text, res, speaker) {
   const el = $('#coach'); const p = CTX.pack; const pe = personaOf(p, q.persona);
   const fallback = (why) => {
-    el.innerHTML = q.model ? `<h3>${ICON.spark} Reference answer</h3><p class="tiny">${esc(why)}</p><div class="improved">${esc(q.model)}</div><div class="followup"><b>${esc(pe.name)} follows up:</b> "${esc(q.followup)}"</div>`
-      : `<h3>${ICON.spark} Coach</h3><p class="small muted">${esc(why)} The scorecard above is complete: it is computed by rules and needs no AI.</p><div class="followup"><b>${esc(pe.name)} would follow up:</b> "${esc(q.followup)}"</div>`;
+    el.innerHTML = q.model ? `<h3>${ICON.spark} Reference answer</h3><p class="tiny">${esc(why)}</p><div class="improved">${esc(q.model)}</div><div class="followup"><b>${esc(pe.name)} follows up:</b> ${quote(q.followup)}</div>`
+      : `<h3>${ICON.spark} Coach</h3><p class="small muted">${esc(why)} The scorecard above is complete: it is computed by rules and needs no AI.</p><div class="followup"><b>${esc(pe.name)} would follow up:</b> ${quote(q.followup)}</div>`;
   };
   const flags = res.flags.map((fl) => `${fl.dim}: ${fl.text}: ${fl.why}`).slice(0, 20);
   const body = isSample(p)
@@ -534,7 +551,7 @@ async function coach(q, text, res, speaker) {
     el.innerHTML = `<h3>${ICON.spark} Coach <span class="pill accent">${esc(j.model || 'live')}</span>${j.cached ? '<span class="pill neutral">cached</span>' : ''}</h3>
       <p>${esc(j.critique)}</p>
       ${safe ? `<div class="improved">${esc(j.improved)}</div>` : q.model ? `<div class="improved">${esc(q.model)}</div><p class="tiny">The live answer used a figure not in the disclosures, so the checked reference answer is shown instead.</p>` : '<p class="tiny">The live answer used a figure the rules could not find in the disclosures, so it is withheld. The critique above still applies.</p>'}
-      <div class="followup"><b>${esc(pe.name)} follows up:</b> "${esc(j.followup || q.followup)}"</div>`;
+      <div class="followup"><b>${esc(pe.name)} follows up:</b> ${quote(j.followup || q.followup)}</div>`;
   } catch {
     clearTimeout(to);
     fallback(q.model ? 'The live coach is unavailable right now, so this is the reference answer from the question bank. It passes every check above.' : 'The live coach is unavailable right now.');
@@ -608,8 +625,8 @@ function buildRecs(themes, best, rc, contra) {
   if (imp && num(imp.need) && imp.need > imp.record) R.push({ title: 'Decide on margin guidance before the call, not during it', body: `${imp.ytdLabel} EBITDA margin is ${f1(imp.ytd)}%. The bottom of the ${imp.low} to ${imp.high}% range needs about ${f1(imp.need)}% for the rest of the year, above the ${f1(imp.record)}% best quarter on record. Defending it invites the hardest follow-up of the call. Recommend the board settles a revised range and files it with the results, so the CFO can point to it.` });
   if (rc.gaps.length) R.push({ title: CTX.pack.remarks ? 'Close the gaps in the prepared remarks' : 'Write the prepared remarks around the pressure map', body: `${CTX.pack.remarks ? 'The draft is silent on' : 'Cover'}: ${rc.gaps.map((g) => g.label).slice(0, 5).join('; ')}.${num(K.mBps) && K.mBps < 0 ? ` Explain the ${Math.abs(Math.round(K.mBps))} bps margin decline with its drivers.` : ''}${rc.risky[0] ? ` Remove "${rc.risky[0].phrase}": ${rc.risky[0].why}` : ''}` });
   const broken = cs.filter((c) => c.status === 'broken');
-  if (broken.length) R.push({ title: `Own ${broken.length === 1 ? 'the statement that did not hold' : `the ${broken.length} statements that did not hold`} in the opening`, body: `${broken.map((c) => `${c.id} ("${c.said}"): ${c.why}`).join('; ')}. One sentence each, from the speaker who made it: what was said, what happened, what changes.` });
-  for (const c of cs.filter((x) => x.status === 'deflected')) R.push({ title: `Disclose ${c.topic || 'the deflected item'} proactively`, body: `Last time: "${c.said}". ${c.why || ''} Put it in the CFO's section before an analyst asks again, and commit to regular disclosure.` });
+  if (broken.length) R.push({ title: `Own ${broken.length === 1 ? 'the statement that did not hold' : `the ${broken.length} statements that did not hold`} in the opening`, body: `${broken.map((c) => `${c.id} (\u201c${c.said.replace(/["\u201c\u201d]/g, '')}\u201d): ${c.why}`).join('; ')}. One sentence each, from the speaker who made it: what was said, what happened, what changes.` });
+  for (const c of cs.filter((x) => x.status === 'deflected')) R.push({ title: `Disclose ${c.topic || 'the deflected item'} proactively`, body: `Last time: \u201c${c.said.replace(/["\u201c\u201d]/g, '')}\u201d. ${c.why || ''} Put it in the CFO's section before an analyst asks again, and commit to regular disclosure.` });
   const weak = themes.filter((t) => t.band === 'red' || t.band === 'off').map((t) => t.th);
   if (weak.length) R.push({ title: `Rehearse again: ${weak.slice(0, 4).join(', ')}`, body: `These themes are not ready${Object.keys(best).length ? ' on the answers given so far' : ' because nothing has been rehearsed yet'}. Owners follow the pressure map: ${P.slice(0, 4).map((x) => `${x.theme} to ${x.owner === 'ENERGY' ? 'the segment head' : x.owner}`).join('; ')}.` });
   if (contra.length) R.push({ title: 'Align the speakers on one line per theme', body: `${contra.map((c) => c.q.id).join(', ')} got different answers from different speakers. Agree the wording, then rehearse both again.` });
@@ -640,10 +657,14 @@ async function render() {
   else if (h.startsWith('#/rehearse')) { const id = h.split('/')[2] || CTX.questions[0]?.id; app.innerHTML = viewRehearse(id); bindRehearse(id); }
   else if (h.startsWith('#/report')) { app.innerHTML = viewReport(); bindReport(); }
   else app.innerHTML = viewQuarter();
+  drawCharts();
   app.querySelectorAll('[data-theme-set]').forEach((b) => b.addEventListener('click', () => { set('callready.theme', b.dataset.themeSet); applyTheme(b.dataset.themeSet); app.querySelectorAll('[data-theme-set]').forEach((x) => x.setAttribute('aria-checked', String(x === b))); }));
   window.scrollTo(0, 0);
-  app.querySelector('.steps [aria-current]')?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  const cur = app.querySelector('.steps [aria-current]'), strip = app.querySelector('.steps');
+  if (cur && strip) { const r = cur.getBoundingClientRect(), sr = strip.getBoundingClientRect(); if (r.left < sr.left || r.right > sr.right) strip.scrollLeft += r.left - sr.left - 16; }
 }
 installTooltip();
+// Text widths are measured with the web font; redraw once it has loaded.
+document.fonts?.ready.then(() => drawCharts());
 window.addEventListener('hashchange', render);
 render();

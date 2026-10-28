@@ -21,6 +21,11 @@ export function normalizePack(p) {
     p.company = { ...(p.company || {}), marginBasis: 'EBIT' };
   }
   if (typeof p?.company?.units === 'string') p.company.units = p.company.units.split(/[;(]/)[0].trim();
+  // Period labels are the short form ("Q2 FY27"); a date range in brackets moves to `period`.
+  for (const x of [per.current, per.priorYear, per.priorQuarter, ...(p?.history || [])]) {
+    const m = x && typeof x.label === 'string' && x.label.match(/^(.*?)\s*\((.+)\)\s*$/);
+    if (m) { x.label = m[1].trim(); x.period ||= m[2].trim(); }
+  }
   return p;
 }
 export const METRICS = ['revenueGrowth', 'ebitdaMargin', 'netDebtToEbitda', 'capex', 'segmentEbit', 'workingCapital', 'cashFlow', 'other'];

@@ -9,6 +9,15 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 - `docs/07-PITCH.md` is now a shot-by-shot recording script: setup checklist, clicks, spoken lines, timings and fallbacks. `scripts/record_demo.mjs` includes the any-company beat.
 
 ### Fixed
+- Charts are laid out by rules at the real container width: text is measured with the web font, labels wrap and then truncate with the full text in the tooltip, value labels move inside the bar or across the zero line when they do not fit, and tick labels thin out. Fixes overlapping labels on phones in the segment chart and the margin bridge.
+- Period labels are normalised to the short form ("Q2 FY27"); a bracketed date range moves to `period`.
+- Every quote on screen gets one pair of curly quotes (no more nested quotes).
+- Phone header is compact, and the step bar no longer clips the first step.
+
+### Added
+- `scripts/check_layout.mjs`: a layout gate that renders 6 screens x 7 companies x 2 sizes in headless Chrome and fails on overlapping chart text, chart text outside its chart, sideways page scroll, or content outside its panel.
+
+### Fixed (earlier)
 - Persona line spacing, the "1 rehearsed answers" plural, and chart labels too small to read on phones.
 - The upload retries and keeps polling through slow or dropped requests (seen during a Tailscale Funnel incident).
 
