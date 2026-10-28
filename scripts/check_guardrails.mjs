@@ -101,6 +101,29 @@ if (has('applyEvidencePolicy')) {
   ok(kept.pack.provenance?.policy === 'confirmed' && s.provenance?.policy === 'strict', 'the pack records which policy was applied');
 }
 
+console.log('--- EBITDA derived from verified components when not printed');
+{
+  const p = clone(samplePack); delete p.questions; delete p.bridge;
+  for (const k of ['current', 'priorYear', 'priorQuarter']) p.periods[k].ebitda = null;
+  Object.assign(p.periods.current, { pbt: 164, financeCost: 28, da: 108 });
+  Object.assign(p.periods.priorYear, { pbt: 202, financeCost: 17, da: 99 });
+  p.periods.priorQuarter = null;
+  const v = core.validatePack(p);
+  ok(v.errors.length === 0, `a pack with PBT, finance costs and D&A but no EBITDA validates (${v.errors.join(' ') || 'ok'})`);
+  const ctx = core.analyze(p);
+  ok(ctx.k.cur.ebitda === 300 && ctx.k.py.ebitda === 318, `EBITDA derived as PBT + finance costs + D&A (${ctx.k.cur.ebitda}, ${ctx.k.py.ebitda})`);
+  ok((p.derived || []).some((d) => /periods\.current\.ebitda/.test(d)), 'the derivation is recorded on the pack');
+  const src = 'Profit before tax 164 202 Finance costs 28 17 Depreciation 108 99 Revenue 2,480 2,170';
+  const ver = core.verifyAgainstSource(p, src);
+  ok(!ver.checks.some((c) => c.path === 'periods.current.ebitda'), 'a derived figure is not looked for in the document; its inputs are');
+  ok(ver.checks.some((c) => c.path === 'periods.current.pbt' && c.found), 'the inputs of a derived figure are verified');
+  const q = clone(samplePack); delete q.questions; q.periods.current.ebitda = null;
+  const e = core.validatePack(q).errors.join(' ');
+  ok(/profit before tax/i.test(e) && /finance cost/i.test(e), `when EBITDA cannot be found or derived, the error names what is needed (${e.slice(0, 120)})`);
+  const a = clone(samplePack); delete a.questions; a.company.quarter = 'FY25';
+  ok(!core.validatePack(a).warnings.some((w) => /quarter label/i.test(w)), 'an annual label like FY25 is accepted');
+}
+
 console.log('--- Upload limits');
 ok(has('uploadAllowed'), 'uploadAllowed exists');
 if (has('uploadAllowed')) {

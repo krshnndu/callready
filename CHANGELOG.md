@@ -4,6 +4,10 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Added
+- Annual statements (FY25 vs FY24, or year-end dates such as "31 March 2025") are read by the rules. Found when a user uploaded Reliance Retail's annual financial statements.
+- EBITDA is derived by arithmetic (PBT + finance costs + D&A - other income) when a document does not print it. The derivation is recorded and shown; its inputs are verified against the document, the result is not. When EBITDA can be neither found nor derived, the error names the figures needed. Extraction prompt `extract-v3` asks for those inputs.
+
 ### Fixed
 - Blank speaker names from extraction gave empty options in "Answering as". Speakers now always fall back to their role, and the sanitiser drops blank names.
 - The persona line no longer splits punctuation off into its own layout item; curly quotes are used across all UI and rule copy.

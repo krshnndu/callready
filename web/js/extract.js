@@ -4,17 +4,22 @@
 // cross-check of AI figures on the Review screen, and a fallback when the AI service is unavailable.
 import { SCHEMA } from './core.js';
 
-const PERIOD = /\b(Q[1-4]|H[12]|[69]M)\s?FY\s?'?(\d{2,4})\b/gi;
+// Quarterly (Q2 FY27), half and nine-month (H1, 6M, 9M FY27), or annual (FY25) periods.
+const PERIOD = /\b(?:(Q[1-4]|H[12]|[69]M)\s?)?FY\s?'?(\d{2,4})\b/gi;
+const YEAR_END = /\b(?:31(?:st)?\s+March,?\s+(\d{4})|March\s+31,?\s+(\d{4})|31[./-]0?3[./-](\d{4}))\b/gi;
 // Row labels, normalised (lower case, punctuation dropped). Exact match after normalising, longest first.
 const ROWS = {
   revenue: ['revenue from operations', 'net revenue nr', 'net revenue', 'total revenue from operations', 'revenue from operations net', 'income from operations', 'total income from operations', 'net sales', 'revenue', 'sales'],
   ebitda: ['ebitda', 'reported ebitda', 'operating ebitda'],
   ebit: ['ebit', 'operating profit', 'operating income'],
-  pat: ['profit after tax', 'pat', 'net profit', 'profit for the period', 'net profit after tax', 'net income', 'profit after tax pat'],
+  pat: ['profit after tax', 'pat', 'net profit', 'profit for the period', 'profit for the year', 'net profit after tax', 'net income', 'profit after tax pat'],
+  pbt: ['profit before tax', 'pbt', 'profit before tax pbt'],
+  financeCost: ['finance costs', 'finance cost', 'interest expense'],
+  otherIncome: ['other income', 'other income net'],
   ocf: ['cash flow from operations', 'net cash from operating activities', 'operating net cash flow a', 'operating net cash flow', 'cash from operations', 'net cash generated from operating activities'],
   capex: ['capital expenditure', 'capex'],
   netDebt: ['net debt period end', 'net debt'],
-  da: ['depreciation and amortisation', 'depreciation and amortization', 'depreciation amortization', 'depreciation amortisation', 'depreciation'],
+  da: ['depreciation and amortisation expense', 'depreciation and amortization expense', 'depreciation and amortisation', 'depreciation and amortization', 'depreciation amortization', 'depreciation amortisation', 'depreciation'],
   invDays: ['inventory days'],
   recDays: ['receivable days', 'debtor days', 'receivables days'],
   payDays: ['payable days', 'creditor days', 'payables days'],
@@ -23,7 +28,7 @@ const norm = (s) => s.toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g,
 const ROW_INDEX = Object.entries(ROWS).flatMap(([f, ls]) => ls.map((l) => [norm(l), f])).sort((a, b) => b[0].length - a[0].length);
 
 const fy = (y) => { const n = Number(y); return n < 100 ? 2000 + n : n; };
-const parsePeriod = (m) => ({ kind: m[1].toUpperCase(), fy: fy(m[2]), label: `${m[1].toUpperCase()} FY${String(fy(m[2])).slice(2)}` });
+const parsePeriod = (m) => (m[1] ? { kind: m[1].toUpperCase(), fy: fy(m[2]), label: `${m[1].toUpperCase()} FY${String(fy(m[2])).slice(2)}` } : { kind: 'FY', fy: fy(m[2]), label: `FY${String(fy(m[2])).slice(2)}` });
 
 // A numeric token: 2,480 / 11.6 / (160) / -8.5 / 1,195. Percent, bps and NA are change columns, not periods.
 function rowValues(rest) {
@@ -56,7 +61,8 @@ export function extractByRules(text, { name = '' } = {}) {
   const tables = [], rejected = [];
   let cur = null;
   lines.forEach((line, i) => {
-    const ps = [...line.matchAll(PERIOD)];
+    // Year-end dates ("31 March 2025", "March 31, 2025", "31.03.2025") are financial years: FY25.
+    const ps = [...line.matchAll(PERIOD)].map((m) => [m[0], m[1], m[2]]).concat([...line.matchAll(YEAR_END)].map((m) => [m[0], undefined, String(Number(m[1] || m[2] || m[3]) % 100).padStart(2, '0')])).map((m) => Object.assign(m, { index: line.indexOf(m[0]) })).sort((a, b) => a.index - b.index);
     if (ps.length >= 2) {
       const ctx = lines.slice(Math.max(0, i - 12), i + 1).join(' ').toLowerCase();
       cur = { at: i, header: line, periods: ps.map(parsePeriod), basis: /consolidated/.test(ctx) ? 'consolidated' : /standalone/.test(ctx) ? 'standalone' : '', rows: {} };
@@ -81,10 +87,13 @@ export function extractByRules(text, { name = '' } = {}) {
     }
   });
   // The current quarter is the latest quarterly period named in any header.
-  const qs = tables.flatMap((t) => t.periods).filter((p) => p.kind.startsWith('Q'));
-  const latest = qs.sort((a, b) => b.fy - a.fy || b.kind.localeCompare(a.kind))[0];
+  const all = tables.flatMap((t) => t.periods);
+  const qs = all.filter((p) => p.kind.startsWith('Q'));
+  // Quarterly results if the document has quarters; otherwise annual statements (FY vs FY).
+  const latest = qs.length ? qs.sort((a, b) => b.fy - a.fy || b.kind.localeCompare(a.kind))[0] : all.filter((p) => p.kind === 'FY').sort((a, b) => b.fy - a.fy)[0];
   const role = (p) => {
     if (!latest) return null;
+    if (latest.kind === 'FY') return p.kind === 'FY' ? (p.fy === latest.fy ? 'current' : p.fy === latest.fy - 1 ? 'priorYear' : null) : null;
     const q = Number(latest.kind[1]);
     if (p.kind === latest.kind && p.fy === latest.fy) return 'current';
     if (p.kind === latest.kind && p.fy === latest.fy - 1) return 'priorYear';
@@ -96,7 +105,7 @@ export function extractByRules(text, { name = '' } = {}) {
   // Consolidated tables first, then unlabelled, then standalone; within those, document order.
   const rank = { consolidated: 0, '': 1, standalone: 2 };
   const ordered = [...tables].sort((a, b) => rank[a.basis] - rank[b.basis] || a.at - b.at);
-  const periods = { current: { label: latest?.label || '' }, priorYear: { label: latest ? `${latest.kind} FY${String(latest.fy - 1).slice(2)}` : '' }, priorQuarter: null };
+  const periods = { current: { label: latest?.label || '' }, priorYear: { label: latest ? (latest.kind === 'FY' ? `FY${String(latest.fy - 1).slice(2)}` : `${latest.kind} FY${String(latest.fy - 1).slice(2)}`) : '' }, priorQuarter: null };
   const ytd = {}, used = new Set();
   for (const t of ordered) {
     const roles = t.periods.map(role);
@@ -130,7 +139,7 @@ export function extractByRules(text, { name = '' } = {}) {
     id: `rules-${Date.now().toString(36)}`,
     company: { name: nameM ? nameM[1].trim() : (name || 'Uploaded company').replace(/\.(pdf|txt|md)$/i, ''), quarter: latest?.label || '', units: units(text), unitWord: (units(text).split(' ').pop() || '') },
     periods,
-    ytd: ytd.revenue != null ? { label: ytd.label, revenue: ytd.revenue, ebitda: ytd.ebitda ?? null, capex: ytd.capex ?? null, revenuePy: ytd.revenuePy ?? null, quartersElapsed: latest ? Number(latest.kind[1]) : null } : null,
+    ytd: ytd.revenue != null && latest?.kind !== 'FY' ? { label: ytd.label, revenue: ytd.revenue, ebitda: ytd.ebitda ?? null, capex: ytd.capex ?? null, revenuePy: ytd.revenuePy ?? null, quartersElapsed: latest ? Number(latest.kind[1]) : null } : null,
     commitments,
     provenance: { source: 'upload', extractedBy: 'rules', policy: 'strict' },
   };

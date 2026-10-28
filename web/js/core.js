@@ -11,7 +11,7 @@ export const quarterNum = (label) => { const m = /Q([1-4])/i.exec(label || ''); 
 export const margin = (p) => (p && num(p.revenue) && num(p.ebitda) != null ? (p.ebitda / p.revenue) * 100 : null);
 
 // ---------- validation ----------
-export const PERIOD_FIELDS = ['revenue', 'ebitda', 'ebit', 'pat', 'ocf', 'capex', 'netDebt', 'da', 'invDays', 'recDays', 'payDays'];
+export const PERIOD_FIELDS = ['revenue', 'ebitda', 'ebit', 'pat', 'ocf', 'capex', 'netDebt', 'da', 'invDays', 'recDays', 'payDays', 'pbt', 'financeCost', 'otherIncome'];
 
 // ---------- Layer 1: sanitise untrusted packs (uploads, AI extraction, files, saved state) ----------
 // A schema walk: every field is forced to its type, strings are length-capped, lists are count-capped,
@@ -111,6 +111,19 @@ export function uploadAllowed(files) {
 // and the pack says so, rather than the pack being rejected.
 export function normalizePack(p) {
   const per = p?.periods || {};
+  // EBITDA not printed (annual statements, some results formats): derive it by arithmetic from figures
+  // that are, and record how. Operating EBITDA = PBT + finance costs + D&A - other income.
+  // Normalising runs more than once (validate, analyze); the record of a derivation must survive it.
+  p.derived = p.derived || [];
+  for (const k of ['current', 'priorYear', 'priorQuarter']) {
+    const x = per[k];
+    if (!x || num(x.ebitda) != null || num(x.ebit) != null) continue;
+    if ([x.pbt, x.financeCost, x.da].every((v) => num(v) != null)) {
+      const oi = num(x.otherIncome) ?? 0;
+      x.ebitda = Math.round((x.pbt + x.financeCost + x.da - oi) * 100) / 100;
+      p.derived.push(`periods.${k}.ebitda = PBT + finance costs + D&A${oi ? ' - other income' : ''} (${x.pbt} + ${x.financeCost} + ${x.da}${oi ? ` - ${oi}` : ''})`);
+    }
+  }
   const usesEbit = ['current', 'priorYear'].every((k) => per[k] && per[k].ebitda == null && typeof per[k].ebit === 'number');
   if (usesEbit) {
     for (const x of [per.current, per.priorYear, per.priorQuarter, ...(p.history || [])]) if (x && x.ebitda == null && typeof x.ebit === 'number') x.ebitda = x.ebit;
@@ -138,7 +151,8 @@ export function validatePack(p) {
   for (const k of ['current', 'priorYear']) {
     const per = p.periods?.[k];
     if (!per) { errors.push(`periods.${k} is missing.`); continue; }
-    for (const f of ['revenue', 'ebitda']) if (num(per[f]) == null) errors.push(`periods.${k}.${f} must be a number.`);
+    if (num(per.revenue) == null) errors.push(`periods.${k}.revenue must be a number.`);
+    if (num(per.ebitda) == null) errors.push(`periods.${k}.ebitda is missing. The document must print EBITDA (or operating profit), or profit before tax, finance costs and depreciation so EBITDA can be derived. Type it in from the document if it is there.`);
   }
   if (!p.periods?.priorQuarter) warnings.push('No prior quarter: quarter-on-quarter figures are skipped.');
   // Layer 2: figures must make financial sense.
@@ -157,7 +171,7 @@ export function validatePack(p) {
   }
   for (const [i, sg] of (p.segments || []).entries()) for (const k of ['current', 'priorYear', 'priorQuarter']) { const m = sg?.[k]?.margin; if (num(m) != null && (m < -100 || m > 100)) errors.push(`segments.${i}.${k}.margin of ${m}% is outside -100 to 100%: margins are percentages.`); }
   { const cur = p.periods?.current; const base = num(p.ttmEbitda) ?? (num(cur?.ebitda) ? cur.ebitda * 4 : null); if (num(cur?.netDebt) != null && base > 0 && cur.netDebt > 20 * base) warnings.push(`Net debt of ${cur.netDebt} is above 20x EBITDA: check the units.`); }
-  if (p.company?.quarter && !/^Q[1-4]\s?FY\s?\d{2,4}$/i.test(p.company.quarter.trim())) warnings.push(`The quarter label "${p.company.quarter}" is not like "Q2 FY27": period comparisons may be mislabelled.`);
+  if (p.company?.quarter && !/^(Q[1-4]\s?)?FY\s?\d{2,4}$/i.test(p.company.quarter.trim())) warnings.push(`The quarter label "${p.company.quarter}" is not like "Q2 FY27": period comparisons may be mislabelled.`);
 
   const cur = p.periods?.current;
   if (Array.isArray(p.segments) && p.segments.length && num(cur?.revenue)) {
@@ -470,7 +484,9 @@ export function verifyAgainstSource(p, sourceText) {
   const src = norm(sourceText).replace(/(\d),(\d)/g, '$1$2');
   const has = (v) => numberForms(v).some((f) => src.includes(f.replace(/,/g, '')));
   const checks = [];
-  const check = (path, v) => { if (num(v) != null) checks.push({ path, value: v, found: has(v) }); };
+  // A derived figure is not looked for in the document; the figures it was computed from are.
+  const derived = new Set((p.derived || []).map((d) => d.split(' = ')[0]));
+  const check = (path, v) => { if (num(v) != null && !derived.has(path)) checks.push({ path, value: v, found: has(v) }); };
   for (const [name, per] of Object.entries(p.periods || {})) for (const f of PERIOD_FIELDS) check(`periods.${name}.${f}`, per?.[f]);
   for (const f of ['revenue', 'ebitda', 'netDebt']) check(`priorFY.${f}`, p.priorFY?.[f]);
   for (const f of ['revenue', 'ebitda', 'capex', 'revenuePy']) check(`ytd.${f}`, p.ytd?.[f]);

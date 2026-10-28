@@ -41,6 +41,23 @@ console.log('--- Misaligned rows give no figure, never a wrong one');
   ok((r.rejected || []).some((x) => /net profit/i.test(x)), 'the refused row is reported');
 }
 
+console.log('--- Annual statements (FY vs FY), like the Reliance Retail upload');
+{
+  const t = 'Reliance Retail Limited\nStatement of Profit and Loss for the year ended 31 March 2025 (Rs in crore)\nParticulars FY25 FY24\nRevenue from operations 271,012 258,388\nOther income 1,214 1,108\nFinance costs 3,056 2,811\nDepreciation and amortisation expense 4,519 4,035\nProfit before tax 13,402 11,989\nProfit for the year 9,973 8,875\n';
+  const { pack: p } = ex.extractByRules(t, {});
+  ok(p.company.quarter === 'FY25' && p.periods.current.label === 'FY25' && p.periods.priorYear.label === 'FY24', `annual periods recognised (${p.company.quarter}: ${p.periods.current.label} vs ${p.periods.priorYear.label})`);
+  ok(p.periods.current.revenue === 271012 && p.periods.priorYear.revenue === 258388, 'annual revenue read for both years');
+  ok(p.periods.current.pat === 9973 && p.periods.current.pbt === 13402 && p.periods.current.financeCost === 3056 && p.periods.current.da === 4519, 'PAT, PBT, finance costs and D&A read');
+}
+
+{
+  const t = 'Reliance Retail Limited\n(Rs in crore)\nParticulars Year ended 31 March 2025 Year ended 31 March 2024\nRevenue from operations 271,012 258,388\nProfit before tax 13,402 11,989\n';
+  const { pack: p } = ex.extractByRules(t, {});
+  ok(p.company.quarter === 'FY25' && p.periods.current.revenue === 271012 && p.periods.priorYear.pbt === 11989, `year-end dates read as financial years (${p.company.quarter}, ${p.periods.current.revenue}, ${p.periods.priorYear.pbt})`);
+  const u = 'X Limited\nParticulars March 31, 2025 March 31, 2024\nRevenue from operations 1,000 900\n';
+  ok(ex.extractByRules(u, {}).pack.periods.priorYear.revenue === 900, 'the US date order (March 31, 2025) also works');
+}
+
 const scratch = process.argv[2] || '/private/tmp/claude-501/-Users-krshnndu-Projects-illuminati-assignment/ce522e7e-e5ba-4f11-b613-b61d426ea16b/scratchpad';
 if (existsSync(`${scratch}/newco/manifest.json`)) {
   console.log('--- New, unseen companies (truth read from the PDFs)');
