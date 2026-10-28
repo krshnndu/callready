@@ -1,4 +1,4 @@
-import { analyze, validatePack, verifyAgainstSource, sanitizePack, uploadAllowed, SCHEMA, METRICS } from './core.js';
+import { analyze, validatePack, verifyAgainstSource, sanitizePack, uploadAllowed, applyEvidencePolicy, SCHEMA, METRICS } from './core.js';
 import { scoreAnswer, remarksCheck, DIM_LABELS, OWN_PAST } from './score.js';
 import { samplePack } from './sample.js';
 import { personas as DEFAULT_PERSONAS } from './questions.js';
@@ -223,6 +223,7 @@ function viewReview() {
       <div class="readout"><div class="v">${ver.linesFound}/${ver.lines.length}</div><div class="l">transcript lines found</div></div>` : '<div class="readout"><div class="v">JSON</div><div class="l">uploaded pack: no source document to check against</div></div>'}
       ${d.model ? `<div class="readout"><div class="v small-v">${esc(d.model)}</div><div class="l">converted by</div></div>` : ''}
     </div>
+    ${ver ? (() => { const nF = ver.checks.filter((c) => !c.found).length, nQ = ver.quotes.filter((q) => !q.found).length, nL = ver.lines.filter((l) => !l.found).length; return nF + nQ + nL ? `<div class="policy" role="note"><b>Evidence policy: nothing unverified is used.</b> ${nF} figure${nF === 1 ? '' : 's'}, ${nQ} quote${nQ === 1 ? '' : 's'} and ${nL} transcript line${nL === 1 ? '' : 's'} (amber below) were not found word for word in your document. When you use this company they are left out, so no question, score or recommendation rests on them. Correct any figure from the document first if you want it kept.<label class="keep"><input type="checkbox" id="keep-unverified"> Keep them anyway: I have checked each one against the document</label></div>` : '<div class="policy ok" role="note"><b>Evidence policy:</b> every figure, quote and transcript line was found in your document.</div>'; })() : ''}
     ${d.fixes?.length ? `<div class="banner" style="margin-top:var(--s-3)"><b>The sanitiser cleaned ${d.fixes.length} field${d.fixes.length > 1 ? 's' : ''} before checking:</b> ${d.fixes.slice(0, 6).map(esc).join('; ')}${d.fixes.length > 6 ? '; ...' : ''}</div>` : ''}
     ${v.errors.length ? `<div class="risk" style="margin-top:var(--s-4)"><b>Fix before use:</b> ${v.errors.map(esc).join(' ')}</div>` : ''}
     ${v.warnings.length ? `<div class="banner" style="margin-top:var(--s-3)">${v.warnings.map(esc).join(' ')}</div>` : ''}
@@ -279,8 +280,11 @@ function collectDraft() {
 function bindReview() {
   $('#dl-draft')?.addEventListener('click', () => { const d = collectDraft(); download(`${(d.pack.company.short || 'company').replace(/\W+/g, '-').toLowerCase()}-pack.json`, d.pack); });
   $('#use-draft')?.addEventListener('click', () => {
-    const d = collectDraft(); const v = validatePack(d.pack);
-    if (v.errors.length) { $('#use-status').innerHTML = `<span class="down">Fix first:</span> ${v.errors.map(esc).join(' ')}`; return; }
+    const d = collectDraft();
+    // Strict evidence policy (robustness R2): unverified figures, quotes and lines are left out unless confirmed.
+    if (d.sourceText) d.pack = applyEvidencePolicy(d.pack, d.sourceText, { keepUnverified: !!$('#keep-unverified')?.checked }).pack;
+    const v = validatePack(d.pack);
+    if (v.errors.length) { $('#use-status').innerHTML = `<span class="down">Fix first:</span> ${v.errors.map(esc).join(' ')}${d.sourceText ? ' A required figure that was not found in your document was left out: type it in from the document, or tick the keep box.' : ''}`; return; }
     set('callready.userpack', d.pack); set('callready.active', { kind: 'user' }); set('callready.draft', null);
     location.hash = '#/';
   });
@@ -344,6 +348,7 @@ function viewQuarter() {
       ${p.company.synthetic ? '<li>Meridian Arc Industries and every figure, person, analyst and broker are synthetic, built to reproduce the situation in the brief.</li>' : `<li>Source: ${esc(kindOf(p))}${p.provenance?.extractedBy ? `, converted by ${esc(p.provenance.extractedBy)} and checked by rules` : ''}.${(p.provenance?.urls || []).map((x) => ` <a href="${esc(x)}" target="_blank" rel="noopener">Filing</a>`).join('')}</li>`}
       ${p.provenance?.verify ? `<li>Rules found ${p.provenance.verify.numbersFound} of ${p.provenance.verify.numbersTotal} extracted figures, and ${p.provenance.verify.quotesFound} of ${p.provenance.verify.quotesTotal} quotes, word for word in the source.</li>` : ''}
       ${p.provenance?.caveats ? `<li>${esc(p.provenance.caveats)}</li>` : ''}
+      ${p.provenance?.policy ? `<li>Evidence policy: ${p.provenance.policy === 'strict' ? `strict. ${(p.provenance.removed || []).length} value${(p.provenance.removed || []).length === 1 ? ' was' : 's were'} left out because the rules could not find ${(p.provenance.removed || []).length === 1 ? 'it' : 'them'} in the source${(p.provenance.removed || []).length ? `: ${esc(p.provenance.removed.slice(0, 6).join('; '))}${p.provenance.removed.length > 6 ? '; ...' : ''}` : ''}.` : 'unverified values were kept after a person confirmed them against the document.'}</li>` : ''}
       ${K.ttmAnnualised && num(K.lev) ? '<li>No trailing-twelve-month EBITDA in the source: leverage uses this quarter annualised.</li>' : ''}
       <li>Pressure weights and score thresholds are judgement calls from typical earnings-call practice, not fitted to data.</li>
       <li>Scores rank answer quality against a rubric; they do not predict the share-price reaction. Disclosure flags are prompts for the company secretary, not legal advice.</li>

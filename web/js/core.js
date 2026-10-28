@@ -82,6 +82,9 @@ export function sanitizePack(raw) {
   if (safeUrls.length !== urls.length) note('provenance.urls', `${urls.length - safeUrls.length} non-http link(s) dropped`);
   out.provenance = { source: en(pv.source, ENUMS_().source, 'provenance.source') || 'upload', urls: safeUrls };
   for (const k of ['extractedBy', 'at', 'caveats', 'note']) if (pv[k] != null) out.provenance[k] = str(pv[k], k === 'caveats' ? 600 : 120, `provenance.${k}`);
+  if (pv.policy === 'strict' || pv.policy === 'confirmed') out.provenance.policy = pv.policy;
+  if (pv.removed != null) out.provenance.removed = list(pv.removed, 80, 'provenance.removed', () => null).map((_, i) => toStr(pv.removed[i], 160));
+  if (pv.unverifiedKept != null) out.provenance.unverifiedKept = list(pv.unverifiedKept, 50, 'provenance.unverifiedKept', () => null).map((_, i) => toStr(pv.unverifiedKept[i], 120));
   if (pv.extractedSeconds != null) out.provenance.extractedSeconds = num(pv.extractedSeconds, 'provenance.extractedSeconds');
   if (pv.files != null) out.provenance.files = list(pv.files, 10, 'provenance.files', () => null).map((_, i) => toStr(pv.files[i], 120));
   if (pv.unverified != null) out.provenance.unverified = list(pv.unverified, 50, 'provenance.unverified', () => null).map((_, i) => toStr(pv.unverified[i], 120));
@@ -279,7 +282,7 @@ function analystLines(p, words) {
 export function pressureMap(p, k = kpis(p), imp = implied(p, k), cs = commitmentStatus(p, k, imp)) {
   const P = [];
   const byMetric = (...ms) => cs.filter((c) => ms.includes(c.metric)).map((c) => c.id);
-  const units = p.company.units || '';
+  const units = p.company.unitWord || (p.company.units || '').split(' ').pop() || '';
   if (imp && imp.need != null) P.push({ id: 'guidance', theme: 'Guidance', title: `${p.company.fyLabel || 'Full-year'} margin guidance ${imp.need > (imp.record ?? 0) ? 'is out of reach' : 'is under pressure'}`,
     evidence: `${imp.ytdLabel} margin ${r1(imp.ytd)}%. The bottom of the ${imp.low} to ${imp.high}% range needs about ${r1(imp.need)}% for the rest of the year; the best quarter on record is ${r1(imp.record)}%.`,
     magnitude: clamp(imp.need > imp.record ? imp.need - imp.record : (imp.need - k.m) / 3), salience: 1.0, ties: byMetric('ebitdaMargin'), kw: [...KW.guidance, 'margin'], owner: 'CFO', template: 'guidance' });
@@ -477,4 +480,33 @@ export function verifyAgainstSource(p, sourceText) {
   const lines = (p.transcript || []).map((l) => ({ ref: l.ref, found: src.includes(norm(l.text).replace(/(\d),(\d)/g, '$1$2').slice(0, 80)) }));
   const nOk = checks.filter((c) => c.found).length;
   return { checks, quotes, lines, numbersFound: nOk, numbersTotal: checks.length, quotesFound: quotes.filter((q) => q.found).length, linesFound: lines.filter((l) => l.found).length };
+}
+
+// ---------- strict evidence policy: nothing unverified is used ----------
+// Run when an extracted pack is used. Figures not found in the source document are cleared, and
+// commitments and transcript lines not found word for word are left out, unless a person has confirmed
+// them against the document (keepUnverified). Every removal is reported.
+export function applyEvidencePolicy(pack, sourceText, { keepUnverified = false } = {}) {
+  const p = JSON.parse(JSON.stringify(pack));
+  p.provenance = { ...(p.provenance || {}), policy: keepUnverified ? 'confirmed' : 'strict' };
+  if (!sourceText) return { pack: p, removed: [] };
+  const ver = verifyAgainstSource(p, sourceText);
+  if (keepUnverified) {
+    p.provenance.unverifiedKept = ver.checks.filter((c) => !c.found).map((c) => `${c.path}=${c.value}`).slice(0, 50);
+    return { pack: p, removed: [] };
+  }
+  const removed = [];
+  for (const c of ver.checks.filter((x) => !x.found)) {
+    const ks = c.path.split('.'); const last = ks.pop(); const t = ks.reduce((o, k) => o?.[k], p);
+    if (t && last in t) { t[last] = null; removed.push(`${c.path} (${c.value}): not found in the document, cleared`); }
+  }
+  const qOk = new Set(ver.quotes.filter((q) => q.found).map((q) => q.id));
+  for (const c of p.commitments || []) if (!qOk.has(c.id)) removed.push(`commitment ${c.id} "${String(c.said).slice(0, 60)}": quote not found word for word, left out`);
+  p.commitments = (p.commitments || []).filter((c) => qOk.has(c.id));
+  const lOk = new Set(ver.lines.filter((l) => l.found).map((l) => l.ref));
+  for (const l of p.transcript || []) if (!lOk.has(l.ref)) removed.push(`transcript line ${l.ref}: not found word for word, left out`);
+  p.transcript = (p.transcript || []).filter((l) => lOk.has(l.ref));
+  for (const sg of p.segments || []) for (const k of ['current', 'priorYear', 'priorQuarter']) if (sg[k] && sg[k].revenue == null && sg[k].margin == null) sg[k] = null;
+  p.provenance.removed = removed.slice(0, 80);
+  return { pack: p, removed };
 }

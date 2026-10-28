@@ -75,6 +75,32 @@ console.log('--- Units and consistency rules (robustness R4)');
   ok(!g.ctx.pressure.some((x) => x.id === 'profit'), 'a loss that narrows is not a pressure point');
 }
 
+console.log('--- Strict evidence policy: nothing unverified is used (robustness R2)');
+ok(has('applyEvidencePolicy'), 'applyEvidencePolicy exists');
+if (has('applyEvidencePolicy')) {
+  const html = readFileSync(new URL('../web/samples/meridian-arc-q2fy27-results.html', import.meta.url), 'utf8');
+  const source = html.replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ');
+  const p = clone(samplePack); delete p.questions;
+  p.periods.current.pat = 999;                       // invented
+  p.periods.priorQuarter.capex = 777;                // invented
+  p.segments[0].current.margin = 7.1;                // true, printed in the table
+  p.commitments = [
+    { id: 'G1', kind: 'guidance', by: 'CFO', said: 'Capex for FY27 will be around 600 crore, and net debt to EBITDA will stay below 1x.', metric: 'capex', target: { value: 600 } },
+    { id: 'S9', kind: 'statement', by: 'CFO', said: 'We promised margins of 20 percent by Q2.', metric: 'ebitdaMargin', target: { low: 20 } },
+  ];
+  p.transcript = [{ ref: 'T1', speaker: 'CFO', text: 'Working capital should normalise by the end of Q2 as channel inventory unwinds after the summer season.' }, { ref: 'T2', speaker: 'CEO', text: 'We will double revenue next year.' }];
+  const { pack: s, removed } = core.applyEvidencePolicy(p, source, { keepUnverified: false });
+  ok(s.periods.current.pat === null && s.periods.priorQuarter.capex === null, 'invented figures are cleared');
+  ok(s.periods.current.revenue === 2480 && s.periods.priorYear.ebitda === 308 && s.segments[0].current.margin === 7.1, 'figures found in the document are kept');
+  ok(s.commitments.map((c) => c.id).join() === 'G1', 'a commitment quoted word for word is kept; an invented one is dropped');
+  ok(s.transcript.map((l) => l.ref).join() === 'T1', 'a transcript line found in the document is kept; an invented one is dropped');
+  ok(['periods.current.pat', 'periods.priorQuarter.capex', 'commitment S9', 'transcript line T2'].every((k) => removed.some((r) => r.startsWith(k))), 'each planted value is named in the removals');
+  ok(removed.some((r) => r.startsWith('segments.0.priorQuarter.revenue')), 'a true-looking figure the document never prints (last quarter segment revenue) is also cleared');
+  const kept = core.applyEvidencePolicy(p, source, { keepUnverified: true });
+  ok(kept.pack.periods.current.pat === 999 && kept.removed.length === 0, 'with confirmation, unverified values are kept and marked');
+  ok(kept.pack.provenance?.policy === 'confirmed' && s.provenance?.policy === 'strict', 'the pack records which policy was applied');
+}
+
 console.log('--- Upload limits');
 ok(has('uploadAllowed'), 'uploadAllowed exists');
 if (has('uploadAllowed')) {

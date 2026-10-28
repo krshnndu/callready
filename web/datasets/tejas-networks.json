@@ -8,6 +8,8 @@
     "units": "INR crore",
     "unitWord": "crore",
     "fyLabel": "FY27",
+    "resultsDate": "",
+    "callDate": "",
     "speakers": {
       "CEO": "Arnob Roy, Managing Director and Chief Executive Officer",
       "CFO": "AVS Prasad, Chief Financial Officer"
@@ -18,6 +20,7 @@
       "label": "Q2 FY27",
       "revenue": 406,
       "ebitda": -108,
+      "ebit": null,
       "pat": -207,
       "ocf": null,
       "capex": null,
@@ -31,11 +34,12 @@
       "label": "Q2 FY26",
       "revenue": 262,
       "ebitda": -293,
+      "ebit": null,
       "pat": -307,
       "ocf": null,
       "capex": null,
       "netDebt": null,
-      "da": 101,
+      "da": null,
       "invDays": null,
       "recDays": null,
       "payDays": null
@@ -44,6 +48,7 @@
       "label": "Q1 FY27",
       "revenue": 402,
       "ebitda": -99,
+      "ebit": null,
       "pat": -202,
       "ocf": null,
       "capex": null,
@@ -74,13 +79,12 @@
       "by": "CFO",
       "said": "The high levels of inventory, we expect a significant portion of the inventories would be utilized in executing the BSNL 4G order in the coming quarters, for which the deliveries have already started in Q2 FY27.",
       "ref": "Transcript page 3",
+      "why": "Inventory slightly decreased to INR 2,314 crore in Q2 FY27 from INR 2,358 crore in Q1 FY27, with deliveries having just started.",
       "metric": "workingCapital",
-      "segment": null,
-      "target": null,
-      "period": "upcoming quarters",
-      "topic": "inventory utilization BSNL order",
       "status": "unclear",
-      "why": "Inventory slightly decreased to INR 2,314 crore in Q2 FY27 from INR 2,358 crore in Q1 FY27, with deliveries having just started."
+      "period": "upcoming quarters",
+      "date": "",
+      "topic": "inventory utilization BSNL order"
     },
     {
       "id": "S2",
@@ -88,13 +92,12 @@
       "by": "CEO",
       "said": "Achieve quarterly positive EBITDA financial performance",
       "ref": "Presentation slide 11",
+      "why": "EBITDA in Q2 FY27 was negative INR 108 crore.",
       "metric": "ebitdaMargin",
-      "segment": null,
-      "target": null,
-      "period": "upcoming quarters",
-      "topic": "quarterly positive EBITDA target",
       "status": "unclear",
-      "why": "EBITDA in Q2 FY27 was negative INR 108 crore."
+      "period": "upcoming quarters",
+      "date": "",
+      "topic": "quarterly positive EBITDA target"
     },
     {
       "id": "D1",
@@ -102,13 +105,12 @@
       "by": "CEO",
       "said": "So I cannot specify the exact number, but it is going to substantially reduce our receivables.",
       "ref": "Transcript page 7",
+      "why": "Management declined to quantify the exact payment collection expected from BSNL.",
       "metric": "workingCapital",
-      "segment": null,
-      "target": null,
-      "period": "Q3 FY27",
-      "topic": "BSNL dues recovery amount",
       "status": "unclear",
-      "why": "Management declined to quantify the exact payment collection expected from BSNL."
+      "period": "Q3 FY27",
+      "date": "",
+      "topic": "BSNL dues recovery amount"
     },
     {
       "id": "D2",
@@ -116,13 +118,12 @@
       "by": "CEO",
       "said": "I don't think I can share the exact details of the order book wins from customers here and there.",
       "ref": "Transcript page 7",
+      "why": "Management declined to share specific customer breakdowns of the INR 2,315 crore order book.",
       "metric": "other",
-      "segment": null,
-      "target": null,
-      "period": "Q2 FY27",
-      "topic": "non-BSNL order book breakdown",
       "status": "unclear",
-      "why": "Management declined to share specific customer breakdowns of the INR 2,315 crore order book."
+      "period": "Q2 FY27",
+      "date": "",
+      "topic": "non-BSNL order book breakdown"
     },
     {
       "id": "D3",
@@ -130,13 +131,12 @@
       "by": "CEO",
       "said": "Yes. So, I mean, I cannot give exact numbers. But as you know, a significant part of the inventory that we have been carrying for many quarters is for this BSNL expansion order.",
       "ref": "Transcript page 10",
+      "why": "Management declined to give specific percentage or quantum of expected inventory reduction.",
       "metric": "workingCapital",
-      "segment": null,
-      "target": null,
-      "period": "next 6 to 9 months",
-      "topic": "quantum of inventory reduction",
       "status": "unclear",
-      "why": "Management declined to give specific percentage or quantum of expected inventory reduction."
+      "period": "next 6 to 9 months",
+      "date": "",
+      "topic": "quantum of inventory reduction"
     }
   ],
   "transcript": [
@@ -235,6 +235,7 @@
   ],
   "remarks": "",
   "id": "ds-tejas-networks",
+  "bridge": [],
   "provenance": {
     "source": "dataset",
     "extractedBy": "gemini-3.8-flash-medium",
@@ -254,6 +255,10 @@
     "unverified": [
       "periods.priorYear.da=101"
     ],
-    "caveats": "Loss-making with negative EBITDA, worsened QoQ ((99) Cr in Q1). Net debt rose to INR 4,384 Cr (from 4,277 Cr), stated in the transcript only. Order book INR 2,315 Cr. Presentation is short (13 slides, ~9.5k chars). Transcript is the Q2 FY27 call of 16 Oct 2026."
+    "caveats": "Loss-making with negative EBITDA, worsened QoQ ((99) Cr in Q1). Net debt rose to INR 4,384 Cr (from 4,277 Cr), stated in the transcript only. Order book INR 2,315 Cr. Presentation is short (13 slides, ~9.5k chars). Transcript is the Q2 FY27 call of 16 Oct 2026.",
+    "policy": "strict",
+    "removed": [
+      "periods.priorYear.da (101): not found in the document, cleared"
+    ]
   }
 }

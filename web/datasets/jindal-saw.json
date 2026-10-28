@@ -8,8 +8,10 @@
     "units": "INR million",
     "unitWord": "million",
     "fyLabel": "FY27",
+    "resultsDate": "",
+    "callDate": "",
     "speakers": {
-      "CEO": null,
+      "CEO": "",
       "CFO": "Narendra Mantri, Chief Operating and Financial Officer"
     }
   },
@@ -18,6 +20,7 @@
       "label": "Q2 FY27",
       "revenue": 45231,
       "ebitda": 3123,
+      "ebit": null,
       "pat": 353,
       "ocf": null,
       "capex": null,
@@ -31,6 +34,7 @@
       "label": "Q2 FY26",
       "revenue": 42640,
       "ebitda": 4816,
+      "ebit": null,
       "pat": 1386,
       "ocf": null,
       "capex": null,
@@ -44,6 +48,7 @@
       "label": "Q1 FY27",
       "revenue": 44760,
       "ebitda": 4204,
+      "ebit": null,
       "pat": 908,
       "ocf": null,
       "capex": null,
@@ -59,6 +64,7 @@
       "label": "Q3 FY26",
       "revenue": 49630,
       "ebitda": 6322,
+      "ebit": null,
       "ocf": null,
       "capex": null
     },
@@ -66,6 +72,7 @@
       "label": "Q4 FY26",
       "revenue": 46569,
       "ebitda": 5042,
+      "ebit": null,
       "ocf": null,
       "capex": null
     }
@@ -87,78 +94,13 @@
   "ttmEbitda": null,
   "segments": [],
   "consensus": null,
-  "commitments": [
-    {
-      "id": "G1",
-      "kind": "guidance",
-      "by": "other",
-      "said": "So, overall, volumes in FY'27 should be higher than FY'26 volumes.",
-      "ref": "Page 12 of 15",
-      "metric": "other",
-      "segment": null,
-      "target": null,
-      "period": "FY27",
-      "topic": "full year volume growth expectation",
-      "status": "unclear",
-      "why": "FY27 is currently in progress with H1 pipe sales at 732,000 MT versus FY26 sales of 1,376,000 MT."
-    },
-    {
-      "id": "S1",
-      "kind": "statement",
-      "by": "other",
-      "said": "So, we can expect Q3, Q4 onward that the margins will be moved towards, you know, double-digit and we are expecting and we expect that very soon this situation will be same what we were doing few quarters back.",
-      "ref": "Page 10 of 15",
-      "metric": "ebitdaMargin",
-      "segment": null,
-      "target": {
-        "low": 10
-      },
-      "period": "H2 FY27",
-      "topic": "EBITDA margin recovery toward double-digit",
-      "status": "unclear",
-      "why": "Q2 FY27 consolidated EBITDA margin was 6.9%."
-    },
-    {
-      "id": "S2",
-      "kind": "statement",
-      "by": "other",
-      "said": "Right now, we can comment on H2 blended because things are so volatile. We are working out certain modalities to export even the job-work order also. So, we cannot comment on exact numbers as of now, but H2 should be better than H1.",
-      "ref": "Page 13 of 15",
-      "metric": "other",
-      "segment": null,
-      "target": null,
-      "period": "H2 FY27",
-      "topic": "H2 performance better than H1",
-      "status": "unclear",
-      "why": "H2 results have not yet been reported."
-    },
-    {
-      "id": "D1",
-      "kind": "deflection",
-      "by": "other",
-      "said": "Okay. So, we will not talk about the margin at this point of time.",
-      "ref": "Page 8 of 15",
-      "metric": "ebitdaMargin",
-      "segment": null,
-      "target": null,
-      "period": "FY27",
-      "topic": "margins on new export LOIs",
-      "status": "unclear",
-      "why": "Management declined to comment on margin comparability for new non-MENA LOIs."
-    }
-  ],
+  "commitments": [],
   "transcript": [
     {
       "ref": "T-L001",
       "call": "Q2 FY27 Earnings Call",
       "speaker": "Shaurya Shah, Equirus Securities",
       "text": "So, just wanted to know whether these whether these will kind of replace the affected MENA volumes, or the delayed MENA volumes, at comparable margins?"
-    },
-    {
-      "ref": "T-L002",
-      "call": "Q2 FY27 Earnings Call",
-      "speaker": "Vinay Kumar Gupta, Jindal Saw Limited",
-      "text": "Okay. So, we will not talk about the margin at this point of time. Let me discuss two things which you rightly pointed out. One is that, first of all, we have now, after announcement of – after let us say receiving the additional LOI of USD50 million, so the total LOIs other than the confirmed orders are USD625 million."
     },
     {
       "ref": "T-L003",
@@ -171,12 +113,6 @@
       "call": "Q2 FY27 Earnings Call",
       "speaker": "Shaurya Shah, Equirus Securities",
       "text": "The other thing I wanted to ask is that there is also some imposition of anti-dumping duty on DI pipe imports into Saudi Arabia. So, just wanted to know your exposure to Saudi region, specifically for DI pipes, and can you explain like the specific rates, if possible, as in the anti-dumping rate that could be applicable if possible, on our DI pipes exports to Saudi?"
-    },
-    {
-      "ref": "T-L005",
-      "call": "Q2 FY27 Earnings Call",
-      "speaker": "Rajeev Goyal, Jindal Saw Limited",
-      "text": "Yes, so basically you're right that anti-dumping duty has been imposed by Saudi Arabia government on the Indian exporters. But good thing is that since we did not export pipes from India to Saudi, so we are not into that anti-dumping duty imposition. And we are doing sale to Saudi Arabia through our Abu Dhabi subsidiary."
     },
     {
       "ref": "T-L006",
@@ -269,6 +205,7 @@
   ],
   "remarks": "",
   "id": "ds-jindal-saw",
+  "bridge": [],
   "provenance": {
     "source": "dataset",
     "extractedBy": "gemini-3.8-flash-medium",
@@ -286,6 +223,15 @@
       "linesTotal": 16
     },
     "unverified": [],
-    "caveats": "Strong margin-pressure case: standalone EBITDA margin 6.8% vs 9.8% YoY and 9.1% QoQ; consolidated EBITDA 3,123 vs 4,816 YoY. Tax line is a credit (Rs 266.7M prior-year adjustment), which flatters PAT. 'Total Income' is net of forex. Results doc is a financial-highlights deck, not the full Reg 33 statement. Transcript is the Q2 FY27 call of 19 Oct 2026."
+    "caveats": "Strong margin-pressure case: standalone EBITDA margin 6.8% vs 9.8% YoY and 9.1% QoQ; consolidated EBITDA 3,123 vs 4,816 YoY. Tax line is a credit (Rs 266.7M prior-year adjustment), which flatters PAT. 'Total Income' is net of forex. Results doc is a financial-highlights deck, not the full Reg 33 statement. Transcript is the Q2 FY27 call of 19 Oct 2026.",
+    "policy": "strict",
+    "removed": [
+      "commitment G1 \"So, overall, volumes in FY'27 should be higher than FY'26 vo\": quote not found word for word, left out",
+      "commitment S1 \"So, we can expect Q3, Q4 onward that the margins will be mov\": quote not found word for word, left out",
+      "commitment S2 \"Right now, we can comment on H2 blended because things are s\": quote not found word for word, left out",
+      "commitment D1 \"Okay. So, we will not talk about the margin at this point of\": quote not found word for word, left out",
+      "transcript line T-L002: not found word for word, left out",
+      "transcript line T-L005: not found word for word, left out"
+    ]
   }
 }

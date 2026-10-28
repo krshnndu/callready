@@ -8,11 +8,13 @@
     "units": "INR million",
     "unitWord": "million",
     "fyLabel": "FY27",
+    "resultsDate": "",
+    "callDate": "",
+    "marginBasis": "EBIT",
     "speakers": {
       "CEO": "Srini Pallia, CEO and Managing Director",
       "CFO": "Aparna Iyer, Chief Financial Officer"
-    },
-    "marginBasis": "EBIT"
+    }
   },
   "periods": {
     "current": {
@@ -155,17 +157,19 @@
       "kind": "guidance",
       "by": "CEO",
       "said": "We expect revenue from our IT Services business segment to be in the range of $2,571 million to $2,625 million*. This translates to sequential guidance of (-)1.5% to (+)0.5% in constant currency terms.",
-      "ref": "Outlook for the Quarter ending December 31, 2026",
+      "ref": "Outlook for the Quarter ending December ",
+      "why": "Guidance applies to the upcoming quarter ending December 31, 2026.",
       "metric": "revenueGrowth",
+      "status": "unclear",
+      "period": "Q3 FY27",
+      "date": "",
+      "topic": "Q3 FY27 revenue growth guidance",
       "segment": "IT Services",
       "target": {
         "low": -1.5,
-        "high": 0.5
-      },
-      "period": "Q3 FY27",
-      "topic": "Q3 FY27 revenue growth guidance",
-      "status": "unclear",
-      "why": "Guidance applies to the upcoming quarter ending December 31, 2026."
+        "high": 0.5,
+        "value": null
+      }
     },
     {
       "id": "D1",
@@ -173,22 +177,15 @@
       "by": "CEO",
       "said": "As far as we are concerned, we don't call out that specific number, Ashwin. We just give the overall health numbers.",
       "ref": "Page 12 of 15",
+      "why": "Management declined to disclose the specific health exchange enrollment revenue figure.",
       "metric": "other",
-      "segment": null,
-      "target": null,
-      "period": "Q2 FY27",
-      "topic": "Health exchange enrollment business size",
       "status": "unclear",
-      "why": "Management declined to disclose the specific health exchange enrollment revenue figure."
+      "period": "Q2 FY27",
+      "date": "",
+      "topic": "Health exchange enrollment business size"
     }
   ],
   "transcript": [
-    {
-      "ref": "T-L001",
-      "call": "Q2 FY27",
-      "speaker": "Girish Pai, BOB Capital Markets",
-      "text": "I wanted to ask about the TCV number, which is down quarter-on-quarter quite a bit both from large deal and the total TCV perspective. Were these numbers up to your expectations? If not, what exactly transpired in the quarter?"
-    },
     {
       "ref": "T-L002",
       "call": "Q2 FY27",
@@ -206,12 +203,6 @@
       "call": "Q2 FY27",
       "speaker": "CFO",
       "text": "Girish, you would note we just gave a salary increase effective 1st March 2025 -- sorry, 2026. So it's been just a few months since we rolled out. So right now, it's not under consideration."
-    },
-    {
-      "ref": "T-L005",
-      "call": "Q2 FY27",
-      "speaker": "Sudheer Guntupalli, Kotak Mahindra AMC",
-      "text": "any thoughts on using your cash-rich balance sheet to make, you know, very big bang acquisitions like we had done in the cloud wave, be it the likes of Capco, Rizing , etc.?"
     },
     {
       "ref": "T-L006",
@@ -304,12 +295,6 @@
       "text": "Like Srini said, they are in the process of being signed, and we're confident of securing both the deals, and we will share that with you when we meet next in January."
     },
     {
-      "ref": "T-L021",
-      "call": "Q2 FY27",
-      "speaker": "Gaurav Rateria, Morgan Stanley",
-      "text": "Is there also an element of the deals getting pushed out, which kind of haven't has an impact on the guidance in 3Q, and if the deal wins get bunched up in 3Q, could that have a positive influence on the 4Q revenue conversion metrics?"
-    },
-    {
       "ref": "T-L022",
       "call": "Q2 FY27",
       "speaker": "CFO",
@@ -348,6 +333,7 @@
   ],
   "remarks": "Srini Pallia, CEO and Managing Director, said, “The strategic investments we have been making are beginning to deliver results. They are enhancing our ability to win in new markets, add new clients, and grow existing relationships. At the same time, our consulting -led, AI-powered strategy is helping us create larger transformation opportunities. W e see AI as a long-term growth driver that will expand the addressable market for technology and business transformation. We are already seeing its potential reflected in the momentum across our AI-Native Unit and AI offerings portfolio”.\n\nAparna Iyer, Chief Financial Officer, said, “Our operating margin for the quarter was 16.5%, an expansion of 0.5% sequentially. We have delivered this improvement even while continuing to invest in our business and people. We remain relentless in driving cash flow conversion. Q2 is yet another quarter where our operating cash flow has been robust and stood at 166% of net income.”",
   "id": "ds-wipro",
+  "bridge": [],
   "provenance": {
     "source": "dataset",
     "extractedBy": "gemini-3.8-flash-medium",
@@ -365,6 +351,12 @@
       "linesTotal": 22
     },
     "unverified": [],
-    "caveats": "IFRS, not Ind AS. Reports operating margin (16.5%), not EBITDA. Segments (IT Services by SMU/sector) and Q3 revenue guidance ($2,571-2,625M) present. Operating cash flow 165.8% of net income. Transcript is the Q2 FY27 call of 15 Oct 2026 (same quarter)."
+    "caveats": "IFRS, not Ind AS. Reports operating margin (16.5%), not EBITDA. Segments (IT Services by SMU/sector) and Q3 revenue guidance ($2,571-2,625M) present. Operating cash flow 165.8% of net income. Transcript is the Q2 FY27 call of 15 Oct 2026 (same quarter).",
+    "policy": "strict",
+    "removed": [
+      "transcript line T-L001: not found word for word, left out",
+      "transcript line T-L005: not found word for word, left out",
+      "transcript line T-L021: not found word for word, left out"
+    ]
   }
 }

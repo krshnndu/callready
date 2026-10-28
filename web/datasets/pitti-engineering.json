@@ -8,6 +8,8 @@
     "units": "INR crore",
     "unitWord": "crore",
     "fyLabel": "FY27",
+    "resultsDate": "",
+    "callDate": "",
     "speakers": {
       "CEO": "Akshay S Pitti, MD & Chief Executive Officer",
       "CFO": "M Pavan Kumar, Chief Financial Officer"
@@ -18,6 +20,7 @@
       "label": "Q2 FY27",
       "revenue": 578.4,
       "ebitda": 88.9,
+      "ebit": null,
       "pat": 33.9,
       "ocf": null,
       "capex": null,
@@ -31,6 +34,7 @@
       "label": "Q2 FY26",
       "revenue": 477.7,
       "ebitda": 77.7,
+      "ebit": null,
       "pat": 40.1,
       "ocf": null,
       "capex": null,
@@ -66,15 +70,18 @@
       "kind": "statement",
       "by": "other",
       "said": "Phased investments of ~INR 740 crore to expand manufacturing capacity and support growing demand across key end-markets",
-      "ref": null,
+      "ref": "",
+      "why": "Target investment of ~INR 740 crore is scheduled in a phased manner through FY31.",
       "metric": "capex",
-      "target": {
-        "value": 740
-      },
-      "period": "FY31",
-      "topic": "phased manufacturing capacity expansion capex",
       "status": "unclear",
-      "why": "Target investment of ~INR 740 crore is scheduled in a phased manner through FY31."
+      "period": "FY31",
+      "date": "",
+      "topic": "phased manufacturing capacity expansion capex",
+      "target": {
+        "low": null,
+        "high": null,
+        "value": 740
+      }
     }
   ],
   "transcript": [],
@@ -98,6 +105,7 @@
   ],
   "remarks": "",
   "id": "ds-pitti-engineering",
+  "bridge": [],
   "provenance": {
     "source": "dataset",
     "extractedBy": "gemini-3.8-flash-medium",
@@ -114,6 +122,8 @@
       "linesTotal": 0
     },
     "unverified": [],
-    "caveats": "Margin-pressure case with full P&L, balance sheet and abridged cash flow (H1 CFO 323.0 Cr vs 95.4). Adjusted EBITDA margin 15.8% vs 16.8%; EBIT -15.9% YoY. Reports both 'Adjusted' (ex-ESOP) and 'Reported' EBITDA, both excluding other income. No transcript: call held 23 Oct 2026, transcript not yet filed."
+    "caveats": "Margin-pressure case with full P&L, balance sheet and abridged cash flow (H1 CFO 323.0 Cr vs 95.4). Adjusted EBITDA margin 15.8% vs 16.8%; EBIT -15.9% YoY. Reports both 'Adjusted' (ex-ESOP) and 'Reported' EBITDA, both excluding other income. No transcript: call held 23 Oct 2026, transcript not yet filed.",
+    "policy": "strict",
+    "removed": []
   }
 }

@@ -8,9 +8,11 @@
     "units": "INR crore",
     "unitWord": "crore",
     "fyLabel": "FY27",
+    "resultsDate": "",
+    "callDate": "",
     "speakers": {
-      "CEO": null,
-      "CFO": null
+      "CEO": "",
+      "CFO": ""
     }
   },
   "periods": {
@@ -18,6 +20,7 @@
       "label": "Q2FY27",
       "revenue": 4850,
       "ebitda": 343,
+      "ebit": null,
       "pat": 60,
       "ocf": null,
       "capex": null,
@@ -31,6 +34,7 @@
       "label": "Q2FY26",
       "revenue": 4026,
       "ebitda": 536,
+      "ebit": null,
       "pat": 223,
       "ocf": null,
       "capex": null,
@@ -44,6 +48,7 @@
       "label": "Q1FY27",
       "revenue": 3956,
       "ebitda": 268,
+      "ebit": null,
       "pat": 43,
       "ocf": null,
       "capex": null,
@@ -77,6 +82,7 @@
   ],
   "remarks": "",
   "id": "ds-jk-tyre",
+  "bridge": [],
   "provenance": {
     "source": "dataset",
     "extractedBy": "gemini-3.8-flash-medium",
@@ -93,6 +99,8 @@
       "linesTotal": 0
     },
     "unverified": [],
-    "caveats": "Severe margin-pressure case: consolidated EBITDA 343 Cr vs 536 Cr (-36% YoY), margin 7.1%. EBITDA INCLUDES other income, and the headline line is Total Income, not revenue from operations. URL is the CloudFront CDN that jktyre.com/investor links to (company-hosted). The consolidated-results PDF linked on the same page was a scanned image with no text, so it was discarded. No Q2 transcript published yet (only an audio recording)."
+    "caveats": "Severe margin-pressure case: consolidated EBITDA 343 Cr vs 536 Cr (-36% YoY), margin 7.1%. EBITDA INCLUDES other income, and the headline line is Total Income, not revenue from operations. URL is the CloudFront CDN that jktyre.com/investor links to (company-hosted). The consolidated-results PDF linked on the same page was a scanned image with no text, so it was discarded. No Q2 transcript published yet (only an audio recording).",
+    "policy": "strict",
+    "removed": []
   }
 }
