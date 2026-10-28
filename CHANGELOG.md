@@ -4,6 +4,9 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Changed
+- Web deploys come from GitHub: Vercel's Git integration builds `web/` (root directory) on every push to `main`, so no machine-specific Vercel login is needed to ship.
+
 ### Added
 - `docs/11-HANDOFF.md` and `GEMINI.md`: continue the project with any agent (state, gates, workflow, backlog). Host details and test data sit in the build server's gitignored `private/`.
 - Robustness, test-first (`docs/10-EDGE-CASES.md`, `docs/superpowers/plans/2026-10-28-robustness.md`). Rule-based extraction (`extract.js`) runs first, and AI only when needed. A strict evidence policy applies. A fuzz test (10,000 packs) and units and consistency rules were added. The coach is now on demand. Recommendations carry their evidence. `scripts/journey.mjs` drives the live site with unseen filings: Havells and CEAT each 6 of 6 against hand-checked truth.

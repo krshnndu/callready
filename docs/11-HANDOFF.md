@@ -17,6 +17,8 @@ Built and verified:
 - **Guardrails in four layers,** each tested: sanitising on entry, financial sanity rules, escaping at render, and a CSP. On the API: a key, limits, caps, output caps and 7-day retention.
 - **Verified on unseen real filings,** with Havells and CEAT run end to end on the live site: 6 of 6 headline figures matched the hand-checked truth for each company, and every figure in use was found in its document.
 
+**Deploying.** The web app deploys itself: Vercel's Git integration builds `web/` on every push to `main` (connected 2026-10-28). Pull requests get preview deploys. The API is deployed on the server; see `private/HANDOFF.md`.
+
 ## 2. The gates (run all before claiming anything works)
 
 | Command | What it proves | Last result |
@@ -48,11 +50,10 @@ House rules (also in `AGENTS.md`):
 
 ## 4. Backlog, in priority order
 
-1. **Deploy without the original Mac.** Connect Vercel's Git integration so a push to `main` deploys `web/` (owner step; see `private/HANDOFF.md`).
-2. **More rule coverage for tables the rules cannot read yet.** Nestle's garbled table text and Wipro's IFRS million layout fall back to AI today. Add row synonyms and header patterns, with a failing test from their text first.
-3. **Guidance pressure titles from rule-extracted sentences.** They use the first 60 characters of the sentence; derive a short topic instead.
-4. **Margin basis.** CEAT reports a -403 bps margin change; we compute -405 bps from the rounded reported figures. Both are correct. Consider showing the company's own stated change when the document prints it.
-5. **Close-out (governance C11):** a final report and lessons learned, plus the decommissioning plan (see the teardown list in `private/HANDOFF.md`).
+1. **More rule coverage for tables the rules cannot read yet.** Nestle's garbled table text and Wipro's IFRS million layout fall back to AI today. Add row synonyms and header patterns, with a failing test from their text first.
+2. **Guidance pressure titles from rule-extracted sentences.** They use the first 60 characters of the sentence; derive a short topic instead.
+3. **Margin basis.** CEAT reports a -403 bps margin change; we compute -405 bps from the rounded reported figures. Both are correct. Consider showing the company's own stated change when the document prints it.
+4. **Close-out (governance C11):** a final report and lessons learned, plus the decommissioning plan (see the teardown list in `private/HANDOFF.md`).
 
 ## 5. Known limitations
 

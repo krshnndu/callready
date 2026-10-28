@@ -63,7 +63,7 @@ LLM_BASE_URL=http://127.0.0.1:20128/v1 LLM_API_KEY=... uv run uvicorn callready.
 
 ## Environment
 
-Every API variable is listed in [`.env.example`](.env.example): the gateway URL and key, the model chain, the daily and per-client caps, and the 7-day retention. The web app needs two Vercel env vars, `BACKEND_ORIGIN` and `BACKEND_KEY`, which its two functions use to reach the API. The browser never sees them.
+Every API variable is listed in [`.env.example`](.env.example): the gateway URL and key, the model chain, the daily and per-client caps, and the 7-day retention. The web app needs two Vercel env vars, `BACKEND_ORIGIN` and `BACKEND_KEY`, which its functions use to reach the API. The browser never sees them. Vercel's Git integration deploys `web/` on every push to `main`, and builds a preview for every pull request.
 
 ## Architecture
 
