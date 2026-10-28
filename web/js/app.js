@@ -3,6 +3,8 @@ import { scoreAnswer, remarksCheck, DIM_LABELS, OWN_PAST } from './score.js';
 import { samplePack } from './sample.js';
 import { personas as DEFAULT_PERSONAS } from './questions.js';
 import { bars, line, waterfall, diverging, installTooltip, textW } from './charts.js';
+import { extractByRules, mergeRulesFirst, crossCheck } from './extract.js';
+import { recommendations } from './recs.js';
 
 // Charts are drawn after the page renders, at the measured width of their box, and redrawn on resize.
 const CHARTS = new Map();
@@ -112,10 +114,11 @@ async function viewLoad() {
   <div class="grid-2">
     <section class="panel glass">
       <h2>Upload results</h2>
-      <p class="sub">A results press release, investor presentation or call transcript: PDF or text, one or more files. Text is read in your browser; AI converts it to the pack format; rules then check every figure against your document, and you review it before anything is used.</p>
+      <p class="sub">A results press release, investor presentation or call transcript: PDF or text, one or more files. Text is read in your browser. Rules read the financial tables and guidance sentences first; AI is used only if the rules cannot read the tables, or if you ask it to add more. Every figure is then checked against your document, and you review it before anything is used.</p>
       <label class="drop" for="files">${ICON.upload}<span><b>Choose PDF or text files</b><br><span class="tiny">or drop them here</span></span><input id="files" type="file" accept=".pdf,.txt,.md,text/plain,application/pdf" multiple></label>
       <p class="tiny" id="file-list"></p>
       <textarea id="paste" rows="5" placeholder="Or paste the results text here"></textarea>
+      <label class="keep small" style="margin-top:var(--s-3)"><input type="checkbox" id="use-ai"> Also use AI to add guidance, segments and the call Q&amp;A (slower; figures are still read by rules first and checked)</label>
       <div class="row" style="margin-top:var(--s-3)"><button class="btn primary" id="convert">Convert and check</button><span class="tiny" id="convert-status" role="status"></span></div>
       <div class="notice"><b>Only upload published documents.</b> The document text is sent to AI model providers through our gateway to convert it, and the result is kept on our server for 7 days. Do not upload unpublished results.</div>
     </section>
@@ -132,11 +135,12 @@ async function viewLoad() {
 function download(name, obj) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
-async function pdfText(file) {
+async function pdfText(file, notes = []) {
   const pdfjs = await import(`${PDFJS}pdf.min.mjs`);
   pdfjs.GlobalWorkerOptions.workerSrc = `${PDFJS}pdf.worker.min.mjs`;
   const doc = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
   let out = '';
+  if (doc.numPages > 80) notes.push(`${file.name} has ${doc.numPages} pages; only the first 80 are read`);
   for (let i = 1; i <= Math.min(doc.numPages, 80); i++) {
     const page = await doc.getPage(i); const tc = await page.getTextContent();
     out += tc.items.map((it) => it.str + (it.hasEOL ? '\n' : ' ')).join('') + '\n\n';
@@ -157,12 +161,30 @@ function bindLoad() {
       btn.disabled = true; st.textContent = 'Reading the documents...';
       if (files.files.length) { const u = uploadAllowed(files.files); if (!u.ok) { st.textContent = u.reason; return; } }
       let text = '';
-      for (const f of files.files) text += `=== ${f.name} ===\n` + (/\.pdf$/i.test(f.name) ? await pdfText(f) : await f.text()) + '\n\n';
-      text = (text + $('#paste').value).replace(/[ \t]+/g, ' ').trim().slice(0, 148000);
+      const notes = [];
+      for (const f of files.files) {
+        let t;
+        try { t = /\.pdf$/i.test(f.name) ? await pdfText(f, notes) : await f.text(); }
+        catch (e) { st.textContent = /password/i.test(String(e?.name || e?.message)) ? `${f.name} is password-protected. Remove the password (print to PDF) and upload it again.` : `${f.name} could not be read as a PDF (${String(e?.message || e).slice(0, 80)}). Export it again, or paste its text.`; return; }
+        if (t.trim().length < 50) notes.push(`${f.name} has almost no text layer (a scan?), so it adds nothing`);
+        text += `=== ${f.name} ===\n` + t + '\n\n';
+      }
+      text = (text + $('#paste').value).replace(/[ \t]+/g, ' ').trim();
+      if (text.length > 148000) { notes.push(`the text was ${Math.round(text.length / 1000)}k characters; only the first 148k are used`); text = text.slice(0, 148000); }
       if (text.length < 200) { st.textContent = 'Not enough text. A PDF that is a scanned image has no text to read: paste the text instead.'; return; }
-      st.textContent = `Converting ${Math.round(text.length / 1000)}k characters with AI. This takes one to three minutes...`;
+      const docName = [...files.files].map((f) => f.name).join(', ') || 'pasted text';
+      // Rules first: if the rules can read the core tables, no AI call is made for the figures.
+      const rules = extractByRules(text, { name: docName });
+      const rulesOk = validatePack(sanitizePack(rules.pack).pack).errors.length === 0;
+      if (rulesOk && !$('#use-ai')?.checked) {
+        const clean = sanitizePack({ ...rules.pack, id: `user-${Date.now().toString(36)}`, provenance: { source: 'upload', extractedBy: 'rules', at: new Date().toISOString(), files: [...files.files].map((f) => f.name) } });
+        set('callready.draft', { pack: clean.pack, fixes: [...notes, ...clean.fixes], sourceText: text, model: 'rules (no AI)', rulesReport: rules.report });
+        location.hash = '#/review';
+        return;
+      }
+      st.textContent = rulesOk ? `The rules read the tables; now AI adds guidance, segments and the Q&A (${Math.round(text.length / 1000)}k characters, one to three minutes)...` : `The rules could not read this document's tables, so AI is converting it (${Math.round(text.length / 1000)}k characters, one to three minutes)...`;
       // The network path to the API can be slow or drop a request; retry rather than give up.
-      const body = JSON.stringify({ text, name: [...files.files].map((f) => f.name).join(', ') || 'pasted text' });
+      const body = JSON.stringify({ text, name: docName });
       let j = null;
       for (let attempt = 0; attempt < 3 && !j?.job && j?.status !== 'done'; attempt++) {
         try { const r = await fetch(`${API}/extract`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }); j = await r.json(); if (r.status === 429) throw new Error(j.detail || 'rate limit'); } catch (e) { if (String(e.message).includes('limit')) throw e; await new Promise((d) => setTimeout(d, 3000)); }
@@ -178,8 +200,10 @@ function bindLoad() {
         catch (e) { if (++misses > 8) throw e; }
       }
       if (j.status !== 'done' || !j.pack) throw new Error(j.error || j.detail || 'failed');
-      const clean = sanitizePack({ ...j.pack, id: `user-${Date.now().toString(36)}`, provenance: { source: 'upload', extractedBy: j.model, at: new Date().toISOString(), files: [...files.files].map((f) => f.name) } });
-      set('callready.draft', { pack: clean.pack, fixes: clean.fixes, sourceText: text, model: j.model });
+      const merged = rulesOk ? mergeRulesFirst(rules.pack, j.pack) : j.pack;
+      const cc = crossCheck(j.pack, rules.pack);
+      const clean = sanitizePack({ ...merged, id: `user-${Date.now().toString(36)}`, provenance: { source: 'upload', extractedBy: rulesOk ? `rules + ${j.model}` : j.model, at: new Date().toISOString(), files: [...files.files].map((f) => f.name) } });
+      set('callready.draft', { pack: clean.pack, fixes: [...notes, ...clean.fixes], sourceText: text, model: rulesOk ? `rules + ${j.model}` : j.model, crossCheck: cc, rulesReport: rules.report });
       location.hash = '#/review';
     } catch (e) {
       st.textContent = `Conversion failed (${String(e.message || e).slice(0, 120)}). The AI service may be busy: try again, or upload a pack in the JSON format.`;
@@ -224,7 +248,9 @@ function viewReview() {
       ${d.model ? `<div class="readout"><div class="v small-v">${esc(d.model)}</div><div class="l">converted by</div></div>` : ''}
     </div>
     ${ver ? (() => { const nF = ver.checks.filter((c) => !c.found).length, nQ = ver.quotes.filter((q) => !q.found).length, nL = ver.lines.filter((l) => !l.found).length; return nF + nQ + nL ? `<div class="policy" role="note"><b>Evidence policy: nothing unverified is used.</b> ${nF} figure${nF === 1 ? '' : 's'}, ${nQ} quote${nQ === 1 ? '' : 's'} and ${nL} transcript line${nL === 1 ? '' : 's'} (amber below) were not found word for word in your document. When you use this company they are left out, so no question, score or recommendation rests on them. Correct any figure from the document first if you want it kept.<label class="keep"><input type="checkbox" id="keep-unverified"> Keep them anyway: I have checked each one against the document</label></div>` : '<div class="policy ok" role="note"><b>Evidence policy:</b> every figure, quote and transcript line was found in your document.</div>'; })() : ''}
-    ${d.fixes?.length ? `<div class="banner" style="margin-top:var(--s-3)"><b>The sanitiser cleaned ${d.fixes.length} field${d.fixes.length > 1 ? 's' : ''} before checking:</b> ${d.fixes.slice(0, 6).map(esc).join('; ')}${d.fixes.length > 6 ? '; ...' : ''}</div>` : ''}
+    ${d.crossCheck?.checked ? `<div class="policy ${d.crossCheck.disagreements.length ? '' : 'ok'}" role="note"><b>Rules cross-check of the AI:</b> the rules read the same figures independently and agree on ${d.crossCheck.agree} of ${d.crossCheck.checked}.${d.crossCheck.disagreements.length ? ` Disagreements (the rules' value is used): ${d.crossCheck.disagreements.map((x) => `${esc(x.path)} AI ${fmt(x.ai)} vs rules ${fmt(x.rules)}`).join('; ')}.` : ''}</div>` : ''}
+    ${d.rulesReport?.tables?.length ? `<p class="tiny" style="margin-top:var(--s-3)">Tables the rules read: ${d.rulesReport.tables.map((t) => `${esc(t.header.slice(0, 60))} (${esc(t.basis)})`).join('; ')}.</p>` : ''}
+    ${d.fixes?.length ? `<div class="banner" style="margin-top:var(--s-3)"><b>Notes on reading and cleaning (${d.fixes.length}):</b> ${d.fixes.slice(0, 6).map(esc).join('; ')}${d.fixes.length > 6 ? '; ...' : ''}</div>` : ''}
     ${v.errors.length ? `<div class="risk" style="margin-top:var(--s-4)"><b>Fix before use:</b> ${v.errors.map(esc).join(' ')}</div>` : ''}
     ${v.warnings.length ? `<div class="banner" style="margin-top:var(--s-3)">${v.warnings.map(esc).join(' ')}</div>` : ''}
   </section>
@@ -522,8 +548,9 @@ function renderCard(q, text, res, speaker) {
     <ul class="dims">${Object.entries(res.dims).map(([k2, d]) => { const b = d.score >= 75 ? 'green' : d.score >= 55 ? 'amber' : 'red'; const on = Math.round(d.score / 10); return `<li><span>${DIM_LABELS[k2]} <span class="tiny">${res.weights[k2]}%</span></span><span class="segs ${b}" data-tip="${esc(DIM_LABELS[k2])}: ${d.score} of 100, weight ${res.weights[k2]}%">${Array.from({ length: 10 }, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</span><span class="num" style="text-align:right">${d.score}</span></li><li><span class="why">${esc(d.why)}</span></li>`; }).join('')}</ul>
     <div class="answer-view">${markAnswer(text, res)}</div>
     ${res.flags.length ? `<ul class="flags">${res.flags.map((fl) => `<li><span class="led ${fl.kind === 'red' ? 'red' : 'amber'}"></span><div><b>${fl.dim}:</b> <q>${esc(fl.text)}</q><br><span class="muted">${esc(fl.why)}</span></div></li>`).join('')}</ul>` : '<p class="small" style="margin-top:12px">No flags. Every figure matches the disclosures.</p>'}
-    <div class="coach" id="coach"><h3>${ICON.spark} Coach</h3><p class="muted small"><span class="spin"></span> Asking the coach for a critique and a stronger answer...</p></div>`;
-  coach(q, text, res, speaker);
+    <div class="coach" id="coach">${q.model ? `<h3>${ICON.spark} Reference answer</h3><p class="tiny">Written from the disclosures and checked by the same rules. No AI was used for this scorecard.</p><div class="improved">${esc(q.model)}</div>` : '<p class="tiny">This scorecard is rules only. No AI was used.</p>'}
+      <div class="row" style="margin-top:var(--s-3)"><button class="btn ghost" id="ask-coach" type="button">${ICON.spark}<span>Ask the AI coach for a critique</span></button><span class="tiny">One AI call. Its answer is checked by the rules before it is shown.</span></div></div>`;
+  $('#ask-coach').addEventListener('click', () => { $('#coach').innerHTML = `<h3>${ICON.spark} Coach</h3><p class="muted small"><span class="spin"></span> Asking the coach for a critique and a stronger answer...</p>`; coach(q, text, res, speaker); });
 }
 // What an uploaded pack sends the coach: compact lines built from the same context the rules use.
 function coachFacts() {
@@ -615,7 +642,7 @@ function viewReport() {
     <button class="btn primary" id="print">${ICON.print} Print the briefing</button>
   </div>
   <section class="panel glass"><h2>Recommendations before the call</h2><p class="sub">Each one is tied to a computed fact, so it can be checked.</p>
-    <ol class="recs">${recs.map((r) => `<li><div><h3>${esc(r.title)}</h3><p>${esc(r.body)}</p></div></li>`).join('')}</ol></section>
+    <ol class="recs">${recs.map((r) => `<li><div><h3>${esc(r.title)}</h3><p>${esc(r.body)}</p><p class="evidence"><b>Evidence:</b> ${r.evidence.map((e) => (CTX.sources[e] ? cite(e) : `<span class="pill neutral">${esc(e)}</span>`)).join(' ')}</p></div></li>`).join('')}</ol></section>
   <div class="grid-2">
     <section class="panel glass"><h2>Readiness by theme</h2><p class="sub">Mean of the best answer per question; questions not rehearsed count as zero.</p>
       <div class="hbars">${themes.map((t) => hb(t.th, `${t.done}/${t.n}`, t.avg, `${t.th}: ${t.avg ?? 'not rehearsed'}${t.avg != null ? ' of 100' : ''}, ${t.done} of ${t.n} questions rehearsed`)).join('')}</div>
@@ -631,20 +658,7 @@ function viewReport() {
   <section class="panel glass"><h2>Business case</h2><p class="sub">Every input below is an assumption for a mid-cap Indian listed company. Change any of them and the case recomputes.</p>
     <div class="grid-2"><div class="bc-grid">${BC_FIELDS.map(([k2, l]) => `<label><span>${esc(l)}</span><input type="number" min="0" inputmode="decimal" data-bc="${k2}" value="${BC[k2]}"></label>`).join('')}</div><div id="bc-out">${bizOut()}</div></div></section>`);
 }
-function buildRecs(themes, best, rc, contra) {
-  const { imp, commitments: cs, pressure: P, k: K } = CTX;
-  const R = [];
-  if (imp && num(imp.need) && imp.need > imp.record) R.push({ title: 'Decide on margin guidance before the call, not during it', body: `${imp.ytdLabel} EBITDA margin is ${f1(imp.ytd)}%. The bottom of the ${imp.low} to ${imp.high}% range needs about ${f1(imp.need)}% for the rest of the year, above the ${f1(imp.record)}% best quarter on record. Defending it invites the hardest follow-up of the call. Recommend the board settles a revised range and files it with the results, so the CFO can point to it.` });
-  if (rc.gaps.length) R.push({ title: CTX.pack.remarks ? 'Close the gaps in the prepared remarks' : 'Write the prepared remarks around the pressure map', body: `${CTX.pack.remarks ? 'The draft is silent on' : 'Cover'}: ${rc.gaps.map((g) => g.label).slice(0, 5).join('; ')}.${num(K.mBps) && K.mBps < 0 ? ` Explain the ${Math.abs(Math.round(K.mBps))} bps margin decline with its drivers.` : ''}${rc.risky[0] ? ` Remove "${rc.risky[0].phrase}": ${rc.risky[0].why}` : ''}` });
-  const broken = cs.filter((c) => c.status === 'broken');
-  if (broken.length) R.push({ title: `Own ${broken.length === 1 ? 'the statement that did not hold' : `the ${broken.length} statements that did not hold`} in the opening`, body: `${broken.map((c) => `${c.id} (\u201c${c.said.replace(/["\u201c\u201d]/g, '')}\u201d): ${c.why}`).join('; ')}. One sentence each, from the speaker who made it: what was said, what happened, what changes.` });
-  for (const c of cs.filter((x) => x.status === 'deflected')) R.push({ title: `Disclose ${c.topic || 'the deflected item'} proactively`, body: `Last time: \u201c${c.said.replace(/["\u201c\u201d]/g, '')}\u201d. ${c.why || ''} Put it in the CFO's section before an analyst asks again, and commit to regular disclosure.` });
-  const weak = themes.filter((t) => t.band === 'red' || t.band === 'off').map((t) => t.th);
-  if (weak.length) R.push({ title: `Rehearse again: ${weak.slice(0, 4).join(', ')}`, body: `These themes are not ready${Object.keys(best).length ? ' on the answers given so far' : ' because nothing has been rehearsed yet'}. Owners follow the pressure map: ${P.slice(0, 4).map((x) => `${x.theme} to ${x.owner === 'ENERGY' ? 'the segment head' : x.owner}`).join('; ')}.` });
-  if (contra.length) R.push({ title: 'Align the speakers on one line per theme', body: `${contra.map((c) => c.q.id).join(', ')} got different answers from different speakers. Agree the wording, then rehearse both again.` });
-  R.push({ title: 'Send every forward-looking figure through the company secretary', body: 'Any number about the rest of the year, the next year or the current quarter that is not already in guidance is new disclosure. The scorecard flags these in red; none should reach the call.' });
-  return R;
-}
+function buildRecs(themes, best, rc, contra) { return recommendations(CTX, { themes, best, rc, contra }); }
 function bindReport() {
   $('#demo')?.addEventListener('click', () => {
     const add = DEMO.map(([qid, speaker, kind]) => { const q = CTX.questions.find((x) => x.id === qid); const text = q[kind]; const r = scoreAnswer(CTX, q, text); return { qid, speaker, text, total: r.total, band: r.band, flags: r.flags.map((fl) => fl.dim), acked: ackSet(q, text), at: Date.now() }; });

@@ -59,5 +59,16 @@ ok(planted.flags.some((f) => f.dim === 'Accuracy' && f.text.includes('12.6')), '
 const fwd = scoreAnswer(q1, q1.model + ' We expect H2 margin to be 13.1%.');
 ok(fwd.band === 'red' && fwd.flags.some((f) => f.dim === 'Disclosure'), 'planted forward number (13.1% in H2) forces Red');
 
+console.log('--- Recommendations carry evidence');
+{
+  const { recommendations } = await import('../web/js/recs.js');
+  const { remarksCheck: rcF } = await import('../web/js/score.js');
+  const recs = recommendations(ctx, { themes: [{ th: 'Guidance', band: 'off' }], best: {}, rc: rcF(ctx, remarksDraft), contra: [] });
+  ok(recs.length >= 5, `${recs.length} recommendations for the sample`);
+  ok(recs.every((r) => Array.isArray(r.evidence) && r.evidence.length > 0 && r.evidence.every((e) => typeof e === 'string' && e.length)), 'every recommendation lists its evidence');
+  const ids = new Set([...ctx.commitments.map((c) => c.id), ...Object.keys(ctx.sources)]);
+  ok(recs.flatMap((r) => r.evidence).every((e) => ids.has(e) || /^(computed|rule|rehearsal)/.test(e)), 'every piece of evidence is a real commitment, a real source line, or a named computation');
+}
+
 console.log(fails ? `\n${fails} check(s) FAILED: no-go` : '\nAll checks passed: go');
 process.exit(fails ? 1 : 0);

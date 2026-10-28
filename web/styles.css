@@ -278,6 +278,8 @@ mark.warn { background: var(--mark-warn); color: inherit; border-radius: 3px; pa
 .recs li::before { content: counter(r); font: 600 1.1rem/1 var(--font-display); color: var(--accent-ink); padding-top: 2px; }
 .recs h3 { margin: 0 0 4px; font-size: 1rem; }
 .recs p { margin: 0; color: var(--ink-2); font-size: var(--fs-meta); }
+.recs .evidence { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: var(--fs-caption); }
+.recs .evidence .pill, .recs .evidence .cite { white-space: normal; text-align: left; line-height: 1.35; max-width: 100%; }
 .banner { padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--warn-tint); color: var(--warn); font-size: var(--fs-meta); font-weight: 500; }
 
 /* theme switch */

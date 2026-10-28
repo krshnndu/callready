@@ -26,6 +26,10 @@ jobs:
         run: node scripts/check_bias.mjs
       - name: Guardrails (sanitiser, financial sanity rules, upload limits)
         run: node scripts/check_guardrails.mjs
+      - name: Fuzz (10,000 mutated packs: missing, zero and negative values)
+        run: node scripts/check_fuzz.mjs 10000
+      - name: Rule-based extractor (sample document)
+        run: node scripts/check_extract_rules.mjs /nonexistent
       - name: API pack in sync with the web pack
         run: |
           cp data/pack.json /tmp/pack.before.json
