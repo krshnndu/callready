@@ -60,7 +60,7 @@ Open http://127.0.0.1:8731. Every screen works without the API. To run the API: 
 | `web/` | The app: `js/pack.js` (data), `js/engine.js` (rules), `js/questions.js`, `js/app.js` (screens), `styles.css`, `api/` (Vercel proxy functions) |
 | `api/` | Coach API (FastAPI) |
 | `data/pack.json` | The pack exported for the API by `scripts/export_pack.mjs` |
-| `docs/` | PRD, architecture, data, scoring, roadmap, decisions and risks, pitch |
+| `docs/` | PRD, architecture, data, scoring, roadmap, decisions and risks, pitch, governance (PMI-CPMAI) |
 | `ops/` | Deployment templates with placeholders |
 | `private/` | Gitignored. Host-specific runbook |
 
