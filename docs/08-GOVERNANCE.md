@@ -97,11 +97,13 @@ Ordered by value to the submission (17:00 today), then by governance value. Effo
 | C11 | Final report and lessons learned (`09-CLOSEOUT.md`), and the decommissioning plan as the transition plan | V | 20 | At close |
 | C12 | One 15-minute validation call with an IR or finance professional on the top 10 questions | II, III | external | After |
 
+Applied on 2026-10-28: C1 (notice on the Rehearse screen and in the assumptions), C2 (7-day retention in the API), C3 (an editable business case on the Report screen), C4 (`scripts/check_engine.mjs`), C5 (the log below), C6 (`/health` telemetry), C7 (prompt `coach-v2`), C8 (R-11 to R-14).
+
 ## 4. Go/no-go log
 
 | Gate | Date | Decision | Evidence | Owner |
 | --- | --- | --- | --- | --- |
 | G-A Business feasibility (is this an AI problem, is there value, will it be used) | 2026-10-28 | Go, with AI limited to writing and coaching | PRD; rules-first design; the brief | Team lead |
-| G-B Data readiness | pending C4 | | `check_engine.mjs` reconciliation | Team lead |
-| G-C Model ready for operation (scoring rules and coach) | pending C4 and C7 | Retroactive: the coach is already live | Calibration results; two live coach samples, both checked | Team lead |
+| G-B Data readiness | 2026-10-28 | Go | `node scripts/check_engine.mjs`: segments reconcile to revenue and EBITDA in all four quarters, every headline KPI matches `03-DATA.md`, every commitment cites a real transcript line, and `data/pack.json` is in sync | Team lead |
+| G-C Model ready for operation (scoring rules and coach) | 2026-10-28 | Go (retroactive: the coach went live before this gate) | The same script: 12 of 12 reference answers Green with no flags, both weak samples Red and 66 points lower, the planted wrong figure and planted forward number both caught. Building the check found and fixed one real defect: a forward number after "H2" escaped the disclosure check. Coach: prompt `coach-v2` with the injection guard; two live samples passed the number check | Team lead |
 | G-D Decommission | at close | | `09-CLOSEOUT.md` | Team lead |

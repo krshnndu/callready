@@ -34,6 +34,9 @@ export const segments = [
   { name: 'Energy Solutions', key: 'ENE', rows: { 'Q1 FY26': [200, -1.5], 'Q2 FY26': [230, -3.0], 'Q1 FY27': [290, -10.2], 'Q2 FY27': [330, -8.5] } },
 ];
 
+// Unallocated corporate cost (EBIT reconciliation: segment EBIT + unallocated + D&A = EBITDA).
+export const unallocated = { 'Q1 FY26': -19.8, 'Q2 FY26': -20.3, 'Q1 FY27': -21.6, 'Q2 FY27': -22.3 };
+
 export const consensus = { q: 'Q2 FY27', revenue: 2440, ebitda: 315, margin: 12.9, pat: 150, source: 'Synthetic street consensus, 12 brokers' };
 
 // Margin bridge Q2 FY26 to Q2 FY27, in bps.

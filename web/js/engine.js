@@ -205,7 +205,8 @@ const FORWARD_OK = /guidance|implied|record|consensus|bridge|margin|growth/;
 
 // ---------- Answer scorecard (deterministic part) ----------
 const HEDGES = ['basically', 'sort of', 'kind of', 'to be honest', 'you know', 'i think', 'i guess', 'actually', 'obviously', 'frankly', 'more or less'];
-const FORWARD_NUM = /(next quarter|q3|q4|h2|fy28|going forward|by (march|december)|will be|we expect|expect it|we will|target)[^.]{0,60}?\d[\d,.]*\s*(%|percent|bps|crore|x\b)?/gi;
+// A forward-looking clause: the trigger and the rest of the sentence (decimals kept, so 13.1% is read whole).
+const FORWARD_NUM = /(next quarter|q3|q4|h2|fy28|going forward|by (march|december)|will be|we expect|expect it|we will|target)(?:[^.]|\.(?=\d)){0,90}/gi;
 const MNPI = [
   { re: /\b(october|november)\b[^.]{0,50}(sales|demand|orders|revenue|trading)/i, why: 'Current-quarter trading detail not in the disclosures (selective disclosure risk).' },
   { re: /\b(acquisition|acquire|merger|stake sale|divest|fund ?rais|qip)\b/i, why: 'Corporate action not disclosed in the pack: never hint at it on a call.' },
@@ -266,7 +267,7 @@ export function scoreAnswer(q, text, { durationS } = {}) {
   let saf = 100;
   for (const r of MNPI) { const m = text.match(r.re); if (m) { saf = 0; flags.push({ kind: 'red', dim: 'Disclosure', text: m[0], why: r.why }); } }
   for (const fn of text.matchAll(FORWARD_NUM)) {
-    const after = extractFigures(fn[0]).filter((f) => !/^(q|h|fy)$/i.test(fn[0].slice(Math.max(0, f.index - 2), f.index).trim()));
+    const after = extractFigures(fn[0]);
     const unguided = after.filter((f) => { const m = matchFigure(f, fn[0]); return !m || !(FORWARD_OK.test(m.label) || /^Q\d FY\d\d|FY26|H1|TTM/.test(m.label)); });
     if (unguided.length) { saf = 0; flags.push({ kind: 'red', dim: 'Disclosure', text: fn[0], why: 'A forward-looking number that is not in the guidance on record. This is new guidance given on the fly.' }); break; }
   }

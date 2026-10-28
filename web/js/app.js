@@ -100,6 +100,7 @@ function viewQuarter() {
       <li>Consensus (${consensus.source.toLowerCase()}) stands in for the estimates a real IR team would buy.</li>
       <li>Pressure weights and score thresholds are judgement calls from typical earnings-call practice, not fitted to data.</li>
       <li>Scores rank answer quality against a rubric; they do not predict the share-price reaction. Disclosure flags are prompts for the company secretary, not legal advice.</li>
+      <li>AI use: every figure, ranking and score is computed by rules in the browser. Only the rehearsal coach uses AI models, and its output is re-checked by the same rules before it is shown.</li>
     </ul></details>
   </section>
   <div class="row no-print"><span class="spacer"></span><a class="btn primary" href="#/pressure">See what investors will push on ${ICON.arrow}</a></div>`);
@@ -208,6 +209,7 @@ function viewRehearse(qid) {
         <span class="spacer"></span>
         ${q.weak ? '<button class="btn ghost" id="weak" type="button">Load a weak sample</button>' : ''}
       </div>
+      <div class="notice" role="note"><b>What is AI here, and where your answer goes.</b> The scorecard is rules running in your browser; nothing is sent anywhere to compute it. The coach is AI (Gemini 3.8 Flash, with Claude Sonnet 4.6 as fallback) reached through our gateway, so your answer is sent to those model providers. The coach's reply is cached on our server for 7 days, then deleted. Do not paste real unpublished information.</div>
       <p class="tiny" style="margin-top:var(--s-3)">Owner for this question: ${q.owner === 'ENERGY' ? company.speakers.ENERGY : company.speakers[q.owner]}. Sources: ${q.cites.map(cite).join(' ') || 'results tables'}</p>
     </section>
     <section class="panel glass" id="card"><div class="empty">Your scorecard appears here: seven dimensions, every flagged phrase marked in your answer, a follow-up from the same analyst, and a stronger answer grounded in the disclosures.</div></section>
@@ -350,6 +352,14 @@ function viewReport() {
     <p class="sub">Each one is tied to a computed fact, so it can be checked.</p>
     <ol class="recs">${recs.map((r) => `<li><div><h3>${esc(r.title)}</h3><p>${esc(r.body)}</p></div></li>`).join('')}</ol>
   </section>
+  <section class="panel glass">
+    <h2>Business case</h2>
+    <p class="sub">Every input below is an assumption for a mid-cap Indian listed company. Change any of them and the case recomputes.</p>
+    <div class="grid-2">
+      <div class="bc-grid">${BC_FIELDS.map(([k, l]) => `<label><span>${esc(l)}</span><input type="number" min="0" data-bc="${k}" value="${BC[k]}"></label>`).join('')}</div>
+      <div id="bc-out">${bizOut()}</div>
+    </div>
+  </section>
   <div class="grid-2">
     <section class="panel glass">
       <h2>Readiness by theme</h2>
@@ -386,7 +396,34 @@ function buildRecs(themes, best, rc, contra) {
     body: 'Any number about H2, FY28 or the current quarter that is not already in guidance is new disclosure. The scorecard flags these in red; none should reach the call.' });
   return R;
 }
+// Business case (docs/08-GOVERNANCE.md C3). Every input is an assumption, editable on screen.
+const BC_DEFAULT = { irPeople: 3, irHoursWithout: 24, irHoursWith: 8, execs: 3, execHoursWithout: 4, execHoursWith: 3, irRate: 2500, execRate: 15000, coachCalls: 300, costPerCall: 2, hosting: 2000 };
+let BC = { ...BC_DEFAULT };
+const inr = (x) => '\u20b9' + Math.round(x).toLocaleString('en-IN');
+function bizCase() {
+  const irSaved = BC.irPeople * (BC.irHoursWithout - BC.irHoursWith);
+  const exSaved = BC.execs * (BC.execHoursWithout - BC.execHoursWith);
+  const value = irSaved * BC.irRate + exSaved * BC.execRate;
+  const cost = BC.coachCalls * BC.costPerCall + BC.hosting;
+  return { irSaved, exSaved, value, cost, net: value - cost, multiple: cost ? value / cost : 0 };
+}
+const BC_FIELDS = [
+  ['irPeople', 'Finance and IR people preparing Q&A'], ['irHoursWithout', 'Hours each per quarter today'], ['irHoursWith', 'Hours each with CallReady'],
+  ['execs', 'Executives rehearsing'], ['execHoursWithout', 'Rehearsal hours each today'], ['execHoursWith', 'Rehearsal hours each with CallReady'],
+  ['irRate', 'Loaded cost per finance/IR hour (INR)'], ['execRate', 'Loaded cost per executive hour (INR)'],
+  ['coachCalls', 'Coach calls per quarter'], ['costPerCall', 'Model cost per coach call (INR)'], ['hosting', 'Hosting per quarter (INR)'],
+];
+function bizOut() {
+  const b = bizCase();
+  return `<div class="readouts">
+    <div class="readout"><div class="v">${b.irSaved + b.exSaved} h</div><div class="l">prep hours saved per quarter</div></div>
+    <div class="readout"><div class="v">${inr(b.value)}</div><div class="l">time value per quarter</div></div>
+    <div class="readout"><div class="v">${inr(b.cost)}</div><div class="l">running cost per quarter</div></div>
+    <div class="readout"><div class="v">${b.multiple.toFixed(0)}x</div><div class="l">value to cost</div></div>
+  </div><p class="tiny" style="margin-top:var(--s-3)">Not counted, and larger: one avoided disclosure slip or broken-promise exchange on a live call, which moves the share price and the board's trust.</p>`;
+}
 function bindReport() {
+  document.querySelectorAll('[data-bc]').forEach((el) => el.addEventListener('input', () => { BC[el.dataset.bc] = Number(el.value) || 0; $('#bc-out').innerHTML = bizOut(); }));
   $('#demo').addEventListener('click', () => {
     const add = DEMO.map(([qid, speaker, kind]) => { const q = questions.find((x) => x.id === qid); const text = q[kind]; const r = scoreAnswer(q, text); return { qid, speaker, text, total: r.total, band: r.band, flags: r.flags.map((f) => f.dim), acked: ackSet(q, text), at: Date.now() }; });
     saveAttempts([...memAttempts, ...add]); render();

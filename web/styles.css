@@ -250,6 +250,14 @@ mark.warn { background: var(--mark-warn); color: inherit; border-radius: 3px; pa
 .recs p { margin: 0; color: var(--ink-2); font-size: var(--fs-meta); }
 .banner { padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--warn-tint); color: var(--warn); font-size: var(--fs-meta); font-weight: 500; }
 
+/* AI notice and business case */
+.notice { margin-top: var(--s-4); padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--accent-tint); color: var(--ink); font-size: var(--fs-caption); line-height: 1.5; }
+.notice b { display: block; margin-bottom: 2px; font-size: var(--fs-meta); }
+.bc-grid { display: grid; gap: 6px; }
+.bc-grid label { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: var(--s-3); align-items: center; font-size: var(--fs-meta); color: var(--ink-2); }
+.bc-grid input { font: 500 var(--fs-meta) var(--font-ui); font-variant-numeric: tabular-nums; color: var(--ink); background: var(--glass-solid); border: 1px solid var(--line-strong); border-radius: var(--r-sm); padding: 6px 10px; text-align: right; width: 100%; }
+.bc-grid input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
 details.assume summary { cursor: pointer; font-weight: 600; }
 details.assume ul { margin: var(--s-3) 0 0; padding-left: 1.2em; color: var(--ink-2); font-size: var(--fs-meta); }
 

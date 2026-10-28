@@ -21,6 +21,7 @@
 - **Pressure** = magnitude x investor salience x credibility (1.5 if a promise is broken) x recurrence (1.3 if management deflected it before).
 - **Scorecard:** accuracy 25, consistency with commitments 20, directness 15, explanation 15, forward clarity 10, disclosure safety 10, delivery 5. A figure that is not in the disclosures caps accuracy. Any new forward-looking number, or a hint about current trading, an order or an acquisition, forces Red whatever the total.
 - **The coach is checked too.** Its improved answer is re-scored by the same checker. If it uses a figure that is not in the disclosures, the vetted reference answer is shown instead.
+- **Checked before release.** `node scripts/check_engine.mjs` reconciles the pack and calibrates the scorer; it is the evidence for the go/no-go gates in `docs/08-GOVERNANCE.md` (PMI-CPMAI).
 - **Demo-proof.** If the coach or the backend is unavailable, every step still works, and the reference answers fill in for the coach.
 
 ## Data and assumptions
