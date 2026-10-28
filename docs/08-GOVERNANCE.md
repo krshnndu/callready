@@ -29,7 +29,7 @@ Status: **Met**, **Partial** or **Gap**.
 | --- | --- | --- |
 | Privacy and security plan | Partial | No personal data by design: the pack is synthetic and there are no accounts. The API needs a shared key, its body size and per-client calls are capped, and secrets live only on the host. **Gaps:** answers sent to the coach go to third-party model providers through the gateway, and the UI does not say so; cached answers are kept indefinitely, though the plan promised 7 days |
 | Transparency | Partial | The coach names the model that answered; the rules and weights are published (`04-SCORING.md`). **Gap:** no plain statement on screen of which parts are rules and which are AI, and no model card |
-| Bias checks | Gap | The "bias" that matters here is scorer bias: penalising plain or non-native phrasing, or one speaker role. Never tested |
+| Bias checks | Met (2026-10-28) | Scorer bias by register tested with `scripts/check_bias.mjs` (plain and Indian-English rephrasings of 5 reference answers). It found a 13 to 23 point penalty on Indian-English acknowledgements, now fixed. Not yet tested: bias by speaker role |
 | Regulatory compliance | Partial | SEBI disclosure rules shape the disclosure-safety checks. India's DPDP Act would apply to real users' data; today there is none. Not legal advice, and the product says so |
 | Accountability and audit trail | Partial | Git history, a decisions log (D-01 to D-09) and a versioned prompt (`coach-v1`). **Gaps:** go/no-go decisions were never recorded; the coach's outputs are cached but not logged with the model and prompt version that produced them |
 
@@ -97,7 +97,7 @@ Ordered by value to the submission (20:00 today, moved from 17:00), then by gove
 | C11 | Final report and lessons learned (`09-CLOSEOUT.md`), and the decommissioning plan as the transition plan | V | 20 | At close |
 | C12 | One 15-minute validation call with an IR or finance professional on the top 10 questions | II, III | external | After |
 
-Applied on 2026-10-28: C1 (notice on the Rehearse screen and in the assumptions), C2 (7-day retention in the API), C3 (an editable business case on the Report screen), C4 (`scripts/check_engine.mjs`), C5 (the log below), C6 (`/health` telemetry), C7 (prompt `coach-v2`), C8 (R-11 to R-14).
+Applied on 2026-10-28: C1 (notice on the Rehearse screen and in the assumptions), C2 (7-day retention in the API), C3 (an editable business case on the Report screen), C4 (`scripts/check_engine.mjs`), C5 (the log below), C6 (`/health` telemetry), C7 (prompt `coach-v2`; a live injection attempt was ignored and nothing leaked), C8 (R-11 to R-14), C9 (`scripts/check_bias.mjs`: it found that Indian-English ways of owning an earlier statement, such as "as informed during the last call", went unrecognised and cost 13 to 23 points; fixed by widening the phrases the consistency check accepts, and all 10 rephrasings now score within 7 points of the reference).
 
 ## 4. Go/no-go log
 

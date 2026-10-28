@@ -217,6 +217,10 @@ const MNPI = [
 const DRIVER = /(because|due to|driven by|from|caused by|reflects|came from|of which|bridge)/i;
 const ACTION = /(we will|we are|our priority|we plan|we have started|we'll|from now on|every quarter|each quarter|we intend)/i;
 
+// Ways of owning a statement from an earlier call, across registers (plain, US/UK and Indian-English
+// business usage). Added after scripts/check_bias.mjs found Indian-English phrasing scored 13 to 23 points lower.
+export const OWN_PAST = ['last call', 'previous call', 'earlier call', 'as informed', 'as communicated', 'as indicated', 'as mentioned', 'had mentioned', 'had said', 'had expected', 'had committed', 'had stated', 'we committed', 'we had guided', 'take your point', 'not a satisfactory', 'has not happened', 'have not happened', 'did not materialise', 'did not materialize'];
+
 export function scoreAnswer(q, text, { durationS } = {}) {
   const words = text.trim().split(/\s+/).filter(Boolean);
   const wc = words.length;
@@ -237,7 +241,8 @@ export function scoreAnswer(q, text, { durationS } = {}) {
   // Consistency
   const cmap = Object.fromEntries(commitments.map((c) => [c.id, c]));
   const needAck = (q.mustAck || []).map((id) => cmap[id]);
-  const missed = needAck.filter((c) => !c.ack.some((w) => t.includes(w)));
+  const ackWords = (c) => (/^[SD]/.test(c.id) ? [...c.ack, ...OWN_PAST] : c.ack);
+  const missed = needAck.filter((c) => !ackWords(c).some((w) => t.includes(w)));
   let con = needAck.length ? Math.round(100 * (1 - missed.length / needAck.length)) : 85;
   if (missed.length) con = Math.min(con, 50);
   for (const c of missed) flags.push({ kind: 'amber', dim: 'Consistency', text: `${c.id}: ${c.said}`, why: `Silent on a commitment that is ${c.status}. Own it before the analyst quotes it back (${c.ref}).` });

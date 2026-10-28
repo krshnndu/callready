@@ -1,5 +1,5 @@
 import { company, quarters, segments, commitments, transcripts, notes, remarksDraft, consensus, bridge } from './pack.js';
-import { kpis, impliedH2, pressureMap, segmentTable, remarksCheck, scoreAnswer, DIM_LABELS } from './engine.js';
+import { kpis, impliedH2, pressureMap, segmentTable, remarksCheck, scoreAnswer, DIM_LABELS, OWN_PAST } from './engine.js';
 import { questions, personas } from './questions.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -253,7 +253,7 @@ function bindRehearse(qid) {
 }
 function ackSet(q, text) {
   const t = text.toLowerCase();
-  return (q.mustAck || []).filter((id) => commitments.find((c) => c.id === id).ack.some((w) => t.includes(w)));
+  return (q.mustAck || []).filter((id) => { const c = commitments.find((x) => x.id === id); return [...c.ack, ...(/^[SD]/.test(id) ? OWN_PAST : [])].some((w) => t.includes(w)); });
 }
 function markAnswer(text, res) {
   const spans = [];
