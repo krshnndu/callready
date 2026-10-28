@@ -79,7 +79,7 @@ export function scoreAnswer(ctx, q, text, { durationS } = {}) {
 
   // Consistency
   const cmap = Object.fromEntries(commitments.map((c) => [c.id, c]));
-  const needAck = (q.mustAck || []).map((id) => cmap[id]);
+  const needAck = (q.mustAck || []).map((id) => cmap[id]).filter(Boolean); // a question may name a commitment the pack no longer has
   // What counts as owning a commitment: its own words if the pack lists them, the register-neutral
   // phrases for owning an earlier statement, and for guidance the language of targets.
   const ackWords = (c) => [...(c.ack || []), ...(c.kind !== 'guidance' || /^[SD]/.test(c.id) ? OWN_PAST : []),

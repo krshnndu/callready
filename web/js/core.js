@@ -6,6 +6,8 @@ const num = (x) => (typeof x === 'number' && Number.isFinite(x) ? x : null);
 const pct = (a, b) => (num(a) != null && num(b) ? ((a - b) / Math.abs(b)) * 100 : null);
 const clamp = (x) => Math.max(0, Math.min(1, x || 0));
 const r1 = (x) => Math.round(x * 10) / 10;
+// Quarters elapsed in the financial year, from a label like "Q3 FY27".
+export const quarterNum = (label) => { const m = /Q([1-4])/i.exec(label || ''); return m ? Number(m[1]) : null; };
 export const margin = (p) => (p && num(p.revenue) && num(p.ebitda) != null ? (p.ebitda / p.revenue) * 100 : null);
 
 // ---------- validation ----------
@@ -112,6 +114,8 @@ export function normalizePack(p) {
     p.company = { ...(p.company || {}), marginBasis: 'EBIT' };
   }
   if (typeof p?.company?.units === 'string') p.company.units = p.company.units.split(/[;(]/)[0].trim();
+  // A guidance range written backwards is swapped.
+  for (const c of p?.commitments || []) { const t = c.target; if (t && num(t.low) != null && num(t.high) != null && t.low > t.high) [t.low, t.high] = [t.high, t.low]; }
   // Period labels are the short form ("Q2 FY27"); a date range in brackets moves to `period`.
   for (const x of [per.current, per.priorYear, per.priorQuarter, ...(p?.history || [])]) {
     const m = x && typeof x.label === 'string' && x.label.match(/^(.*?)\s*\((.+)\)\s*$/);
@@ -155,7 +159,9 @@ export function validatePack(p) {
   const cur = p.periods?.current;
   if (Array.isArray(p.segments) && p.segments.length && num(cur?.revenue)) {
     const sum = p.segments.reduce((s, x) => s + (num(x.current?.revenue) || 0), 0);
-    if (Math.abs(sum - cur.revenue) / cur.revenue > 0.02) warnings.push(`Segment revenues add up to ${r1(sum)}, not the reported ${cur.revenue} (more than 2% apart). Check the segment table.`);
+    const gap = Math.abs(sum - cur.revenue) / cur.revenue;
+    if (gap > 0.10) warnings.push(`Segment revenues add up to ${r1(sum)}, not the reported ${cur.revenue}: segments are left out of the analysis until the table is fixed.`);
+    else if (gap > 0.02) warnings.push(`Segment revenues add up to ${r1(sum)}, not the reported ${cur.revenue} (more than 2% apart). Check the segment table.`);
   }
   const ids = new Set();
   for (const c of p.commitments || []) {
@@ -164,6 +170,7 @@ export function validatePack(p) {
     if (!['guidance', 'statement', 'deflection'].includes(c.kind)) errors.push(`Commitment ${c.id}: kind must be guidance, statement or deflection.`);
     if (!c.said) errors.push(`Commitment ${c.id}: "said" (the words on record) is missing.`);
   }
+  if (p.consensus && num(p.consensus.revenue) && num(cur?.revenue) && !(p.consensus.revenue / cur.revenue > 0.5 && p.consensus.revenue / cur.revenue < 2)) warnings.push(`Consensus revenue (${p.consensus.revenue}) is more than 2x away from reported revenue (${cur.revenue}), probably other units: consensus is ignored.`);
   if (!(p.commitments || []).length) warnings.push('No commitments on record: the consistency checks have nothing to hold answers to.');
   if (!(p.transcript || []).length) warnings.push('No earlier call transcript: questions cannot draw on what analysts asked before.');
   return { errors, warnings };
@@ -192,7 +199,9 @@ export function kpis(p) {
     ytdRevYoY: p.ytd ? pct(p.ytd.revenue, p.ytd.revenuePy) : null,
   };
   k.mBps = k.m != null && k.mPy != null ? (k.m - k.mPy) * 100 : null;
-  if (p.consensus) k.vsCons = { rev: pct(cur.revenue, p.consensus.revenue), ebitda: pct(cur.ebitda, p.consensus.ebitda), pat: pct(cur.pat, p.consensus.pat), margin: num(p.consensus.ebitda) && num(p.consensus.revenue) ? (p.consensus.ebitda / p.consensus.revenue) * 100 : null };
+  // Consensus in different units from the actuals (more than 2x away) is ignored, not compared.
+  const consOk = p.consensus && num(p.consensus.revenue) && num(cur.revenue) && p.consensus.revenue / cur.revenue > 0.5 && p.consensus.revenue / cur.revenue < 2;
+  if (consOk) k.vsCons = { rev: pct(cur.revenue, p.consensus.revenue), ebitda: pct(cur.ebitda, p.consensus.ebitda), pat: pct(cur.pat, p.consensus.pat), margin: num(p.consensus.ebitda) && num(p.consensus.revenue) ? (p.consensus.ebitda / p.consensus.revenue) * 100 : null };
   return k;
 }
 
@@ -212,11 +221,21 @@ export function implied(p, k = kpis(p)) {
 }
 
 export function segmentTable(p) {
+  // Segments that do not add up to within 10% of revenue (double counting, other units) are left out.
+  if (!segmentsUsable(p)) return [];
   return (p.segments || []).filter((s) => s.current).map((s, i) => {
     const c = s.current, y = s.priorYear || {};
     return { name: s.name, key: s.key || `S${i + 1}`, rev: c.revenue, m: c.margin, revPy: y.revenue, mPy: y.margin, mPq: s.priorQuarter?.margin,
       growth: pct(c.revenue, y.revenue), bps: num(c.margin) != null && num(y.margin) != null ? (c.margin - y.margin) * 100 : null };
   });
+}
+
+export function segmentsUsable(p) {
+  const segs = (p.segments || []).filter((s) => num(s.current?.revenue));
+  const rev = p.periods?.current?.revenue;
+  if (!segs.length || !num(rev)) return true;
+  const sum = segs.reduce((t, s) => t + s.current.revenue, 0);
+  return Math.abs(sum - rev) / rev <= 0.10;
 }
 
 // ---------- commitment status: rules where the numbers allow, otherwise what the pack states ----------
@@ -237,7 +256,7 @@ export function commitmentStatus(p, k = kpis(p), imp = implied(p, k)) {
     } else if (c.metric === 'netDebtToEbitda' && num(t.high) != null && k.lev != null) {
       k.lev > t.high ? rule('broken', `${k.lev.toFixed(2)}x is above the ${t.high}x ceiling`) : k.lev > 0.75 * t.high ? rule('at-risk', `${k.lev.toFixed(2)}x and rising${k.levBase != null ? `, from ${k.levBase.toFixed(2)}x` : ''}`) : rule('on-track', `${k.lev.toFixed(2)}x against a ${t.high}x ceiling`);
     } else if (c.metric === 'capex' && num(t.value) && p.ytd && num(p.ytd.capex) != null) {
-      const share = p.ytd.capex / t.value, elapsed = (p.ytd.quartersElapsed || 2) / 4;
+      const share = p.ytd.capex / t.value, elapsed = (p.ytd.quartersElapsed || quarterNum(p.company?.quarter) || 2) / 4;
       share > elapsed + 0.15 ? rule('at-risk', `${p.ytd.capex} spent so far against about ${t.value} for the year`) : rule('on-track', `${p.ytd.capex} spent so far against about ${t.value}`);
     } else if (c.metric === 'segmentEbit' && c.segment && segs[c.segment.toLowerCase()]) {
       const s = segs[c.segment.toLowerCase()];
@@ -286,8 +305,9 @@ export function pressureMap(p, k = kpis(p), imp = implied(p, k), cs = commitment
   const capex = cs.find((c) => c.metric === 'capex' && c.target?.value);
   if (capex && p.ytd?.capex != null) P.push({ id: 'capex', theme: 'Capital allocation', title: 'Capex against plan',
     evidence: `${p.ytd.label || 'Year to date'} capex ${p.ytd.capex} ${units} against about ${capex.target.value} for the year (${Math.round((p.ytd.capex / capex.target.value) * 100)}%).`,
-    magnitude: clamp((p.ytd.capex / capex.target.value - (p.ytd.quartersElapsed || 2) / 4) / 0.3), salience: 0.6, ties: [capex.id], kw: KW.capex, owner: 'CFO', template: 'capex' });
-  if (k.patYoY != null && k.patYoY <= -15) P.push({ id: 'profit', theme: 'Profit', title: `PAT down ${r1(-k.patYoY)}%`,
+    magnitude: clamp((p.ytd.capex / capex.target.value - (p.ytd.quartersElapsed || quarterNum(p.company?.quarter) || 2) / 4) / 0.3), salience: 0.6, ties: [capex.id], kw: KW.capex, owner: 'CFO', template: 'capex' });
+  const patTitle = num(k.cur.pat) && num(k.py.pat) ? (k.cur.pat < 0 && k.py.pat >= 0 ? `PAT turned to a loss of ${-k.cur.pat} ${units}` : k.cur.pat < 0 && k.py.pat < 0 ? (k.cur.pat < k.py.pat ? `Loss widened to ${-k.cur.pat} ${units}` : null) : k.patYoY <= -15 ? `PAT down ${r1(-k.patYoY)}%` : null) : null;
+  if (patTitle) P.push({ id: 'profit', theme: 'Profit', title: patTitle,
     evidence: `PAT ${k.cur.pat} vs ${k.py.pat} ${units}${k.revYoY != null ? `, while revenue moved ${k.revYoY > 0 ? '+' : ''}${r1(k.revYoY)}%` : ''}.`,
     magnitude: clamp(-k.patYoY / 50), salience: 0.85, ties: [], kw: ['profit', 'pat', 'tax', 'interest', 'depreciation'], owner: 'CFO', template: 'profit' });
   if (k.mPq != null && k.m != null && (k.m - k.mPq) * 100 < -50) P.push({ id: 'margin-qoq', theme: 'Margin', title: `Margin down ${Math.round((k.mPq - k.m) * 100)} bps on last quarter`,
@@ -358,7 +378,7 @@ export function generateQuestions(p, P, k, imp, cs) {
         trap = 'Announcing a new capex number on the call.'; terms = ['capex']; keyFigures = [p.ytd.capex, c.target.value]; break;
       }
       case 'profit':
-        text = `PAT fell ${r1(-k.patYoY)}% to ${k.cur.pat} ${u} while revenue ${k.revYoY >= 0 ? 'grew' : 'fell'} ${r1(Math.abs(k.revYoY))}%. What sits between EBITDA and PAT: depreciation, interest, tax or one-offs, and which of them will recur?`;
+        text = `${k.cur.pat < 0 ? (k.py.pat >= 0 ? `You moved from a profit of ${k.py.pat} ${u} to a loss of ${-k.cur.pat} ${u}` : `The loss widened from ${-k.py.pat} to ${-k.cur.pat} ${u}`) : `PAT fell ${r1(-k.patYoY)}% to ${k.cur.pat} ${u}`} while revenue ${k.revYoY >= 0 ? 'grew' : 'fell'} ${r1(Math.abs(k.revYoY))}%. What sits between EBITDA and PAT: depreciation, interest, tax or one-offs, and which of them will recur?`;
         trap = 'Blaming one-offs the notes do not show, or promising a profit recovery date.'; terms = ['pat', 'profit']; keyFigures = [k.cur.pat]; break;
       case 'marginQoq':
         text = `EBITDA margin slipped from ${r1(k.mPq)}% last quarter to ${r1(k.m)}%. Is this seasonal, or is the trend turning?`;

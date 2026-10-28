@@ -56,6 +56,25 @@ for (const d of index) {
   ok(v.errors.length === 0, `test dataset ${d.slug} still validates (${v.errors.join(' ') || 'no errors'})`);
 }
 
+console.log('--- Units and consistency rules (robustness R4)');
+{
+  const run = (mut) => { const p = clone(samplePack); delete p.questions; mut(p); const v = core.validatePack(p); const ctx = core.analyze(p); return { v, ctx }; };
+  const a = run((p) => { p.consensus.revenue = 24400; p.consensus.ebitda = 3150; });
+  ok(!a.ctx.k.vsCons && a.v.warnings.some((w) => /consensus/i.test(w)), 'consensus 10x away from actuals is ignored, with a warning');
+  const b = run((p) => { p.segments.push({ name: 'Duplicate total', current: { revenue: 2480, margin: 11 }, priorYear: { revenue: 2170, margin: 14 } }); });
+  ok(b.ctx.segs.length === 0 && !b.ctx.pressure.some((x) => x.id.startsWith('seg-')), 'segments that do not sum to revenue are left out of the analysis');
+  const c = run((p) => { const g = p.commitments.find((x) => x.id === 'G2'); g.target = { low: 14.5, high: 13.5 }; });
+  ok(c.ctx.imp && c.ctx.imp.low === 13.5 && c.ctx.imp.high === 14.5, 'a guidance range written backwards is swapped');
+  const d = run((p) => { delete p.ytd.quartersElapsed; p.company.quarter = 'Q4 FY27'; });
+  ok(d.ctx.commitments.find((x) => x.id === 'G4').status === 'on-track', 'quarters elapsed come from the quarter label when missing (Q4 is 4, so 410 of 600 is on track)');
+  const e = run((p) => { p.periods.current.pat = -50; });
+  ok(e.ctx.pressure.some((x) => /turned to a loss/i.test(x.title)), 'PAT that turns negative is called a loss, not a percentage fall');
+  const f = run((p) => { p.periods.current.pat = -150; p.periods.priorYear.pat = -100; });
+  ok(f.ctx.pressure.some((x) => /loss widened/i.test(x.title)), 'a loss that grows is called a widening loss');
+  const g = run((p) => { p.periods.current.pat = -80; p.periods.priorYear.pat = -100; });
+  ok(!g.ctx.pressure.some((x) => x.id === 'profit'), 'a loss that narrows is not a pressure point');
+}
+
 console.log('--- Upload limits');
 ok(has('uploadAllowed'), 'uploadAllowed exists');
 if (has('uploadAllowed')) {
