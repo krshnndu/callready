@@ -1,0 +1,28 @@
+name: Bug report
+description: Something on a screen, in a score or in an extraction is wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options: [Load or upload, Review, Quarter, Pressure map, Question bank, Rehearse or scorecard, Coach, Readiness report, API, Other]
+    validations:
+      required: true
+  - type: input
+    id: pack
+    attributes:
+      label: Which company or pack
+      description: The sample, a test dataset name, or "my upload". Never attach unpublished documents.
+  - type: textarea
+    id: env
+    attributes:
+      label: Browser and device
+      placeholder: Chrome 130 on Android, 390 px wide, dark theme

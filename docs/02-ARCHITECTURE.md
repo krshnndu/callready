@@ -1,6 +1,6 @@
 # 02. Architecture
 
-> **As built (2026-10-28):** the deadline forced a smaller stack than the one planned below. The web app is plain ES modules with no build step and no React. The engine runs in the browser. Two Vercel functions proxy to the API and hold its origin and key. The API is one FastAPI endpoint (`/api/coach`) with a SQLite cache, using Gemini 3.8 Flash (high), Claude Sonnet 4.6 and Flash (medium) in that order. The rest of this document is the target design.
+> **As built (v0.5.0, 2026-10-28):** a smaller stack than the target design below. The web app is plain ES modules with no build step. One pack-agnostic engine (`core.js`, `score.js`) runs in the browser on any `callready.pack.v1` pack. Three Vercel functions (`/api/coach`, `/api/extract`, `/api/health`) proxy to the API and hold its origin and key. The API is FastAPI with SQLite: `/api/coach` (Gemini 3.8 Flash high, Claude Sonnet 4.6, Flash medium), `/api/extract` as a background job the browser polls (Flash medium first, because extraction is transcription the rules verify, then Sonnet 4.6, then Flash high), `/health` with telemetry, and 7-day retention. PDFs are read in the browser by pdf.js, so the file itself never leaves the device; only its text is sent for conversion. The API reaches the internet through Tailscale Funnel. The rest of this document is the target design.
 
 ## 1. Principles
 

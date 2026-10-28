@@ -146,15 +146,23 @@ function bindLoad() {
       text = (text + $('#paste').value).replace(/[ \t]+/g, ' ').trim().slice(0, 148000);
       if (text.length < 200) { st.textContent = 'Not enough text. A PDF that is a scanned image has no text to read: paste the text instead.'; return; }
       st.textContent = `Converting ${Math.round(text.length / 1000)}k characters with AI. This takes one to three minutes...`;
-      let r = await fetch(`${API}/extract`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, name: [...files.files].map((f) => f.name).join(', ') || 'pasted text' }) });
-      let j = await r.json();
+      // The network path to the API can be slow or drop a request; retry rather than give up.
+      const body = JSON.stringify({ text, name: [...files.files].map((f) => f.name).join(', ') || 'pasted text' });
+      let j = null;
+      for (let attempt = 0; attempt < 3 && !j?.job && j?.status !== 'done'; attempt++) {
+        try { const r = await fetch(`${API}/extract`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }); j = await r.json(); if (r.status === 429) throw new Error(j.detail || 'rate limit'); } catch (e) { if (String(e.message).includes('limit')) throw e; await new Promise((d) => setTimeout(d, 3000)); }
+      }
+      if (!j || (!j.job && j.status !== 'done')) throw new Error(j?.error || j?.detail || 'could not start');
       const job = j.job, t0 = Date.now();
-      while (r.ok && j.status === 'running') {
+      let misses = 0;
+      while (j.status === 'running') {
+        if (Date.now() - t0 > 420000) throw new Error('took longer than 7 minutes');
         await new Promise((d) => setTimeout(d, 4000));
         st.textContent = `Converting with AI... ${Math.round((Date.now() - t0) / 1000)} s`;
-        r = await fetch(`${API}/extract?job=${job}`); j = await r.json();
+        try { const r = await fetch(`${API}/extract?job=${job}`); const n = await r.json(); if (r.ok) { j = n; misses = 0; } else if (++misses > 8) throw new Error(n.error || n.detail || `status ${r.status}`); }
+        catch (e) { if (++misses > 8) throw e; }
       }
-      if (!r.ok || j.status !== 'done' || !j.pack) throw new Error(j.error || j.detail || `status ${r.status}`);
+      if (j.status !== 'done' || !j.pack) throw new Error(j.error || j.detail || 'failed');
       j.pack.id = `user-${Date.now().toString(36)}`;
       j.pack.provenance = { source: 'upload', extractedBy: j.model, at: new Date().toISOString(), files: [...files.files].map((f) => f.name) };
       set('callready.draft', { pack: j.pack, sourceText: text, model: j.model });
@@ -391,7 +399,7 @@ function viewQuestions() {
   <section class="panel glass">
     <div class="chips" role="group" aria-label="Filter by theme">${themes.map((t) => `<button class="chip" data-theme-f="${esc(t)}" aria-pressed="${t === qFilter}">${esc(t)}</button>`).join('')}</div>
     <ul class="qlist" style="margin-top:var(--s-4)">${list.map((q) => { const pe = personaOf(p, q.persona); return `<li>
-      <div><div class="qmeta"><span class="pill ${diff[q.difficulty]}">${q.difficulty}</span><b style="color:var(--ink-2)">${esc(pe.name)}</b>${pe.firm ? `, ${esc(pe.firm)}` : ''}<span>Owner: ${esc(spk(p, q.owner).split(',')[0])}</span>${(q.cites || []).filter((c) => CTX.sources[c]).map(cite).join('')}</div>
+      <div><div class="qmeta"><span class="pill ${diff[q.difficulty]}">${q.difficulty}</span><span><b style="color:var(--ink-2)">${esc(pe.name)}</b>${pe.firm ? `, ${esc(pe.firm)}` : ''}</span><span>Owner: ${esc(spk(p, q.owner).split(',')[0])}</span>${(q.cites || []).filter((c) => CTX.sources[c]).map(cite).join('')}</div>
       <p class="qtext">${esc(q.text)}</p><p class="trap"><b>Trap:</b> ${esc(q.trap)}</p></div>
       <div><a class="btn ghost" href="#/rehearse/${q.id}">Rehearse ${ICON.arrow}</a></div>
     </li>`; }).join('')}</ul>
@@ -410,7 +418,7 @@ function viewRehearse(qid) {
   <div class="grid-2">
     <section class="panel glass">
       <div class="row"><label class="small muted" for="qpick">Question</label><select id="qpick">${questions.map((x) => `<option value="${x.id}" ${x.id === q.id ? 'selected' : ''}>${x.id} ${esc(x.theme)}: ${esc(x.text.slice(0, 44))}...</option>`).join('')}</select></div>
-      <div class="qmeta" style="margin-top:var(--s-4)"><b style="color:var(--ink-2)">${esc(pe.name)}</b>${pe.firm ? `, ${esc(pe.firm)}` : ''}. ${esc(pe.style || '')}</div>
+      <div class="qmeta" style="margin-top:var(--s-4)"><span><b style="color:var(--ink-2)">${esc(pe.name)}</b>${pe.firm ? `, ${esc(pe.firm)}` : ''}</span>. ${esc(pe.style || '')}</div>
       <p class="question-block">"${esc(q.text)}"</p>
       <div class="row" style="margin-bottom:var(--s-3)">
         <label class="small muted" for="speaker">Answering as</label>
@@ -571,7 +579,7 @@ function viewReport() {
   const risks = P.slice(0, 5).map((x) => { const qs = questions.filter((q) => q.pressure === x.id); const r = qs.length ? Math.max(...qs.map((q) => best[q.id]?.total || 0)) : 0; return { x, readiness: r, risk: x.score * (1 - r / 100), q: qs[0] }; }).sort((a, b) => b.risk - a.risk);
   const sname = (s) => spk(p, s).split(',')[0];
   const hb = (label, sub, avg, tip) => { const b = avg == null ? 'off' : avg >= 75 ? 'green' : avg >= 55 ? 'amber' : 'red'; return `<div class="hbar" tabindex="0" data-tip="${esc(tip)}"><span class="led ${b}"></span><span class="hl">${esc(label)} <span class="tiny">${sub}</span></span><span class="track"><i class="${b}" style="width:${avg ?? 0}%"></i></span><span class="hv">${avg ?? '-'}</span></div>`; };
-  return shell('#/report', `${head(`Readiness report: ${esc(p.company.short || p.company.name)} ${esc(p.company.quarter)}`, `${att.length ? `${att.length} rehearsed answers from this browser.` : 'No answers rehearsed yet in this browser.'} A theme counts as not ready until it has been rehearsed.`)}
+  return shell('#/report', `${head(`Readiness report: ${esc(p.company.short || p.company.name)} ${esc(p.company.quarter)}`, `${att.length ? `${att.length} rehearsed answer${att.length === 1 ? '' : 's'} from this browser.` : 'No answers rehearsed yet in this browser.'} A theme counts as not ready until it has been rehearsed.`)}
   <div class="row no-print">
     ${isSample(p) ? '<button class="btn ghost" id="demo">Load demo rehearsal</button>' : ''}
     <button class="btn ghost" id="clear">Clear answers</button><span class="spacer"></span>

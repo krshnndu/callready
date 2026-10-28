@@ -395,6 +395,10 @@ details.assume ul { margin: var(--s-3) 0 0; padding-left: 1.2em; color: var(--in
   table { font-size: 0.8rem; }
   td, th { padding: 8px 5px; }
   .brand small { display: none; }
+  /* SVG text scales with the chart; give it more user units so it stays readable on a phone */
+  .chart .lab { font-size: 19px; }
+  .chart .lab.strong { font-size: 20px; }
+  .chart .val { font-size: 21px; }
 }
 @media print {
   body::before { display: none; }

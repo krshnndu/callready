@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest a screen, a rule, a dataset or a check
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What an investor-relations or finance team cannot do today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: If it changes how a score or status is computed, say what evidence would show it is better.
