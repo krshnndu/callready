@@ -8,7 +8,8 @@
 // One series per chart, so no categorical palette: the accent carries data, and status colours carry
 // state beside a text label. Every mark has a hover and focus tooltip (data-tip) and an aria-label.
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const fmt = (v, d = 0) => Number(v).toLocaleString('en-IN', { maximumFractionDigits: d, minimumFractionDigits: d });
+// Numbers as people read them: Indian grouping, a true minus sign (U+2212, not a hyphen), and no "-0".
+const fmt = (v, d = 0) => { const n = Number(Number(v).toFixed(d)) || 0; return n.toLocaleString('en-IN', { maximumFractionDigits: d, minimumFractionDigits: d }).replace('-', '\u2212'); };
 const LAB = 11, VAL = 12;
 
 // Text is measured with the real font where a canvas exists (the browser), with a 6% safety margin;
@@ -38,6 +39,7 @@ export function fit(s, maxW, fs = LAB, maxLines = 2) {
   }
   return out;
 }
+export const MIN_STEP_PX = 2; // a waterfall step thinner than this from zero is the only reason to cut an axis
 const LH = 14; // line height for 11 px labels: the glyph box is about 13.5 px tall
 
 // Honesty by construction. Every chart maps values to pixels through scale(), and only through it, and
@@ -168,7 +170,10 @@ export function waterfall({ start, steps, end, title, unit = '%', decimals = 1, 
   const ends = cols.flatMap((c) => (c.kind === 'total' ? [c.to] : [c.from, c.to]));
   const hi = Math.max(0, ...ends), stepEnds = cols.filter((c) => c.kind !== 'total').flatMap((c) => [c.from, c.to]);
   let lo = Math.min(0, ...ends);
-  if (lo === 0) { const sl = Math.min(...stepEnds, ...cols.filter((c) => c.kind === 'total').map((c) => c.to)); lo = Math.max(0, Math.floor(sl - (hi - sl) * 0.6)); }
+  // Bars start at zero. The axis is cut only when the smallest step would be thinner than MIN_STEP_PX
+  // drawn from zero, because a cut makes the totals look further apart than they are.
+  const smallest = Math.min(...cols.filter((c) => c.kind !== 'total' && c.delta).map((c) => Math.abs(c.delta)));
+  if (lo === 0 && hi > 0 && (smallest / hi) * (h - top - bottom) < MIN_STEP_PX) { const sl = Math.min(...stepEnds, ...cols.filter((c) => c.kind === 'total').map((c) => c.to)); lo = Math.max(0, Math.floor(sl - (hi - sl) * 0.6)); }
   const s = scale(lo, hi, h - bottom, top), cut = { any: false };
   const base = s(Math.max(s.lo, Math.min(s.hi, 0)));
   const marks = cols.map((c, i) => { const w = Math.min(bw * 0.64, 56), x = padL + i * bw + (bw - w) / 2; const yTop = Math.min(s(Math.max(s.lo, c.from)), s(c.to)), yBot = Math.max(s(Math.max(s.lo, c.from)), s(c.to));

@@ -117,8 +117,15 @@ console.log('--- Charts are drawn honestly');
   const ln = ch.line({ W: 560, points: [{ label: 'Q1', value: 14.0 }, { label: 'Q2', value: 11.6, now: true }], title: 'm', band: { low: 13.5, high: 14.5 } });
   const tickLabels = [...ln.matchAll(/class="lab tick"[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]);
   ok(tickLabels.length >= 3 && tickLabels.every((x) => x.endsWith('%')), `line chart ticks carry their unit (${tickLabels.join(', ')})`);
-  const wf = ch.waterfall({ W: 560, start: { label: 'Year ago', value: 14.2 }, steps: [{ label: 'a', delta: -1.8 }, { label: 'b', delta: -0.9 }, { label: 'c', delta: 0.1 }], end: { label: 'Now', value: 11.6 }, title: 'w' });
-  ok(/axis-break/.test(wf) && /Axis starts at \d+(\.\d)?%/.test(wf), 'a waterfall whose axis does not start at zero marks the break and says where it starts');
+  // The sample's own bridge: every step is visible from zero (the smallest, 28 bps, is about 3 px), so the
+  // axis must start at zero and the totals keep their true proportion (11.6 is 82% of 14.2, not half).
+  const wf = ch.waterfall({ W: 560, start: { label: 'Year ago', value: 14.2 }, steps: [{ label: 'a', delta: -1.8 }, { label: 'b', delta: -0.9 }, { label: 'c', delta: -0.28 }, { label: 'd', delta: 0.4 }], end: { label: 'Now', value: 11.62 }, title: 'w' });
+  ok(/data-lo="0"/.test(wf) && !/axis-break|Axis starts at/.test(wf), 'a waterfall starts at zero when every step is visible from zero (no needless cut)');
+  // A step too thin to see from zero (5 bps on a 40% margin) is the only reason to cut, and the cut is marked and said.
+  const wf2 = ch.waterfall({ W: 560, start: { label: 'Year ago', value: 40 }, steps: [{ label: 'a', delta: -0.05 }, { label: 'b', delta: 0.03 }], end: { label: 'Now', value: 39.98 }, title: 'w2' });
+  ok(/axis-break/.test(wf2) && /Axis starts at \d+(\.\d)?%/.test(wf2), 'a waterfall cuts its axis only when a step would vanish, and then marks and says it');
+  // Negative numbers use a true minus sign (U+2212), never a hyphen.
+  ok(/\u2212180/.test(wf) && !/>-\d/.test(wf + ch.diverging({ W: 560, rows: [{ label: 'x', value: -330 }], title: 'd' })), 'chart labels write negatives with a true minus sign');
 }
 
 console.log('--- Recommendations carry evidence');
