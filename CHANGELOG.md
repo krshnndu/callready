@@ -4,6 +4,10 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-10-28
+
+A first-open welcome card, the final demo video link, and the product-demo pitch script.
+
 ### Added
 - A welcome card on the first open of the app, with buttons for the demo video and the source on GitHub. It is not a modal, so it never blocks the app; it shows once per browser (marked seen as soon as it appears), closes with the button, a link click or Escape, and is hidden when printing. The content gate tests it on a phone and a laptop: both links present and opening in a new tab, fully inside the screen, shown once, and dismissable.
 
@@ -151,7 +155,8 @@ First working prototype.
 - Planning package: PRD, architecture, synthetic data, scoring design, roadmap, decisions and risks, and the 90-second pitch.
 - Agent rules, ops templates and the MIT license.
 
-[Unreleased]: https://github.com/krshnndu/callready/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/krshnndu/callready/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/krshnndu/callready/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/krshnndu/callready/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/krshnndu/callready/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/krshnndu/callready/compare/v0.3.0...v0.4.0
