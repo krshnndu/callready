@@ -5,6 +5,7 @@ the improved answer and the analyst follow-up, from the same facts the UI shows
 (data/pack.json). Responses are cached; daily and per-client caps bound the spend.
 """
 
+import asyncio
 import hashlib
 import json
 import os
@@ -45,6 +46,7 @@ def db() -> sqlite3.Connection:
     con.execute("CREATE TABLE IF NOT EXISTS usage (day TEXT PRIMARY KEY, n INTEGER)")
     # One row per coach request: which model answered (or 'cache'/'none'), how long it took.
     con.execute("CREATE TABLE IF NOT EXISTS calls (at REAL, model TEXT, ok INTEGER, ms INTEGER, fallback INTEGER)")
+    con.execute("CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, at REAL, status TEXT, result TEXT)")
     return con
 
 
@@ -54,6 +56,7 @@ def purge() -> None:
     with db() as con:
         con.execute("DELETE FROM cache WHERE at < ?", (cutoff,))
         con.execute("DELETE FROM calls WHERE at < ?", (cutoff,))
+        con.execute("DELETE FROM jobs WHERE at < ?", (cutoff,))
 
 
 def record(model: str, ok: bool, started: float, fallback: bool = False) -> None:
@@ -251,7 +254,8 @@ async def coach(body: CoachIn, request: Request, x_callready_key: str = Header(d
 
 
 # ---------- extraction: a results document's text -> callready.pack.v1 ----------
-EXTRACT_MODELS = [m for m in os.environ.get("EXTRACT_CHAIN", "ag/gemini-3.8-flash-high,ag/claude-sonnet-4-6,ag/gemini-3.8-flash-medium").split(",") if m]
+# Extraction is transcription that the rules then verify, so it starts on the medium tier.
+EXTRACT_MODELS = [m for m in os.environ.get("EXTRACT_CHAIN", "ag/gemini-3.8-flash-medium,ag/claude-sonnet-4-6,ag/gemini-3.8-flash-high").split(",") if m]
 EXTRACT_PROMPT_VERSION = "extract-v1"
 EXTRACT_SCHEMA = """{
   "schema": "callready.pack.v1",
@@ -294,21 +298,11 @@ def extract_messages(body: ExtractIn) -> list[dict]:
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
 
-@app.post("/api/extract")
-async def extract(body: ExtractIn, request: Request, x_callready_key: str = Header(default=""), x_client_ip: str = Header(default="")) -> dict:
-    if BACKEND_KEY and x_callready_key != BACKEND_KEY:
-        raise HTTPException(401, "unauthorised")
-    started = time.time()
-    purge()
-    messages = extract_messages(body)
-    key = hashlib.sha256(json.dumps([EXTRACT_PROMPT_VERSION, EXTRACT_MODELS, messages]).encode()).hexdigest()
-    with db() as con:
-        row = con.execute("SELECT v FROM cache WHERE k=?", (key,)).fetchone()
-    if row:
-        record("cache", True, started)
-        return {**json.loads(row[0]), "cached": True}
-    check_caps(x_client_ip or (request.client.host if request.client else "unknown"))
-    deadline = time.time() + 240
+_jobs_running: set = set()
+
+
+async def run_extract(job: str, key: str, messages: list[dict], started: float) -> None:
+    deadline = time.time() + 300
     last = "no model configured"
     async with httpx.AsyncClient() as client:
         for model in EXTRACT_MODELS:
@@ -320,7 +314,7 @@ async def extract(body: ExtractIn, request: Request, x_callready_key: str = Head
                     f"{LLM_BASE_URL}/chat/completions",
                     headers={"Authorization": f"Bearer {LLM_API_KEY}"},
                     json={"model": model, "messages": messages, "temperature": 0, "max_tokens": 12000, "stream": False},
-                    timeout=min(120, left),
+                    timeout=min(110, left),
                 )
                 count_call()
                 if r.status_code != 200:
@@ -333,12 +327,50 @@ async def extract(body: ExtractIn, request: Request, x_callready_key: str = Head
                     last = f"{model}: not a pack"
                     continue
                 pack["schema"] = "callready.pack.v1"
-                res = {"pack": pack, "model": model.split("/")[-1]}
+                res = {"pack": pack, "model": model.split("/")[-1], "seconds": round(time.time() - started)}
                 with db() as con:
                     con.execute("INSERT OR REPLACE INTO cache VALUES(?,?,?)", (key, json.dumps(res), time.time()))
+                    con.execute("UPDATE jobs SET status='done', result=? WHERE id=?", (json.dumps(res), job))
                 record(model.split("/")[-1], True, started, fallback=model != EXTRACT_MODELS[0])
-                return {**res, "cached": False}
+                return
             except (httpx.HTTPError, ValueError, KeyError, json.JSONDecodeError) as e:
                 last = f"{model}: {type(e).__name__}"
     record("none", False, started)
-    raise HTTPException(503, f"extraction unavailable ({last})")
+    with db() as con:
+        con.execute("UPDATE jobs SET status='failed', result=? WHERE id=?", (json.dumps({"error": f"extraction unavailable ({last})"}), job))
+
+
+@app.post("/api/extract")
+async def extract(body: ExtractIn, request: Request, x_callready_key: str = Header(default=""), x_client_ip: str = Header(default="")) -> dict:
+    """Starts an extraction job and returns at once; the client polls GET /api/extract/{job}."""
+    if BACKEND_KEY and x_callready_key != BACKEND_KEY:
+        raise HTTPException(401, "unauthorised")
+    started = time.time()
+    purge()
+    messages = extract_messages(body)
+    key = hashlib.sha256(json.dumps([EXTRACT_PROMPT_VERSION, EXTRACT_MODELS, messages]).encode()).hexdigest()
+    with db() as con:
+        row = con.execute("SELECT v FROM cache WHERE k=?", (key,)).fetchone()
+    if row:
+        record("cache", True, started)
+        return {"status": "done", **json.loads(row[0]), "cached": True}
+    check_caps(x_client_ip or (request.client.host if request.client else "unknown"))
+    job = hashlib.sha256(f"{key}{time.time()}".encode()).hexdigest()[:16]
+    with db() as con:
+        con.execute("INSERT INTO jobs VALUES (?,?,?,?)", (job, time.time(), "running", None))
+    task = asyncio.create_task(run_extract(job, key, messages, started))
+    _jobs_running.add(task)
+    task.add_done_callback(_jobs_running.discard)
+    return {"status": "running", "job": job}
+
+
+@app.get("/api/extract/{job}")
+def extract_status(job: str, x_callready_key: str = Header(default="")) -> dict:
+    if BACKEND_KEY and x_callready_key != BACKEND_KEY:
+        raise HTTPException(401, "unauthorised")
+    with db() as con:
+        row = con.execute("SELECT status, result, at FROM jobs WHERE id=?", (job[:16],)).fetchone()
+    if not row:
+        raise HTTPException(404, "unknown job")
+    status, result, at = row
+    return {"status": status, "elapsed": round(time.time() - at), **(json.loads(result) if result else {})}
