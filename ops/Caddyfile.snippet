@@ -1,0 +1,19 @@
+# Site block for the API on a Caddy reverse proxy. Add as a NEW block; do not edit
+# other sites. Validate before reloading:  caddy validate --config <Caddyfile>
+<backend-host> {
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options "nosniff"
+        -Server
+    }
+    request_body {
+        max_size 64KB
+    }
+    @allowed path /api/* /health
+    handle @allowed {
+        reverse_proxy 127.0.0.1:<api-port>
+    }
+    handle {
+        respond 404
+    }
+}

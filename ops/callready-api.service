@@ -1,0 +1,17 @@
+# systemd USER unit for the API. Install to ~/.config/systemd/user/ on the host.
+# Placeholders: <repo> is the clone path, <env-file> the 0600 env file outside the repo.
+[Unit]
+Description=CallReady API
+After=network-online.target
+
+[Service]
+WorkingDirectory=<repo>/api
+EnvironmentFile=<env-file>
+ExecStart=<repo>/api/.venv/bin/uvicorn callready.main:app --host 127.0.0.1 --port ${API_PORT} --workers 1 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=on-failure
+RestartSec=5
+MemoryMax=512M
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=default.target
