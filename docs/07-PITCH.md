@@ -1,17 +1,43 @@
-# 07. Pitch (90 seconds)
+# 07. Pitch and recording script (90 seconds)
 
-Required by the brief: the problem, a demo of the prototype, its business value, and one key limitation. One person talks while another clicks. Before going on, open https://callreadyai.vercel.app on the Quarter screen. On the Report screen, press **Clear answers** so the demo starts clean.
+The brief asks for four things in 1.5 minutes: the problem, a demo of the prototype, its business value, and one key limitation. This is a shot-by-shot script for recording the demo video, or for presenting it live with one person speaking and one clicking.
 
-| Time | Beat | Click | Say |
+## Before you record (5 minutes)
+
+1. **Browser.** Chrome, a fresh window, zoom 100%, about 1440 x 900. Hide the bookmarks bar. Close other tabs, so no notifications arrive mid-take.
+2. **Open** https://callreadyai.vercel.app/#/load and click **Use** on *Meridian Arc Industries*, so the sample is the active company.
+3. **Theme.** In the rail, choose **Light**. It reads best on a projector or in a compressed video.
+4. **Clean slate.** Open step 5, **Readiness report**, and press **Clear answers**.
+5. **Warm the coach**, so it answers in about a second instead of 30 to 50: go to step 4, **Rehearse** (Q01 opens), press **Load a weak sample**, then **Score my answer**. Wait for the coach panel to fill. Then reload the page. Optionally, do the same for Q03.
+6. **Check** that https://callreadyai.vercel.app/api/health shows `"api":{"ok":true`. If it does not, the AI coach is offline, and the app falls back to the vetted reference answer. That is fine on camera; say "the coach's reference answer".
+7. Start on the **Quarter** screen (step 1), scrolled to the top.
+
+## The script
+
+Timings are cumulative. Words in quotes are spoken; **bold** is what to click.
+
+| Time | Beat | Do this | Say this |
 | --- | --- | --- | --- |
-| 0:00 to 0:10 | Problem | Quarter screen (already open) | "Revenue is up 14%, but margins fell 258 basis points and cash conversion halved. Tomorrow analysts will ask why, and they will quote last quarter's promises back to the CFO. Those are the two red lights in the last column." |
-| 0:10 to 0:18 | Any company | Step 0, Load a company: the test datasets table | "It works on any company. Upload the results PDF: AI converts it, and rules check every figure against the document. On our test it matched 48 of 48 fields. Here are six real companies from this quarter's NSE filings." |
-| 0:18 to 0:30 | Pressure map | Step 2 (back on the sample) | "Plain arithmetic ranks what investors will push on. Two promises are already broken, and to hit guidance, H2 needs 15.3% margin: this company has never done better than 14.2%." |
-| 0:30 to 0:55 | Rehearse | Step 4 (Q01 opens), **Load a weak sample**, **Score my answer** | "The CFO practises the guidance question. The answer quotes 12.4%, which is not in the results, ignores the August promise, and gives new guidance on the fly. Red. Below it, the coach writes a stronger answer, with every number checked against the disclosures." |
-| 0:55 to 1:12 | Recommendation | Step 5, **Load demo rehearsal** | "The finance team gets a readiness report: weak themes, a contradiction between CEO and CFO on guidance, and the decision to take before the call: revise the margin band rather than defend it." |
-| 1:12 to 1:22 | Value | Same screen | "On our stated assumptions, that is about 50 hours of preparation a quarter, worth around 1.6 lakh rupees, for under 3,000 rupees of running cost. And every spokesperson tells the same story, with disclosure risks caught before anyone says them aloud." |
-| 1:22 to 1:30 | Limitation | Same screen | "One limitation: it only anticipates questions grounded in the disclosures. It will not foresee a question driven by tomorrow's news." |
+| 0:00 to 0:10 | **Problem** | Quarter screen, still. Let the eye rest on the red Change column and the "Promise on record" LEDs | "Revenue is up 14%, but margins fell 258 basis points and cash conversion halved. Tomorrow analysts will ask why, and they will quote last quarter's promises back to the CFO." |
+| 0:10 to 0:18 | **Any company** | Click **0 Load a company**. Point the cursor at the "Verified by rules" column of the test datasets | "It works on any company. Upload the results PDF: AI converts it, and rules check every figure against the document. On our test it matched 48 of 48 fields. These are six real companies from this quarter's NSE filings." |
+| 0:18 to 0:30 | **Pressure map** | Click **2 Pressure map**. Hover the red 15.3% marker on the gauge, then scroll slowly to the first two ranked items | "Plain arithmetic ranks what investors will push on. Two promises are already broken, and to hit guidance, the second half needs a 15.3% margin. This company has never done better than 14.2%." |
+| 0:30 to 0:55 | **Rehearse** | Click **4 Rehearse** (Q01 opens). Click **Load a weak sample**, then **Score my answer**. Scroll the right panel to the red marks, then to the coach's answer | "The CFO practises the guidance question. This answer quotes 12.4%, which is not in the results. It ignores the August promise, and 'definitely' is new guidance given on the fly. Red. The coach writes a stronger answer, and every figure in it is checked against the disclosures before it is shown." |
+| 0:55 to 1:12 | **Recommendation** | Click **5 Readiness report**, then **Load demo rehearsal**. Hover the first recommendation, then the speaker contradiction box | "The finance team gets a readiness report: weak themes, a contradiction between the CEO and the CFO on guidance, and the call to make before the call: revise the margin band rather than defend it." |
+| 1:12 to 1:22 | **Value** | Scroll to **Business case** | "On our stated assumptions, that is about 50 hours of preparation a quarter, worth around 1.6 lakh rupees, for under 3,000 rupees of running cost. And every spokesperson tells the same story." |
+| 1:22 to 1:30 | **Limitation** | Stay on the screen | "One limitation: it anticipates questions grounded in the disclosures. It will not foresee a question driven by tomorrow's news." |
 
-Backup: if the live coach is slow (it can take 30 seconds), keep talking. The scorecard is instant, and the reference answer appears if the coach does not answer in time. Score the weak Q01 sample once before the pitch, so the coach's answer is cached and comes back instantly.
+## If something goes wrong on camera
 
-The business-case figures come from the editable assumptions on the Report screen; say "on our stated assumptions" every time.
+- **The coach is slow.** Keep talking: the scorecard is instant because it is rules in the browser. If the coach has not answered in time, the reference answer appears instead.
+- **The coach is offline.** Say "the coach's reference answer", not "the AI's answer".
+- **Wrong company on screen.** Click the company card in the rail, **Change company**, then **Use** on Meridian Arc.
+
+## Optional 20-second alternate beat: a real company
+
+If time allows, or for Q&A after the pitch: Load a company, **Use** on *JK Tyre*. Then open **Quarter**: "Revenue up 20%, margin down 624 basis points, profit down 73%." Then **Pressure map**: the two items rank themselves. Then **Question bank**: the questions are generated by rules from the company's own filing.
+
+## Assumptions to say aloud if asked
+
+- The sample company is synthetic. The six test companies are real public filings.
+- "50 hours" and "1.6 lakh rupees" come from the editable assumptions on the Report screen. Say "on our stated assumptions".
+- Scores rank answers against a rubric. They do not predict the share price.
