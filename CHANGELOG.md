@@ -4,6 +4,10 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Added
+- `docs/11-HANDOFF.md` and `GEMINI.md`: continue the project with any agent (state, gates, workflow, backlog). Host details and test data sit in the build server's gitignored `private/`.
+- Robustness, test-first (`docs/10-EDGE-CASES.md`, `docs/superpowers/plans/2026-10-28-robustness.md`). Rule-based extraction (`extract.js`) runs first, and AI only when needed. A strict evidence policy applies. A fuzz test (10,000 packs) and units and consistency rules were added. The coach is now on demand. Recommendations carry their evidence. `scripts/journey.mjs` drives the live site with unseen filings: Havells and CEAT each 6 of 6 against hand-checked truth.
+
 ### Security
 - Guardrails in four layers, planned and built test-first with the superpowers methodology (`docs/superpowers/plans/2026-10-28-guardrails.md`). Layer 1: `sanitizePack` on every load path (types, length and list caps, http(s)-only links). Layer 2: financial sanity rules (revenue above zero, profit not above revenue, margins within -100 to 100, units warnings). Layer 3: every chart attribute escaped; the new XSS gate found and fixed unescaped chart labels. Layer 4: Content-Security-Policy, HSTS and COOP; on the live site the CSP blocks an injected inline handler.
 - Upload limits (5 files, 20 MB each, PDF or text, 2 MB packs), proxy body caps (64 KB coach, 200 KB extract), and model output capped at 1500 characters per field.

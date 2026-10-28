@@ -1,5 +1,7 @@
 # Rules for working in this repo
 
+**Continuing this project?** Start with `docs/11-HANDOFF.md`: current state, the gates to run, the workflow and the backlog.
+
 Apply to every contributor: people, Claude Code, the Hermes agent and its subagents.
 
 ## This repo is public
@@ -14,7 +16,9 @@ Apply to every contributor: people, Claude Code, the Hermes agent and its subage
 - Every figure shown to a user cites the pack (file plus row or line id). An uncited figure is a defect.
 - Model output is parsed against a pydantic schema. Pack text goes into prompts as quoted data, never as instructions.
 - Prompts are versioned files. Changing the judge prompt reruns the calibration set (`docs/04-SCORING.md` section 4).
-- Fact-bearing text (transcripts, notes, improved answers, recommendations) is written by the strong model, never the fast one, and checked by `scripts/validate_pack.py` or the number checker.
+- Fact-bearing text (transcripts, notes, improved answers, recommendations) is written by the strong model, never the fast one, and checked by the number checker.
+- No hallucinations: a figure is used only if it is found in the source document, derived by arithmetic from found figures, or confirmed by a person (`applyEvidencePolicy`). A misaligned table row yields no figure, never a guessed one.
+- Rules before AI: extend `web/js/extract.js` and the engine before adding an AI call.
 
 ## Engineering
 

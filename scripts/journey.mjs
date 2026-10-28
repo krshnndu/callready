@@ -21,12 +21,14 @@ let target;
 for (let i = 0; i < 60 && !target; i++) { await sleep(250); try { target = (await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json()).find((t) => t.type === 'page'); } catch { /* not up */ } }
 const ws = new WebSocket(target.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener('open', r, { once: true }));
-let id = 0; const pending = new Map(); const errors = [];
+let id = 0; const pending = new Map(); const errors = [], aiDown = [];
 ws.addEventListener('message', (ev) => {
   const m = JSON.parse(ev.data);
   if (m.id && pending.has(m.id)) { pending.get(m.id)(m.result); pending.delete(m.id); }
   if (m.method === 'Runtime.exceptionThrown') errors.push(m.params.exceptionDetails?.exception?.description?.split('\n')[0] || m.params.exceptionDetails?.text);
-  if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error' && !/favicon|net::ERR_ABORTED/.test(m.params.entry.text)) errors.push(m.params.entry.text.slice(0, 160));
+  // A 5xx from the AI endpoints is the AI being unavailable, which the app handles (rules fallback); it is
+  // reported, not counted as a page error. Anything else logged as an error fails the journey.
+  if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error' && !/favicon|net::ERR_ABORTED/.test(m.params.entry.text)) { if (/status of 5\d\d/.test(m.params.entry.text) && /\/api\/(extract|coach)/.test(m.params.entry.url || '')) aiDown.push(m.params.entry.url.split('/api/')[1]); else errors.push(m.params.entry.text.slice(0, 160)); }
 });
 const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
 const js = async (expression) => (await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true })).result?.value;
@@ -39,7 +41,7 @@ const check = (cond, msg) => { console.log(`${cond ? 'PASS' : 'FAIL'}  ${msg}`);
 const runs = man.map((m, i) => ({ m, ai: i === man.length - 1 }));
 for (const { m, ai } of runs) {
   console.log(`\n=== ${m.company} (${ai ? 'rules + AI' : 'rules only'})`);
-  errors.length = 0;
+  errors.length = 0; aiDown.length = 0;
   await send('Page.navigate', { url: `${BASE}/#/load` }); await sleep(2500);
   await js(`localStorage.clear(); location.reload()`); await sleep(2500);
   const doc = await send('DOM.getDocument', { depth: -1 });
@@ -78,6 +80,7 @@ for (const { m, ai } of runs) {
   const score = await js(`(location.hash = '#/rehearse', new Promise((r) => setTimeout(() => r(document.querySelector('.total .v')?.textContent), 1200)))`);
   const pressure = await js(`(location.hash = '#/pressure', new Promise((r) => setTimeout(() => r([...document.querySelectorAll('.plist h3')].map((h) => h.textContent.trim()).slice(0, 4)), 1200)))`);
   check(errors.length === 0, `no page errors${errors.length ? `: ${[...new Set(errors)].slice(0, 3).join(' | ')}` : ''}`);
+  if (aiDown.length) console.log(`INFO  AI unavailable during this run (${[...new Set(aiDown)].join(', ')}); the app fell back to rules as designed`);
   rows.push({ company: m.company, mode: ai ? 'rules + AI' : 'rules only', secs, figures: `${ver.numbersFound}/${ver.numbersTotal}`, truth: `${acc}/${pairs.length}`, headline: screens['#/'].h1, pressure: pressure.join(' / '), quarter: pack.company.quarter });
 }
 ws.close(); chrome.kill();
