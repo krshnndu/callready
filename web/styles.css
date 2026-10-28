@@ -242,7 +242,9 @@ textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-col
 /* ---------- rehearse ---------- */
 .question-block { font: 500 1.1rem/1.5 var(--font-display); margin: var(--s-3) 0 var(--s-4); }
 .timer { font: 600 1.25rem/1 var(--font-ui); font-variant-numeric: tabular-nums; padding: 8px 14px; border-radius: var(--r-pill); background: var(--sunk); }
-.timer.low { background: var(--bad-tint); color: var(--bad); }
+.timer { font-size: var(--fs-meta) !important; font-weight: 500 !important; }
+.timer.ok { background: var(--ok-tint); color: var(--ok); }
+.timer.low { background: var(--warn-tint); color: var(--warn); }
 select { font: 500 var(--fs-meta) var(--font-ui); color: var(--ink); background: var(--glass-solid); border: 1px solid var(--line-strong); border-radius: var(--r-pill); padding: 8px 12px; }
 .total { display: flex; align-items: baseline; gap: var(--s-3); }
 .total .v { font: 600 3.25rem/1 var(--font-display); font-variant-numeric: tabular-nums; }

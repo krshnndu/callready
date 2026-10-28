@@ -4,6 +4,12 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Fixed
+- A non-answer ("hello, I am doing well") scored 56, because disclosure safety, consistency and accuracy gave free points when nothing was said. A relevance gate now runs first: an answer must use the question's key terms or substantive words, or give a figure on topic. Otherwise five dimensions are not assessed and the total is capped at 15 (Red, flagged as not an answer). Tests first: small talk, a polite refusal, a long off-topic answer and filler now score 6 to 9.
+
+### Changed
+- The 60-second countdown is replaced by a live word count and the speaking time it implies. The clock had no consequence; length is what the Delivery score measures.
+
 ### Added
 - Annual statements (FY25 vs FY24, or year-end dates such as "31 March 2025") are read by the rules. Found when a user uploaded Reliance Retail's annual financial statements.
 - EBITDA is derived by arithmetic (PBT + finance costs + D&A - other income) when a document does not print it. The derivation is recorded and shown; its inputs are verified against the document, the result is not. When EBITDA can be neither found nor derived, the error names the figures needed. Extraction prompt `extract-v3` asks for those inputs.

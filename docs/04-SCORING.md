@@ -27,6 +27,8 @@ Ranking for the sample pack, as built: margin guidance (1.80), cash conversion a
 
 Seven dimensions, 0 to 100 overall. Deterministic checks run first and can cap a dimension; the LLM judge scores the rest with quoted evidence.
 
+**Relevance gate (first).** An answer must engage with the question: one of its key terms, two of its substantive words, or a figure on its topic. Otherwise accuracy, consistency, explanation, forward clarity and disclosure safety are not assessed (scored 0), the total is capped at 15, and the answer is flagged as not an answer. Without the gate, saying nothing scored about 40 from the safety and consistency dimensions alone.
+
 | Dimension | Weight | Deterministic part | LLM judge part |
 | --- | --- | --- | --- |
 | **Accuracy** | 25 | Extract every figure (numbers, %, bps, crore, x). Match each to a pack fact within rounding. One unmatched or wrong figure caps the dimension at 40; a wrong figure on the question's own metric caps it at 20 | Are the matched figures used correctly (right period, right base)? |

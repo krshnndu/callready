@@ -59,6 +59,8 @@ const ACTION = /(we will|we are|our priority|we plan|we have started|we'll|from 
 // business usage). Added after scripts/check_bias.mjs found Indian-English phrasing scored 13 to 23 points lower.
 export const OWN_PAST = ['last call', 'previous call', 'earlier call', 'as informed', 'as communicated', 'as indicated', 'as mentioned', 'had mentioned', 'had said', 'had expected', 'had committed', 'had stated', 'we committed', 'we had guided', 'take your point', 'not a satisfactory', 'has not happened', 'have not happened', 'did not materialise', 'did not materialize'];
 
+const STOPWORDS = new Set(('this that with from have been were will would could should what when where which while about above after again also because before being below between both does doing done down during each even every further here into just more most much must only other over same some such than their them then there these they those through under until very well your yours thank thanks question questions really think going know like make made many good great said says still quite thing things look looking time times today week year years able want need sure fine okay right let\'s whatever basically actually honest point comment').split(' '));
+
 export function scoreAnswer(ctx, q, text, { durationS } = {}) {
   const FACTS = ctx.facts, commitments = ctx.commitments;
   const words = text.trim().split(/\s+/).filter(Boolean);
@@ -131,8 +133,22 @@ export function scoreAnswer(ctx, q, text, { durationS } = {}) {
   if (hedges.length) flags.push({ kind: 'amber', dim: 'Delivery', text: hedges.join(', '), why: 'Filler and hedges weaken authority on a call.' });
   dims.delivery = { score: del, why: `${wc} words (target 60 to 130)${hedges.length ? `, ${hedges.length} hedges` : ''}${wpm ? `, ${wpm} wpm` : ''}` };
 
+  // Relevance gate: an answer must engage with the question before the other dimensions earn points.
+  // Without it, saying nothing scores well on safety (nothing risky said) and consistency (nothing broken).
+  const contentWords = (x) => new Set((x.toLowerCase().match(/[a-z][a-z-]{3,}/g) || []).filter((w) => !STOPWORDS.has(w)));
+  const qWords = contentWords(`${q.text} ${(q.terms || []).join(' ')}`);
+  const aWords = contentWords(text);
+  const stem = (w) => w.slice(0, 5);
+  const qStems = new Set([...qWords].filter((w) => w.length >= 5).map(stem));
+  const overlap = [...aWords].filter((w) => qWords.has(w) || (w.length >= 5 && qStems.has(stem(w)))).length;
+  const termHit = (q.terms || []).some((w) => t.includes(w.toLowerCase()));
+  const substantive = termHit || overlap >= 2 || (figs.length > 0 && overlap >= 1);
+  if (!substantive) {
+    for (const k of ['accuracy', 'consistency', 'explanation', 'forward', 'safety']) dims[k] = { score: 0, why: 'Not assessed: the answer does not engage with the question' };
+    flags.unshift({ kind: 'red', dim: 'Relevance', text: text.slice(0, 60), why: 'Not an answer: it uses none of the question’s key terms and gives no figure on its topic. Answer what was asked.' });
+  }
   const W = { accuracy: 25, consistency: 20, directness: 15, explanation: 15, forward: 10, safety: 10, delivery: 5 };
-  const total = Math.round(Object.entries(W).reduce((s, [k, w]) => s + dims[k].score * w, 0) / 100);
+  const total = Math.min(substantive ? 100 : 15, Math.round(Object.entries(W).reduce((s, [k, w]) => s + dims[k].score * w, 0) / 100));
   const red = flags.some((f) => f.kind === 'red' && f.dim === 'Disclosure');
   const band = red || total < 55 ? 'red' : total < 75 ? 'amber' : 'green';
   return { total, band, dims, flags, figures: figs, words: wc, wpm, weights: W };

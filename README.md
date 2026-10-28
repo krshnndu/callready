@@ -26,7 +26,7 @@ Every screen: [docs/screenshots/](docs/screenshots/). A captioned backup video o
 | 1 | **Quarter** | Results against last year, consensus and the company's own earlier words; revenue and margin trends; segment margin change; margin bridge | Rules |
 | 2 | **Pressure map** | What investors will push on, ranked. Includes the margin needed for the rest of the year to meet guidance, and a gap check on the prepared remarks | Rules |
 | 3 | **Question bank** | Analyst questions by theme and persona, each with its trap and its source | Rules (templates) or hand-written |
-| 4 | **Rehearse** | Type or speak against a 60-second timer. A seven-dimension scorecard, every figure checked, risky phrases marked. The coach adds a critique, a stronger answer and the analyst's follow-up | Rules score; **AI coaches**, and rules re-check the coach |
+| 4 | **Rehearse** | Type or speak, with a live word count and the speaking time it implies. A seven-dimension scorecard, every figure checked, risky phrases marked. The coach adds a critique, a stronger answer and the analyst's follow-up | Rules score; **AI coaches**, and rules re-check the coach |
 | 5 | **Readiness report** | Readiness by theme and speaker, the riskiest questions, contradictions between speakers, recommendations, and an editable business case | Rules |
 
 **The design rule is that a model never computes a figure.** Arithmetic, ranking, commitment status and scoring are plain code (`web/js/core.js`, `web/js/score.js`). AI does two things only: it turns documents into the pack format and it writes coaching. Its output is checked by the same rules before anyone sees it.

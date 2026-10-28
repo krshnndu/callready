@@ -59,6 +59,23 @@ ok(planted.flags.some((f) => f.dim === 'Accuracy' && f.text.includes('12.6')), '
 const fwd = scoreAnswer(q1, q1.model + ' We expect H2 margin to be 13.1%.');
 ok(fwd.band === 'red' && fwd.flags.some((f) => f.dim === 'Disclosure'), 'planted forward number (13.1% in H2) forces Red');
 
+console.log('--- Non-answers score Red (relevance gate)');
+{
+  const q = questions[0];
+  const non = {
+    'small talk': 'hello, I am doing well',
+    'polite refusal': 'I would rather not comment on that at this point in time, thank you for the question.',
+    'off-topic but long': 'The weather in Mumbai has been pleasant this week and our teams enjoyed the cricket match on Sunday. We had a wonderful offsite with good food, great conversations and a lot of energy across the organisation. Everyone is excited about the festive season ahead.',
+    'filler only': 'Basically, you know, it is what it is, and to be honest we are sort of looking at things and we will see how things go over time.',
+  };
+  for (const [k, t] of Object.entries(non)) {
+    const r = scoreAnswer(q, t);
+    ok(r.band === 'red' && r.total <= 20 && r.flags.some((f) => f.dim === 'Relevance'), `${k}: ${r.total} ${r.band}${r.flags.some((f) => f.dim === 'Relevance') ? ', flagged as not an answer' : ', NOT flagged'}`);
+  }
+  const short = scoreAnswer(q, 'We missed the band: margin was 11.6% against 13.5% guided.');
+  ok(!short.flags.some((f) => f.dim === 'Relevance'), `a short but real answer is not treated as a non-answer (${short.total})`);
+}
+
 console.log('--- Recommendations carry evidence');
 {
   const { recommendations } = await import('../web/js/recs.js');

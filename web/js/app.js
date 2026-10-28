@@ -498,7 +498,7 @@ function viewRehearse(qid) {
       <div class="row" style="margin-bottom:var(--s-3)">
         <label class="small muted" for="speaker">Answering as</label>
         <select id="speaker">${speakers.map(([k2, v]) => `<option value="${esc(k2)}" ${k2 === q.owner ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
-        <span class="spacer"></span><span class="timer" id="timer">1:00</span>
+        <span class="spacer"></span><span class="timer" id="wc" aria-live="polite" title="Length is scored under Delivery: 60 to 130 words, about 25 to 50 seconds spoken">0 words</span>
       </div>
       <textarea id="answer" rows="9" placeholder="Type your answer, or press Speak to dictate it." aria-label="Your answer"></textarea>
       <div class="row" style="margin-top:var(--s-3)">
@@ -520,18 +520,18 @@ function ackSet(q, text) {
 function bindRehearse(qid) {
   const q = CTX.questions.find((x) => x.id === qid) || CTX.questions[0];
   if (!q) return;
-  const ta = $('#answer'), tEl = $('#timer');
-  let started = null, left = 60, recDuration = null;
-  clearInterval(timerId);
-  const tick = () => { left = Math.max(0, 60 - Math.floor((Date.now() - started) / 1000)); tEl.textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`; tEl.classList.toggle('low', left <= 10); if (!left) clearInterval(timerId); };
-  const start = () => { if (!started) { started = Date.now(); timerId = setInterval(tick, 250); } };
-  ta.addEventListener('input', start);
+  const ta = $('#answer'), wcEl = $('#wc');
+  let recDuration = null;
+  // Length is what matters on a call, not a clock: a live word count and the speaking time it implies
+  // at about 150 words a minute, coloured against the 60 to 130 word target the Delivery score uses.
+  const count = () => { const n = (ta.value.trim().match(/\S+/g) || []).length; const secs = Math.round((n / 150) * 60); wcEl.textContent = `${n} word${n === 1 ? '' : 's'} \u00b7 about ${secs} s spoken`; wcEl.classList.toggle('ok', n >= 60 && n <= 130); wcEl.classList.toggle('low', n > 130); };
+  const start = count;
+  ta.addEventListener('input', count);
   $('#qpick').addEventListener('change', (e) => { location.hash = `#/rehearse/${e.target.value}`; });
-  $('#weak')?.addEventListener('click', () => { ta.value = q.weak; start(); });
+  $('#weak')?.addEventListener('click', () => { ta.value = q.weak; count(); });
   $('#score').addEventListener('click', () => {
     const text = ta.value.trim();
     if (text.split(/\s+/).length < 5) { $('#card').innerHTML = '<div class="empty">Write at least a sentence first. A real answer on a call runs 60 to 130 words.</div>'; return; }
-    clearInterval(timerId);
     const speaker = $('#speaker').value;
     const res = scoreAnswer(CTX, q, text, { durationS: recDuration || null });
     saveAttempts([...attempts(), { qid: q.id, speaker, text, total: res.total, band: res.band, flags: res.flags.map((f) => f.dim), acked: ackSet(q, text), at: Date.now() }]);
@@ -546,7 +546,7 @@ function bindRehearse(qid) {
     if (rec) { rec.stop(); return; }
     rec = new SR(); rec.lang = 'en-IN'; rec.continuous = true; rec.interimResults = true;
     const base = ta.value ? ta.value + ' ' : '';
-    rec.onresult = (e) => { let s = ''; for (const r of e.results) s += r[0].transcript; ta.value = base + s; };
+    rec.onresult = (e) => { let s = ''; for (const r of e.results) s += r[0].transcript; ta.value = base + s; count(); };
     rec.onend = () => { recDuration = (Date.now() - recStart) / 1000; rec = null; btn.classList.remove('rec'); btn.querySelector('span').textContent = 'Speak'; };
     rec.onerror = () => {};
     recStart = Date.now(); start(); rec.start(); btn.classList.add('rec'); btn.querySelector('span').textContent = 'Stop';
