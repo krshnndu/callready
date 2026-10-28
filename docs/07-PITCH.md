@@ -1,6 +1,6 @@
-# 07. Pitch and recording script (70 seconds)
+# 07. Pitch and recording script (about 80 seconds)
 
-The brief asks for four things: the problem, a demo of the prototype, its business value, and one key limitation. This is a read-aloud script for recording the demo in Tella: the words in quotes are spoken, and the line above each one says what to show on screen. It runs about 180 words, roughly 70 seconds at a relaxed pace.
+The brief asks for four things: the problem, a demo of the prototype, its business value, and one key limitation. This is a read-aloud script for recording the demo in Tella: the words in quotes are spoken, and the line above each one says what to show on screen. It runs about 200 words, roughly 80 seconds at a relaxed pace.
 
 ## Before you record (5 minutes)
 
@@ -16,43 +16,55 @@ The brief asks for four things: the problem, a demo of the prototype, its busine
 
 ## The script
 
-**1. The problem** (0:00 to 0:11)
+**1. The problem** (0:00 to 0:12)
 
-*On screen: the Quarter screen, scrolled to the top. Don't click anything. Let the cursor rest on the margin chart.*
+*On screen: the Quarter screen, scrolled to the top. Don't click. Rest the cursor on the red margin figure.*
 
-"This company just had a good-looking quarter: sales up fourteen percent. But margins fell and cash dried up. Tomorrow, analysts will read last quarter's promises back to the CFO."
+"Earnings day. Revenue is up fourteen percent, but margins fell, cash flow weakened, and one segment is losing money. Analysts will read last quarter's promises back to the CFO."
 
-**2. What it is** (0:11 to 0:20)
+**2. The product and its data** (0:12 to 0:26)
 
-*On screen: click **Load a company** in the left menu. Move the cursor slowly down the list of real companies.*
+*On screen: click **Load a company**. Move the cursor down the list of real companies, then rest on the sample, Meridian Arc.*
 
-"CallReady gets leadership ready for that call, for any listed company. Upload the results, and every number is checked against the original document."
+"CallReady turns a company's results and past calls into a rehearsal. This demo uses a sample company with synthetic data. Upload any results PDF and it works the same, with every figure checked against the document."
 
-**3. Demo: what investors will ask** (0:20 to 0:31)
+**3. What investors will ask** (0:26 to 0:41)
 
-*On screen: click **Pressure map**. Hover over the red marker on the margin bar.*
+*On screen: click **Pressure map**. Hover over the red marker on the margin bar, then scroll to the first two ranked items.*
 
-"It shows what investors will push on. To keep its promise, this company now needs a margin of fifteen point three percent. Its best quarter ever was fourteen point two."
+"First, what investors will push on, ranked by plain arithmetic. To meet its guidance, this company needs a fifteen point three percent margin. Its best quarter ever was fourteen point two. Two earlier promises are already broken."
 
-**4. Demo: rehearsal** (0:31 to 0:46)
+**4. The rehearsal** (0:41 to 0:54)
 
-*On screen: click **Rehearse**. Click **Load a weak sample**, then **Score my answer**. Scroll slowly to the red marks, then down to the coach's answer.*
+*On screen: click **Rehearse**, then **Load a weak sample**, then **Score my answer**. Scroll to the red marks, then to the coach's answer.*
 
-"Then the CFO practises. This answer sounds confident, but quotes a number that isn't in the results and makes a new promise on the spot. Red. The coach suggests a better answer, using only verified numbers."
+"Then the CFO practises. This answer quotes a number that isn't in the results, and makes a new promise on the spot. Red. The coach suggests a stronger answer, using only verified figures."
 
-**5. Business value** (0:46 to 0:57)
+**5. The recommendation and the value** (0:54 to 1:07)
 
-*On screen: click **Readiness report**, then **Load demo rehearsal**. Hover over the first recommendation.*
+*On screen: click **Readiness report**, then **Load demo rehearsal**. Hover over the first recommendation, then scroll to **Business case**.*
 
-"Finally, a readiness report: weak topics, where the CEO and CFO disagree, and what to decide before the call. We estimate it saves fifty hours of prep a quarter."
+"The result is a readiness report with a clear recommendation: decide on the margin guidance before the call, not during it. On our stated assumptions, that saves about fifty hours of preparation a quarter."
 
-**6. The limitation** (0:57 to 1:10)
+**6. The one key limitation** (1:07 to 1:20)
 
-*On screen: click **Load a company**. Scroll to the notice under **Convert and check** that begins "Only upload published documents", and rest the cursor on it (in Tella, zoom in on it). Look at the camera for the last sentence.*
+*On screen: click **Load a company**. Scroll to the notice under **Convert and check** that begins "Only upload published documents", and rest the cursor on it (in Tella, zoom in). Look at the camera for the last sentence.*
 
-"Our biggest limitation is data trust. Teams rehearse before results are public, and our AI still runs on outside providers. Until it runs inside the company's own cloud, compliance won't sign off."
+"Our one key limitation is data trust. Teams rehearse before results are public, and our AI still runs on outside providers. Until it runs inside the company's own cloud, compliance won't sign off."
 
-**If a take runs long:** in part 2, drop "for any listed company" (2 s); in part 5, drop "where the CEO and CFO disagree" (2 s).
+**Length:** about 200 words, roughly 80 seconds of speech, leaving about 10 seconds for clicks inside the 90-second limit. If a take runs long, drop "then scroll to the first two ranked items" from part 3's actions, or "and one segment is losing money" from part 1.
+
+## How the script meets the assignment
+
+| Requirement | Where |
+| --- | --- |
+| Explain the problem | Part 1: revenue up, margins and cash down, a segment losing money, promises read back |
+| Working prototype, sample inputs to a business recommendation | Parts 2 to 5: sample company, pressure map, rehearsal and score, readiness report with its recommendation |
+| Compare with earlier commitments | Part 3: two earlier promises already broken; part 4: the new promise made on the spot |
+| Public or synthetic data, assumptions stated | Part 2: "sample company with synthetic data"; part 5: "on our stated assumptions" (editable on the Business case panel) |
+| Business value | Part 5: fifty hours of preparation a quarter |
+| One key limitation | Part 6: data trust |
+| Tools | Rules plus AI, in the README; part 2 says figures are checked against the document and part 4 that the coach uses only verified figures |
 
 ## If something goes wrong on camera
 

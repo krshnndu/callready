@@ -4,6 +4,9 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Changed
+- Pitch script rewritten as a product demo that covers every point of the brief: the problem, the working journey from sample inputs to a recommendation, earlier commitments compared, synthetic data and assumptions stated, business value, and one key limitation (`docs/07-PITCH.md`, with a compliance table).
+
 ## [0.6.0] - 2026-10-28
 
 Charts that tell the truth, one unit system, a verified coach answer, and the demo video.
