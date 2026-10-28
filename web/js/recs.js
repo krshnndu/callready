@@ -1,8 +1,10 @@
 // Recommendations before the call: pure rules over the analysed pack. Every recommendation carries the
 // evidence it rests on (commitment ids, transcript or note refs, or the computed fact), so none is
 // free-standing advice.
+import { one } from './units.js';
+
 const num = (x) => typeof x === 'number' && Number.isFinite(x);
-const f1 = (x) => (num(x) ? (Math.round(x * 10) / 10).toFixed(1) : '-');
+const f1 = one;
 const unq = (t) => String(t ?? '').replace(/["“”]/g, '');
 
 export function recommendations(ctx, { themes = [], best = {}, rc = { gaps: [], risky: [] }, contra = [] } = {}) {

@@ -6,6 +6,8 @@
 //   - straight double quotes around display text (we use one pair of curly quotes)
 //   - a label with nothing after it ("Owner:", "by"), an empty pill, or an empty heading
 //   - NaN, Infinity, undefined or null in visible text
+//   - a hyphen used as a minus sign, or a change in a percentage given in %, points or pp instead of
+//     bps (the unit rules in web/js/units.js)
 // Run: node scripts/check_content.mjs [base-url]   (default http://127.0.0.1:8731, a local web/ server)
 import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
@@ -47,6 +49,8 @@ const PROBE = `(() => {
   for (const m of text.matchAll(/[^\\s(]\\s+[,;:](?=\\s|$)|\\w\\s+\\.(?=\\s|$)/g)) out.push('space before punctuation: "' + text.slice(Math.max(0, m.index - 25), m.index + 15).replace(/\\s+/g, ' ') + '"');
   for (const m of text.matchAll(/(^|[\\s(])"[A-Za-z0-9][^"\\n]{3,}?"(?=[\\s.,;:)]|$)/g)) out.push('straight quotes around display text: ' + m[0].trim().slice(0, 60));
   for (const m of text.matchAll(/\\b(Owner|Answering as|Sources|by):\\s*$/gm)) out.push('label with nothing after it: "' + m[0] + '"');
+  for (const m of text.matchAll(/(^|[\\s(])-\\d/g)) out.push('hyphen used as a minus sign: "' + text.slice(Math.max(0, m.index - 25), m.index + 12).replace(/\\s+/g, ' ') + '"');
+  for (const m of text.matchAll(/\\b\\d+(\\.\\d+)?\\s?(pts?|pp|percentage points?)\\b|margins?\\s+(up|down|fell|rose|declined|expanded|contracted)\\s+(by\\s+)?\\d+(\\.\\d+)?\\s?%/gi)) out.push('a change in a percentage not given in bps: "' + m[0] + '"');
   for (const m of text.matchAll(/\\b(NaN|Infinity|undefined)\\b|(?<![\\w-])null(?![\\w-])/g)) out.push('shows "' + m[0] + '": "' + text.slice(Math.max(0, m.index - 30), m.index + 10).replace(/\\s+/g, ' ') + '"');
   return [...new Set(out)];
 })()`;

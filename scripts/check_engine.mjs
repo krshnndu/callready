@@ -106,6 +106,15 @@ console.log('--- Coach answers: rounding, redaction, and a rules-built ideal ans
   }
 }
 
+console.log('--- One unit system (web/js/units.js)');
+{
+  const u = await import('../web/js/units.js');
+  ok(u.marginLevel(11.613) === '11.6%' && u.marginChange(-258.2) === '\u2212258 bps' && u.marginChange(40) === '+40 bps', 'margin levels are %, margin changes are signed bps');
+  ok(u.marginChange(-4700) === '\u22124,700 bps' && u.marginChange(-0.2) === '0 bps', 'large bps are grouped; a change that rounds to zero has no sign');
+  ok(u.growth(14) === '+14.0%' && u.signed(-3.04) === '\u22123.0' && u.amount(-1234.5) === '\u22121,234.5', 'growth is a signed percent; negatives use a true minus');
+  ok(u.typesetText('EBIT margin -8.5% vs -3% (-57.7%), range 13.5-14.5, id Q4FY26-L024') === 'EBIT margin \u22128.5% vs \u22123% (\u221257.7%), range 13.5-14.5, id Q4FY26-L024', 'typesetting turns hyphen-minus into minus, and leaves ranges and ids alone');
+}
+
 console.log('--- Charts are drawn honestly');
 {
   const ch = await import('../web/js/charts.js');
@@ -124,6 +133,9 @@ console.log('--- Charts are drawn honestly');
   // A step too thin to see from zero (5 bps on a 40% margin) is the only reason to cut, and the cut is marked and said.
   const wf2 = ch.waterfall({ W: 560, start: { label: 'Year ago', value: 40 }, steps: [{ label: 'a', delta: -0.05 }, { label: 'b', delta: 0.03 }], end: { label: 'Now', value: 39.98 }, title: 'w2' });
   ok(/axis-break/.test(wf2) && /Axis starts at \d+(\.\d)?%/.test(wf2), 'a waterfall cuts its axis only when a step would vanish, and then marks and says it');
+  // The margin bridge is drawn as driver bars around zero, ending in a net-change row that the drivers add up to.
+  const br = ch.diverging({ W: 560, title: 'b', rows: [{ label: 'Gross margin', value: -180 }, { label: 'Operating leverage', value: 40 }, { label: 'Net change', value: -140, total: true }] });
+  ok(/class="bar total"/.test(br) && /class="sep"/.test(br) && /\u2212140 bps/.test(br), 'driver bars end in a net-change row, set apart by a rule');
   // Negative numbers use a true minus sign (U+2212), never a hyphen.
   ok(/\u2212180/.test(wf) && !/>-\d/.test(wf + ch.diverging({ W: 560, rows: [{ label: 'x', value: -330 }], title: 'd' })), 'chart labels write negatives with a true minus sign');
 }

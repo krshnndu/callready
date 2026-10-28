@@ -192,12 +192,16 @@ export function waterfall({ start, steps, end, title, unit = '%', decimals = 1, 
 
 // Horizontal bars around zero, for changes such as segment margin change in bps. The zero line sits
 // where the data puts it (all negative: at the right), and every value label is placed where it fits.
+// A row with total: true (a net change) is drawn in the accent below a rule; gap: true marks a
+// remainder the other rows do not explain.
 export function diverging({ rows, title, unit = ' bps', W = 560 }) {
   rows = (rows || []).filter((r) => finite(r.value));
   if (!rows.length) return NO_DATA;
-  const rowH = 30, gap = 8;
+  const gap = 8;
   const labMax = Math.min(W * 0.36, Math.max(...rows.map((r) => textW(r.label, 12))) + 4);
-  const labels = rows.map((r) => fit(r.label ?? '', labMax, 12, 1)[0] ?? '');
+  // A label that does not fit wraps to a second line (all rows then get the taller height), then truncates.
+  const labels = rows.map((r) => fit(r.label ?? '', labMax, 12, 2));
+  const rowH = labels.some((l) => l.length > 1) ? 40 : 30;
   const plotL = labMax + gap, plotR = W - 4;
   const neg = Math.max(0, ...rows.map((r) => -r.value)), pos = Math.max(0, ...rows.map((r) => r.value));
   const valW = Math.max(...rows.map((r) => textW(`${r.value > 0 ? '+' : ''}${fmt(r.value)}${unit}`, VAL))) + 8;
@@ -211,8 +215,8 @@ export function diverging({ rows, title, unit = ' bps', W = 560 }) {
       const val = `${r.value > 0 ? '+' : ''}${fmt(r.value)}${unit}`;
       const vx = r.value >= 0 ? Math.max(pe, zero + 2) + 6 : Math.min(pe, zero - 2) - 6;
       return `<g class="mark" tabindex="0" data-tip="${esc(r.tip || `${r.label}: ${val}`)}"><rect class="hit" x="0" y="${yy}" width="${W}" height="${rowH - 2}"/>
-        <text x="0" y="${cy}" text-anchor="start" class="lab strong">${esc(labels[i])}</text>
-        ${barMark(s, 'x', yy + 7, rowH - 14, 0, r.value, r.value >= 0 ? 'bar up' : 'bar down', cut)}
+        ${r.total ? `<line class="sep" x1="0" x2="${W}" y1="${yy}" y2="${yy}"/>` : ''}${tlines(labels[i], 0, cy - (labels[i].length - 1) * 7, 'start', 'lab strong')}
+        ${barMark(s, 'x', yy + 7, rowH - 14, 0, r.value, r.total ? 'bar total' : r.gap ? 'bar gap' : r.value >= 0 ? 'bar up' : 'bar down', cut)}
         <text x="${vx}" y="${cy}" text-anchor="${r.value >= 0 ? 'start' : 'end'}" class="val">${esc(val)}</text></g>`; }).join('')}
   </svg>`;
 }

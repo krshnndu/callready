@@ -1,8 +1,9 @@
+import { one, amount, signed, marginChange, typesetText } from './units.js';
 import { analyze, validatePack, verifyAgainstSource, sanitizePack, uploadAllowed, applyEvidencePolicy, SCHEMA, METRICS } from './core.js';
 import { scoreAnswer, remarksCheck, DIM_LABELS, OWN_PAST, redactUnverified, idealAnswer } from './score.js';
 import { samplePack } from './sample.js';
 import { personas as DEFAULT_PERSONAS } from './questions.js';
-import { bars, line, waterfall, diverging, gauge, installTooltip } from './charts.js';
+import { bars, line, diverging, gauge, installTooltip } from './charts.js';
 import { extractByRules, mergeRulesFirst, crossCheck } from './extract.js';
 import { recommendations } from './recs.js';
 import { SITE } from './site.js';
@@ -20,9 +21,10 @@ window.addEventListener('resize', () => { if (Math.abs(window.innerWidth - lastW
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const num = (x) => typeof x === 'number' && Number.isFinite(x);
-const f1 = (x) => (num(x) ? (Math.round(x * 10) / 10).toFixed(1) : '-');
-const fmt = (x) => (num(x) ? Number(x).toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '-');
-const sign = (x, d = 1) => (num(x) ? (x > 0 ? '+' : '') + (Math.round(x * 10 ** d) / 10 ** d).toFixed(d) : '-');
+// Every figure is formatted through units.js: margin levels in %, changes in percentages in bps, true minus signs.
+const f1 = one;
+const fmt = (x) => amount(x, 2);
+const sign = signed;
 const API = '/api';
 // A quote on screen gets exactly one pair of curly quotes; straight quotes inside it are dropped.
 const quote = (t) => {
@@ -360,12 +362,12 @@ function viewQuarter() {
   const rows = [
     ['Revenue', fmt(K.cur.revenue), fmt(K.py.revenue), `${sign(K.revYoY)}%`, K.revYoY >= 0, K.vsCons ? `${sign(K.vsCons.rev)}%` : '', K.vsCons ? K.vsCons.rev >= 0 : null, ties('revenueGrowth')],
     ['EBITDA', fmt(K.cur.ebitda), fmt(K.py.ebitda), `${sign(K.ebitdaYoY)}%`, K.ebitdaYoY >= 0, K.vsCons ? `${sign(K.vsCons.ebitda)}%` : '', K.vsCons ? K.vsCons.ebitda >= 0 : null, []],
-    ['EBITDA margin', `${f1(K.m)}%`, `${f1(K.mPy)}%`, `${Math.round(K.mBps)} bps`, K.mBps >= 0, K.vsCons?.margin ? `${Math.round((K.m - K.vsCons.margin) * 100)} bps` : '', K.vsCons?.margin ? K.m >= K.vsCons.margin : null, ties('ebitdaMargin')],
+    ['EBITDA margin', `${f1(K.m)}%`, `${f1(K.mPy)}%`, marginChange(K.mBps), K.mBps >= 0, K.vsCons?.margin ? marginChange((K.m - K.vsCons.margin) * 100) : '', K.vsCons?.margin ? K.m >= K.vsCons.margin : null, ties('ebitdaMargin')],
     num(K.cur.pat) && ['PAT', fmt(K.cur.pat), fmt(K.py.pat), `${sign(K.patYoY)}%`, K.patYoY >= 0, K.vsCons?.pat != null ? `${sign(K.vsCons.pat)}%` : '', K.vsCons?.pat != null ? K.vsCons.pat >= 0 : null, []],
     num(K.cur.ocf) && ['Operating cash flow', fmt(K.cur.ocf), fmt(K.py.ocf), `${sign(K.ocfYoY)}%`, K.ocfYoY >= 0, '', null, ties('cashFlow')],
-    num(K.conv) && ['OCF / EBITDA', `${Math.round(K.conv)}%`, num(K.convPy) ? `${Math.round(K.convPy)}%` : '-', num(K.convPy) ? `${Math.round(K.conv - K.convPy)} pts` : '-', K.conv >= (K.convPy ?? 0), '', null, []],
-    num(K.ccc) && ['Cash conversion cycle', `${K.ccc} days`, num(K.cccPy) ? `${K.cccPy} days` : '-', num(K.cccPy) ? `${K.ccc - K.cccPy > 0 ? '+' : ''}${K.ccc - K.cccPy} days` : '-', K.ccc <= (K.cccPy ?? K.ccc), '', null, ties('workingCapital')],
-    num(K.lev) && ['Net debt / EBITDA', `${K.lev.toFixed(2)}x`, num(K.levBase) ? `${K.levBase.toFixed(2)}x (year end)` : '-', num(K.levBase) ? `${K.lev - K.levBase > 0 ? '+' : ''}${(K.lev - K.levBase).toFixed(2)}x` : '-', K.lev <= (K.levBase ?? K.lev), '', null, ties('netDebtToEbitda')],
+    num(K.conv) && ['OCF / EBITDA', `${Math.round(K.conv)}%`, num(K.convPy) ? `${Math.round(K.convPy)}%` : '-', num(K.convPy) ? marginChange((K.conv - K.convPy) * 100) : '-', K.conv >= (K.convPy ?? 0), '', null, []],
+    num(K.ccc) && ['Cash conversion cycle', `${K.ccc} days`, num(K.cccPy) ? `${K.cccPy} days` : '-', num(K.cccPy) ? `${signed(K.ccc - K.cccPy, 0)} days` : '-', K.ccc <= (K.cccPy ?? K.ccc), '', null, ties('workingCapital')],
+    num(K.lev) && ['Net debt / EBITDA', `${K.lev.toFixed(2)}x`, num(K.levBase) ? `${K.levBase.toFixed(2)}x (year end)` : '-', num(K.levBase) ? `${signed(K.lev - K.levBase, 2)}x` : '-', K.lev <= (K.levBase ?? K.lev), '', null, ties('netDebtToEbitda')],
   ].filter(Boolean);
   const tp = trendPoints(p);
   const mg = cs.find((c) => c.kind === 'guidance' && c.metric === 'ebitdaMargin' && c.target?.low != null);
@@ -391,7 +393,7 @@ function viewQuarter() {
       <div class="table-wrap"><table><thead><tr><th>Segment</th><th class="n">Revenue</th><th class="n">Growth</th><th class="n">Margin</th></tr></thead>
         <tbody>${segs.map((s) => `<tr><td>${esc(s.name)}</td><td class="n">${fmt(s.rev)}</td><td class="n ${s.growth >= 0 ? 'up' : 'down'}">${num(s.growth) ? sign(s.growth) + '%' : '-'}</td><td class="n">${f1(s.m)}%</td></tr>`).join('')}</tbody></table></div>
       ${segs.some((s) => num(s.bps)) ? `<h3 class="h3">Margin change, bps</h3>${chart((W) => diverging({ W, rows: segs.filter((s) => num(s.bps)).map((s) => ({ label: s.name, value: Math.round(s.bps), tip: `${s.name}: EBIT margin ${f1(s.mPy)}% to ${f1(s.m)}%` })), title: 'Segment margin change' }))}` : ''}` : '<h2>Segments</h2><p class="small muted">The document reports no segments.</p>'}
-      ${p.bridge?.length ? `<h2 style="margin-top:var(--s-5)">Margin bridge</h2><p class="sub">${f1(K.mPy)}% to ${f1(K.m)}%, year on year.</p>${chart((W) => waterfall({ W, start: { label: 'Year ago', value: K.mPy }, steps: p.bridge.map((b) => ({ label: b.short || b.driver.split(':')[0], delta: b.bps / 100, tip: `${b.driver}: ${b.bps > 0 ? '+' : b.bps < 0 ? '\u2212' : ''}${Math.abs(b.bps)} bps` })), end: { label: 'This quarter', value: K.m }, title: 'EBITDA margin bridge' }))}` : ''}
+      ${p.bridge?.length ? `<h2 style="margin-top:var(--s-5)">Margin bridge</h2><p class="sub">${f1(K.mPy)}% to ${f1(K.m)}%, year on year. What moved the margin, in basis points.</p>${chart((W) => diverging({ W, rows: bridgeRows(p.bridge, K), title: 'EBITDA margin bridge' }))}` : ''}
     </section>
     <section class="panel glass">
       <h2>Commitments on record</h2>
@@ -413,6 +415,17 @@ function viewQuarter() {
     </ul></details>
   </section>
   <div class="row no-print"><span class="spacer"></span><a class="btn primary" href="#/pressure">See what investors will push on ${ICON.arrow}</a></div>`);
+}
+
+// The margin bridge as driver bars around zero, ending in the net change. If the drivers do not add up
+// to the reported change, the remainder gets its own "Not explained" row rather than a silent gap.
+function bridgeRows(bridge, K) {
+  const bps = marginChange;
+  const rows = bridge.map((b) => ({ label: b.short || b.driver.split(':')[0], value: Math.round(b.bps), tip: `${b.driver}: ${bps(Math.round(b.bps))}` }));
+  const net = Math.round((K.m - K.mPy) * 100), sum = rows.reduce((a, r) => a + r.value, 0);
+  if (num(net) && Math.abs(net - sum) >= 1) rows.push({ label: 'Not explained', value: net - sum, gap: true, tip: `Not explained by the drivers listed: ${bps(net - sum)}` });
+  if (num(net)) rows.push({ label: 'Net change', value: net, total: true, tip: `EBITDA margin ${f1(K.mPy)}% to ${f1(K.m)}%: ${bps(net)}` });
+  return rows;
 }
 
 // ---------- 2. Pressure ----------
@@ -716,6 +729,19 @@ async function render() {
   if (cur && strip) { const r = cur.getBoundingClientRect(), sr = strip.getBoundingClientRect(); if (r.left < sr.left || r.right > sr.right) strip.scrollLeft += r.left - sr.left - 16; }
 }
 installTooltip();
+
+// Typesetting, for every screen and every partial update: one observer gives every negative number a
+// true minus sign, whatever produced the text (rules, packs, company quotes, the coach). A new template
+// therefore cannot bring a hyphen back. Typed answers in form fields are never touched.
+const SKIP = new Set(['TEXTAREA', 'INPUT', 'SCRIPT', 'STYLE', 'CODE', 'PRE']);
+function typeset(node) {
+  if (node.nodeType === 3) { if (!SKIP.has(node.parentNode?.nodeName)) { const t = typesetText(node.nodeValue); if (t !== node.nodeValue) node.nodeValue = t; } return; }
+  if (node.nodeType !== 1 || SKIP.has(node.nodeName)) return;
+  for (const a of ['data-tip', 'aria-label', 'title']) { const v = node.getAttribute(a); if (v != null) { const t = typesetText(v); if (t !== v) node.setAttribute(a, t); } }
+  for (const c of node.childNodes) typeset(c);
+}
+typeset(document.body);
+new MutationObserver((ms) => { for (const m of ms) { if (m.type === 'characterData') typeset(m.target); else m.addedNodes.forEach(typeset); } }).observe(document.body, { childList: true, subtree: true, characterData: true });
 // A running page checks, at most once a minute on navigation, whether a newer build is live, and offers
 // a reload. Without this a tab opened before a deploy keeps running the old code indefinitely.
 const BUILD = new URL(import.meta.url).searchParams.get('v');
