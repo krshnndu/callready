@@ -142,7 +142,7 @@ export const DIM_LABELS = { accuracy: 'Accuracy', consistency: 'Consistency', di
 
 // ---------- prepared remarks gap check: themes come from the pack's own pressure map ----------
 const RISKY = [
-  { re: /remain confident in (our )?(strategy and (in )?)?(our )?(fy\d+ |full[- ]year )?outlook|reaffirm|on track for (the )?(year|guidance)/i, why: 'Reaffirms an outlook the numbers may no longer support. Invites "so are you reaffirming guidance?"' },
+  { re: /remain confident in (our )?(strategy and (in )?)?(our )?(fy\d+ |full[- ]year )?outlook|reaffirm|on track for (the )?(year|guidance)/i, why: 'Reaffirms an outlook the numbers may no longer support. Invites “so are you reaffirming guidance?”' },
   { re: /record (quarterly )?(revenue|sales|quarter)/i, why: 'Leads with the good news only; analysts read it as spin when margin or cash fell.' },
   { re: /strong (momentum|performance) across (all|the board)/i, why: 'An overclaim if any segment or metric went the wrong way. It costs credibility.' },
   { re: /(won|winning|secured) (new|several|major) (orders|tenders|contracts|customers)|gain(ed|ing)? (market )?share/i, why: 'Share and order wins must be in the published disclosures before they are said on a call.' },

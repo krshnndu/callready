@@ -68,7 +68,7 @@ async function activePack() {
 const kindOf = (p) => (p.provenance?.source === 'sample' ? 'Sample (synthetic)' : p.provenance?.source === 'dataset' ? 'Test dataset (real filing)' : 'Your upload');
 const isSample = (p) => p.id === 'sample-meridian-arc';
 let CTX = null;
-const spk = (p, k) => p.company.speakers?.[k] || ({ CEO: 'CEO', CFO: 'CFO', ENERGY: 'Segment head' }[k] || k);
+const spk = (p, k) => (p.company.speakers?.[k] || '').trim() || ({ CEO: 'CEO', CFO: 'CFO', ENERGY: 'Segment head', management: 'Management' }[k] || k);
 const personaOf = (p, key) => (p.personas || DEFAULT_PERSONAS)[key] || DEFAULT_PERSONAS[key] || DEFAULT_PERSONAS.hawk;
 
 const cite = (id) => `<button class="cite" type="button" data-tip="${esc(CTX.sources[id] || id)}">${esc(id)}</button>`;
@@ -103,7 +103,7 @@ async function viewLoad() {
   return shell('#/load', `${head('Load a company', 'Use the sample, try a real company from the test datasets, or upload your own results. Every screen after this one runs on the company you load here.')}
   <section class="panel glass">
     <h2>Test datasets</h2>
-    <p class="sub">Real Q2 FY27 results of listed Indian companies, from NSE and company filings, converted by the same pipeline as an upload. "Verified" counts the extracted figures the rules found word for word in the source document.</p>
+    <p class="sub">Real Q2 FY27 results of listed Indian companies, from NSE and company filings, converted by the same pipeline as an upload. “Verified” counts the extracted figures the rules found word for word in the source document.</p>
     <div class="table-wrap"><table>
       <thead><tr><th>Company</th><th class="hide-sm">Verified by rules</th><th class="hide-sm">Source</th><th></th></tr></thead>
       <tbody>${row('Meridian Arc Industries', 'Synthetic sample, built to reproduce the brief', 'sample', '', '<span class="pill neutral">Hand-checked</span>', '<span class="tiny">Built in</span>')}
@@ -381,7 +381,7 @@ function viewQuarter() {
     </section>
     <section class="panel glass">
       <h2>Commitments on record</h2>
-      <p class="sub">Status is computed by rules from the figures where the metric allows (marked "rule"). Hover a reference to read the line.</p>
+      <p class="sub">Status is computed by rules from the figures where the metric allows (marked “rule”). Hover a reference to read the line.</p>
       ${cs.length ? `<table><tbody>${cs.map((c) => `<tr><td style="width:44px"><b>${esc(c.id)}</b></td><td>${quote(c.said)}<div class="tiny">${esc(c.why || '')}</div></td><td class="n"><span class="pill ${(st[c.status] || st.unclear)[0]}">${(st[c.status] || st.unclear)[1]}</span><div class="tiny" style="margin-top:4px">${c.statusSource === 'rule' ? 'rule' : c.statusSource === 'stated' ? 'stated' : ''}</div>${c.ref && CTX.sources[c.ref] ? `<div style="margin-top:6px">${cite(c.ref)}</div>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="small muted">No commitments in this pack, so the consistency checks are off.</p>'}
     </section>
   </div>
@@ -484,12 +484,14 @@ function viewRehearse(qid) {
   const q = questions.find((x) => x.id === qid) || questions[0];
   if (!q) return shell('#/rehearse', head('No questions yet', 'This company produced no pressure points to ask about.'));
   const pe = personaOf(p, q.persona);
-  const speakers = Object.entries(p.company.speakers && Object.keys(p.company.speakers).length ? p.company.speakers : { CEO: 'CEO', CFO: 'CFO' });
+  // Every speaker role gets a readable label: the name if the filing gives one, otherwise the role.
+  const roles = [...new Set(['CEO', 'CFO', ...Object.keys(p.company.speakers || {}), ...(q.owner ? [q.owner] : [])])];
+  const speakers = roles.map((r) => [r, spk(p, r)]);
   return shell('#/rehearse', `${head(`Rehearse: ${esc(q.theme)}`, 'Answer as you would on the call. Aim for 60 to 130 words, about 45 seconds spoken. The scorecard checks every figure against the disclosures.')}
   <div class="grid-2">
     <section class="panel glass">
       <div class="row"><label class="small muted" for="qpick">Question</label><select id="qpick">${questions.map((x) => `<option value="${x.id}" ${x.id === q.id ? 'selected' : ''}>${x.id} ${esc(x.theme)}: ${esc(x.text.slice(0, 44))}...</option>`).join('')}</select></div>
-      <div class="qmeta" style="margin-top:var(--s-4)"><span><b style="color:var(--ink-2)">${esc(pe.name)}</b>${pe.firm ? `, ${esc(pe.firm)}` : ''}</span>. ${esc(pe.style || '')}</div>
+      <div class="qmeta" style="margin-top:var(--s-4)"><span><b style="color:var(--ink-2)">${esc(pe.name)}</b>${pe.firm ? `, ${esc(pe.firm)}` : ''}${pe.style ? `. ${esc(pe.style)}` : ''}</span></div>
       <p class="question-block">${quote(q.text)}</p>
       <div class="row" style="margin-bottom:var(--s-3)">
         <label class="small muted" for="speaker">Answering as</label>
@@ -638,7 +640,7 @@ function viewReport() {
     const avg = done.length ? Math.round(qs.reduce((s, q) => s + (best[q.id]?.total || 0), 0) / qs.length) : null;
     return { th, n: qs.length, done: done.length, avg, band: avg == null ? 'off' : avg >= 75 ? 'green' : avg >= 55 ? 'amber' : 'red' };
   });
-  const bySpk = Object.keys(p.company.speakers && Object.keys(p.company.speakers).length ? p.company.speakers : { CEO: 1, CFO: 1 }).map((s) => { const a = att.filter((x) => x.speaker === s); return { s, n: a.length, avg: a.length ? Math.round(a.reduce((t, x) => t + x.total, 0) / a.length) : null }; });
+  const bySpk = [...new Set(['CEO', 'CFO', ...Object.keys(p.company.speakers || {}), ...att.map((x) => x.speaker)])].map((s) => { const a = att.filter((x) => x.speaker === s); return { s, n: a.length, avg: a.length ? Math.round(a.reduce((t, x) => t + x.total, 0) / a.length) : null }; });
   const contra = [];
   for (const q of questions) {
     const a = att.filter((x) => x.qid === q.id); const sp = [...new Set(a.map((x) => x.speaker))];
@@ -706,6 +708,25 @@ async function render() {
   if (cur && strip) { const r = cur.getBoundingClientRect(), sr = strip.getBoundingClientRect(); if (r.left < sr.left || r.right > sr.right) strip.scrollLeft += r.left - sr.left - 16; }
 }
 installTooltip();
+// A running page checks, at most once a minute on navigation, whether a newer build is live, and offers
+// a reload. Without this a tab opened before a deploy keeps running the old code indefinitely.
+const BUILD = new URL(import.meta.url).searchParams.get('v');
+let lastVersionCheck = 0;
+async function checkVersion() {
+  if (!BUILD || Date.now() - lastVersionCheck < 60000 || document.getElementById('new-version')) return;
+  lastVersionCheck = Date.now();
+  try {
+    const { v } = await (await fetch('version.json', { cache: 'no-store' })).json();
+    if (v && v !== BUILD) {
+      const bar = document.createElement('div'); bar.id = 'new-version'; bar.setAttribute('role', 'status');
+      bar.innerHTML = '<span>A newer version of CallReady is live.</span><button class="btn primary small-btn" type="button">Reload</button>';
+      bar.querySelector('button').addEventListener('click', () => location.reload());
+      document.body.appendChild(bar);
+    }
+  } catch { /* offline or blocked: keep running */ }
+}
+window.addEventListener('hashchange', checkVersion);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVersion(); });
 // Text widths are measured with the web font; redraw once it has loaded.
 document.fonts?.ready.then(() => drawCharts());
 window.addEventListener('hashchange', render);

@@ -346,6 +346,9 @@ table.edit td { padding: 6px 6px; } table.edit td:first-child { white-space: now
 .commit:first-of-type { border-top: 0; }
 .said { margin: 6px 0; font-family: var(--font-display); }
 
+/* new version bar */
+#new-version { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 90; display: flex; gap: 12px; align-items: center; padding: 10px 12px 10px 18px; border-radius: var(--r-pill); background: var(--ink); color: var(--bg); font-size: var(--fs-meta); box-shadow: var(--glass-shadow); max-width: calc(100vw - 32px); }
+
 /* evidence policy on Review */
 .policy { margin-top: var(--s-4); padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--warn-tint); font-size: var(--fs-meta); line-height: 1.5; }
 .policy.ok { background: var(--ok-tint); }

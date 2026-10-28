@@ -217,7 +217,7 @@
       "persona": "hawk",
       "owner": "CFO",
       "text": "Revenue grew 14% but EBITDA fell in absolute terms. Can you walk us through the 258 basis point margin decline, and how much of it is structural rather than temporary?",
-      "trap": "A vague \"input costs\" answer. The analyst has already built the bridge and will check yours against it.",
+      "trap": "A vague “input costs” answer. The analyst has already built the bridge and will check yours against it.",
       "mustAck": [
         "S1"
       ],
@@ -282,7 +282,7 @@
       "persona": "credit",
       "owner": "CFO",
       "text": "Net debt rose from 640 to 940 crore in six months, 0.79 times trailing EBITDA. With negative free cash flow and capex ahead of plan, will you breach your below-1x commitment?",
-      "trap": "A flat \"no\" without showing what has to go right.",
+      "trap": "A flat “no” without showing what has to go right.",
       "mustAck": [
         "G5"
       ],

@@ -36,7 +36,7 @@ export function sanitizePack(raw) {
   if (!p) return { pack: { schema: SCHEMA, company: {}, periods: {} }, fixes: ['pack: not an object'] };
   const c = obj(p.company) || {};
   const speakers = {};
-  for (const [k, v] of Object.entries(obj(c.speakers) || {}).slice(0, 8)) speakers[toStr(k, 20)] = str(v, 80, `company.speakers.${k}`);
+  for (const [k, v] of Object.entries(obj(c.speakers) || {}).slice(0, 8)) { const t = str(v, 80, `company.speakers.${k}`).trim(); if (t) speakers[toStr(k, 20)] = t; }
   const out = {
     schema: SCHEMA,
     id: /^[\w-]{1,60}$/.test(p.id || '') ? p.id : (p.id != null && note('id', 'not a safe id, replaced'), `pack-${Date.now().toString(36)}`),
@@ -132,9 +132,9 @@ export function validatePack(p) {
   if (!p || typeof p !== 'object') return { errors: ['Not a JSON object.'], warnings };
   normalizePack(p);
   if (p.company?.marginBasis === 'EBIT') warnings.push('The company reports operating profit (EBIT), not EBITDA: margin checks use operating margin.');
-  if (p.schema !== SCHEMA) errors.push(`"schema" must be "${SCHEMA}".`);
+  if (p.schema !== SCHEMA) errors.push(`“schema” must be “${SCHEMA}”.`);
   if (!p.company?.name) errors.push('company.name is missing.');
-  if (!p.company?.quarter) errors.push('company.quarter is missing (for example "Q2 FY27").');
+  if (!p.company?.quarter) errors.push('company.quarter is missing (for example “Q2 FY27”).');
   for (const k of ['current', 'priorYear']) {
     const per = p.periods?.[k];
     if (!per) { errors.push(`periods.${k} is missing.`); continue; }
@@ -171,7 +171,7 @@ export function validatePack(p) {
     if (!c.id || ids.has(c.id)) errors.push(`Commitment id "${c.id}" is missing or repeated.`);
     ids.add(c.id);
     if (!['guidance', 'statement', 'deflection'].includes(c.kind)) errors.push(`Commitment ${c.id}: kind must be guidance, statement or deflection.`);
-    if (!c.said) errors.push(`Commitment ${c.id}: "said" (the words on record) is missing.`);
+    if (!c.said) errors.push(`Commitment ${c.id}: “said” (the words on record) is missing.`);
   }
   if (p.consensus && num(p.consensus.revenue) && num(cur?.revenue) && !(p.consensus.revenue / cur.revenue > 0.5 && p.consensus.revenue / cur.revenue < 2)) warnings.push(`Consensus revenue (${p.consensus.revenue}) is more than 2x away from reported revenue (${cur.revenue}), probably other units: consensus is ignored.`);
   if (!(p.commitments || []).length) warnings.push('No commitments on record: the consistency checks have nothing to hold answers to.');
@@ -360,13 +360,13 @@ export function generateQuestions(p, P, k, imp, cs) {
         trap = 'Defending the range invites a follow-up you cannot win; a new range given on the call is guidance without a filing.'; terms = ['guidance', 'margin', 'range', 'band']; keyFigures = [imp.ytd, imp.need, imp.record]; break;
       case 'margin':
         text = `Revenue ${k.revYoY >= 0 ? 'grew' : 'fell'} ${r1(Math.abs(k.revYoY))}% but EBITDA margin fell ${Math.round(-k.mBps)} basis points to ${r1(k.m)}%. What drove the decline, in numbers, and how much of it is structural?`;
-        trap = 'A vague "input costs" answer. The analyst has built the bridge and will check yours against it.'; terms = ['margin', 'basis points', 'bps']; keyFigures = [Math.round(-k.mBps), r1(k.m)]; break;
+        trap = 'A vague “input costs” answer. The analyst has built the bridge and will check yours against it.'; terms = ['margin', 'basis points', 'bps']; keyFigures = [Math.round(-k.mBps), r1(k.m)]; break;
       case 'cash':
         text = `Operating cash flow was ${k.cur.ocf} ${u} against ${k.py.ocf} a year ago${k.conv != null ? `, and cash conversion fell to ${Math.round(k.conv)}% of EBITDA` : ''}.${quote ? ` You said ${qt(quote.said)}.` : ''} What happened to working capital, and why should we believe the next date?`;
         trap = 'Giving a new date. A second missed date is worse than none.'; terms = ['cash', 'working capital']; keyFigures = [k.cur.ocf, k.py.ocf]; break;
       case 'leverage':
         text = `Net debt is ${k.cur.netDebt} ${u}, ${k.lev.toFixed(2)} times EBITDA${quote ? `, against your commitment of ${qt(quote.said)}` : ''}. How much headroom is left, and what gives first if it narrows: capex or the dividend?`;
-        trap = 'A flat "no risk" without showing what has to go right.'; terms = ['net debt', 'leverage', 'headroom']; keyFigures = [k.cur.netDebt, +k.lev.toFixed(2)]; break;
+        trap = 'A flat “no risk” without showing what has to go right.'; terms = ['net debt', 'leverage', 'headroom']; keyFigures = [k.cur.netDebt, +k.lev.toFixed(2)]; break;
       case 'consensus':
         text = `EBITDA came in ${r1(-k.vsCons.ebitda)}% below consensus while revenue was ${r1(Math.abs(k.vsCons.rev))}% ${k.vsCons.rev >= 0 ? 'above' : 'below'}. Was the street wrong on margins, or did something change inside the quarter?`;
         trap = 'Blaming the analysts. They modelled what management told them.'; terms = ['consensus', 'ebitda', 'street']; keyFigures = [k.cur.ebitda]; break;

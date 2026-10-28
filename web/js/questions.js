@@ -24,7 +24,7 @@ export const questions = [
   {
     id: 'Q02', pressure: 'margin', theme: 'Margin', persona: 'hawk', owner: 'CFO', difficulty: 'Hard',
     text: 'Revenue grew 14% but EBITDA fell in absolute terms. Can you walk us through the 258 basis point margin decline, and how much of it is structural rather than temporary?',
-    trap: 'A vague "input costs" answer. The analyst has already built the bridge and will check yours against it.',
+    trap: 'A vague “input costs” answer. The analyst has already built the bridge and will check yours against it.',
     cites: ['Q1FY27-L019'], mustAck: ['S1'], terms: ['258', 'margin', 'basis points', 'bps'], keyFigures: [258, 180, 90, 28, 40],
     followup: 'Of the 180 bps in gross margin, how much is price competition you cannot get back?',
     model: 'Of the 258 basis points, 180 came from gross margin: copper and steel costs and price competition in Home Appliances. 90 came from Energy Solutions losses, and 28 from staffing the new plant ahead of volumes. Operating leverage gave back 40. In August we said this was transitory; part of it is not. The plant cost fades as volumes come through, and Energy losses are ours to fix. The Appliances price competition is the structural part, which is why that segment margin is 7.1% against 10.4% a year ago. We will show this bridge every quarter.',
@@ -65,7 +65,7 @@ export const questions = [
   {
     id: 'Q07', pressure: 'leverage', theme: 'Balance sheet', persona: 'credit', owner: 'CFO', difficulty: 'Medium',
     text: 'Net debt rose from 640 to 940 crore in six months, 0.79 times trailing EBITDA. With negative free cash flow and capex ahead of plan, will you breach your below-1x commitment?',
-    trap: 'A flat "no" without showing what has to go right.',
+    trap: 'A flat “no” without showing what has to go right.',
     cites: ['Q4FY26-L031', 'N4', 'N5'], mustAck: ['G5'], terms: ['net debt', '1x', 'leverage'], keyFigures: [640, 940, 0.79, 103, 75],
     followup: 'Would you cut the dividend before you let leverage go above 1x?',
     model: 'Net debt is 940 crore, 0.79 times trailing EBITDA of 1,195 crore, so we are inside the below 1x commitment today, but the headroom has narrowed from 0.52 times at year end. Free cash flow was negative 103 crore this quarter, and we paid the 75 crore final dividend. Staying below 1x depends on working capital releasing cash in H2. We will track it every quarter and tell you early if the commitment is at risk.',

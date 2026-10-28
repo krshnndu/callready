@@ -59,6 +59,8 @@ jobs:
         run: (cd web && python3 -m http.server 8731 --bind 127.0.0.1 &) && sleep 2
       - name: XSS gate (hostile pack on every screen)
         run: CHROME=$(which google-chrome) node scripts/check_xss.mjs
+      - name: Content gate (options, labels, quotes, punctuation on every screen)
+        run: CHROME=$(which google-chrome) node scripts/check_content.mjs
       - name: Layout gate (6 screens x 7 companies x 2 sizes)
         run: CHROME=$(which google-chrome) node scripts/check_layout.mjs
 

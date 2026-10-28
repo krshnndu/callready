@@ -4,6 +4,14 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Fixed
+- Blank speaker names from extraction gave empty options in "Answering as". Speakers now always fall back to their role, and the sanitiser drops blank names.
+- The persona line no longer splits punctuation off into its own layout item; curly quotes are used across all UI and rule copy.
+- Stale code: every build stamps its commit into all module URLs, and a running page offers a reload when a newer version is live.
+
+### Added
+- `scripts/check_content.mjs`: a content-quality gate over every screen x company x size (empty options, nameless buttons, stray punctuation, straight quotes, empty labels, NaN/undefined). It runs in CI.
+
 ### Changed
 - Web deploys come from GitHub: Vercel's Git integration builds `web/` (root directory) on every push to `main`, so no machine-specific Vercel login is needed to ship.
 

@@ -41,6 +41,18 @@
           "value": "same-origin"
         }
       ]
+    },
+    {
+      "source": "/version.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
     }
-  ]
+  ],
+  "buildCommand": "node build.mjs",
+  "outputDirectory": ".",
+  "installCommand": ""
 }
