@@ -143,7 +143,16 @@ async function pdfText(file, notes = []) {
   if (doc.numPages > 80) notes.push(`${file.name} has ${doc.numPages} pages; only the first 80 are read`);
   for (let i = 1; i <= Math.min(doc.numPages, 80); i++) {
     const page = await doc.getPage(i); const tc = await page.getTextContent();
-    out += tc.items.map((it) => it.str + (it.hasEOL ? '\n' : ' ')).join('') + '\n\n';
+    // Join text pieces by their position on the page: pieces that touch are one word, so a number the
+    // PDF stores as "31" + "7" reads as 317, and a change of baseline starts a new line.
+    let line = '', lastX = null, lastY = null;
+    for (const it of tc.items) {
+      const [a, b, , , x, y] = it.transform; const fs = Math.hypot(a, b) || 10;
+      if (lastY != null && Math.abs(y - lastY) > fs * 0.5) { out += line + '\n'; line = ''; lastX = null; }
+      if (it.str) { line += (line && (lastX == null || x - lastX > fs * 0.15) ? ' ' : '') + it.str; lastX = x + it.width; lastY = y; }
+      if (it.hasEOL) { out += line + '\n'; line = ''; lastX = null; }
+    }
+    out += line + '\n\n';
   }
   return out;
 }
@@ -178,10 +187,12 @@ function bindLoad() {
       const rulesOk = validatePack(sanitizePack(rules.pack).pack).errors.length === 0;
       if (rulesOk && !$('#use-ai')?.checked) {
         const clean = sanitizePack({ ...rules.pack, id: `user-${Date.now().toString(36)}`, provenance: { source: 'upload', extractedBy: 'rules', at: new Date().toISOString(), files: [...files.files].map((f) => f.name) } });
-        set('callready.draft', { pack: clean.pack, fixes: [...notes, ...clean.fixes], sourceText: text, model: 'rules (no AI)', rulesReport: rules.report });
+        set('callready.draft', { pack: clean.pack, fixes: [...notes, ...(rules.report.rejected || []).map((r) => `table row not read (misaligned): ${r}`), ...clean.fixes], sourceText: text, model: 'rules (no AI)', rulesReport: rules.report });
         location.hash = '#/review';
         return;
       }
+      const rulesDraft = (why) => { const clean = sanitizePack({ ...rules.pack, id: `user-${Date.now().toString(36)}`, provenance: { source: 'upload', extractedBy: 'rules', at: new Date().toISOString(), files: [...files.files].map((f) => f.name) } }); set('callready.draft', { pack: clean.pack, fixes: [...notes, ...(why ? [why] : []), ...clean.fixes], sourceText: text, model: 'rules (no AI)', rulesReport: rules.report }); location.hash = '#/review'; };
+      try {
       st.textContent = rulesOk ? `The rules read the tables; now AI adds guidance, segments and the Q&A (${Math.round(text.length / 1000)}k characters, one to three minutes)...` : `The rules could not read this document's tables, so AI is converting it (${Math.round(text.length / 1000)}k characters, one to three minutes)...`;
       // The network path to the API can be slow or drop a request; retry rather than give up.
       const body = JSON.stringify({ text, name: docName });
@@ -205,6 +216,11 @@ function bindLoad() {
       const clean = sanitizePack({ ...merged, id: `user-${Date.now().toString(36)}`, provenance: { source: 'upload', extractedBy: rulesOk ? `rules + ${j.model}` : j.model, at: new Date().toISOString(), files: [...files.files].map((f) => f.name) } });
       set('callready.draft', { pack: clean.pack, fixes: [...notes, ...clean.fixes], sourceText: text, model: rulesOk ? `rules + ${j.model}` : j.model, crossCheck: cc, rulesReport: rules.report });
       location.hash = '#/review';
+      } catch (e) {
+        // The AI step failed. If the rules read the tables, carry on with the rules' figures.
+        if (rulesOk) { rulesDraft(`AI was unavailable (${String(e.message || e).slice(0, 80)}), so only the rules' reading is used`); return; }
+        throw e;
+      }
     } catch (e) {
       st.textContent = `Conversion failed (${String(e.message || e).slice(0, 120)}). The AI service may be busy: try again, or upload a pack in the JSON format.`;
     } finally { btn.disabled = false; }

@@ -53,7 +53,7 @@ function units(text) {
 
 export function extractByRules(text, { name = '' } = {}) {
   const lines = String(text || '').split(/\r?\n/).map((l) => l.replace(/\s+/g, ' ').trim());
-  const tables = [];
+  const tables = [], rejected = [];
   let cur = null;
   lines.forEach((line, i) => {
     const ps = [...line.matchAll(PERIOD)];
@@ -73,7 +73,10 @@ export function extractByRules(text, { name = '' } = {}) {
       let k = 0, consumed = 0;
       while (k < rawWords.length && consumed < words) { if (norm(rawWords[k])) consumed += norm(rawWords[k]).split(' ').length; k++; }
       const vals = rowValues(rawWords.slice(k).join(' '));
-      if (vals && vals.length >= 2 && !(field in cur.rows)) cur.rows[field] = vals;
+      // A row must have exactly one value per period in its header. More or fewer means a number was
+      // split or merged in the text, so the row is refused: no figure is better than a wrong one.
+      if (vals && vals.length === cur.periods.length && !(field in cur.rows)) cur.rows[field] = vals;
+      else if (vals && vals.length >= 2 && vals.length !== cur.periods.length) rejected.push(`${line.slice(0, 80)} (${vals.length} values for ${cur.periods.length} periods)`);
       break;
     }
   });
@@ -131,7 +134,7 @@ export function extractByRules(text, { name = '' } = {}) {
     commitments,
     provenance: { source: 'upload', extractedBy: 'rules', policy: 'strict' },
   };
-  const report = { tables: [...used].map((t) => ({ header: t.header, basis: t.basis || 'unlabelled', rows: Object.keys(t.rows) })), latest: latest?.label || null, guidance: commitments.length };
+  const report = { tables: [...used].map((t) => ({ header: t.header, basis: t.basis || 'unlabelled', rows: Object.keys(t.rows) })), latest: latest?.label || null, guidance: commitments.length, rejected };
   return { pack, report };
 }
 

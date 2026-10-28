@@ -32,6 +32,15 @@ ok(pack.commitments.some((c) => /around 600 crore/.test(c.said)), 'capex guidanc
 ok(v.quotesFound === v.quotes.length, `every guidance quote is word for word (${v.quotesFound}/${v.quotes.length})`);
 ok(Array.isArray(report.tables) && report.tables.length >= 1, `report lists the tables used (${report.tables?.length})`);
 
+console.log('--- Misaligned rows give no figure, never a wrong one');
+{
+  const t = 'Havells India Limited\n(In Rs crores) Q2 FY27 Q2 FY26 YoY (%) Q1 FY27\nNet Revenue (NR) 6,417 4,767 34.6% 6,510\nEBITDA 576 442 30.5% 474\nNet Profit 353 31 7 11.1% 298\nTax 123 96  103\n';
+  const { pack: p, report: r } = ex.extractByRules(t, {});
+  ok(p.periods.priorYear.pat == null && p.periods.current.pat == null, `a row with more numbers than periods (a number split in two) is refused (PAT ${p.periods.current.pat}/${p.periods.priorYear.pat})`);
+  ok(p.periods.current.revenue === 6417 && p.periods.priorQuarter.revenue === 6510 && p.periods.priorYear.ebitda === 442, 'well-formed rows around it are still read');
+  ok((r.rejected || []).some((x) => /net profit/i.test(x)), 'the refused row is reported');
+}
+
 const scratch = process.argv[2] || '/private/tmp/claude-501/-Users-krshnndu-Projects-illuminati-assignment/ce522e7e-e5ba-4f11-b613-b61d426ea16b/scratchpad';
 if (existsSync(`${scratch}/newco/manifest.json`)) {
   console.log('--- New, unseen companies (truth read from the PDFs)');
