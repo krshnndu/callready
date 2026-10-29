@@ -4,6 +4,9 @@ All notable changes to CallReady. The format follows [Keep a Changelog](https://
 
 ## [Unreleased]
 
+### Removed
+- **Retired 2026-10-29.** The API, its public tunnel and the Vercel web project are shut down and the repository is archived. Final report, lessons learned and the decommissioning record: `docs/09-CLOSEOUT.md`.
+
 ## [0.6.1] - 2026-10-28
 
 A first-open welcome card, the final demo video link, and the product-demo pitch script.

@@ -2,7 +2,9 @@
 
 **Is the leadership team ready for tough investor questions?** CallReady rehearses a listed company's earnings call against the company's own disclosures. Upload the quarter's results, or pick a real company from the test datasets. CallReady ranks what investors will push on, writes the questions they will ask, and scores each rehearsed answer for accuracy, consistency with past promises, and disclosure safety. It ends in a readiness report with recommendations to act on before the call.
 
-**Live: [callreadyai.vercel.app](https://callreadyai.vercel.app)** · **[Demo video](https://www.tella.tv/video/surviving-earnings-day-0dxghs83)** · Made by [Krishnendu](https://krishnendu.me) · [Changelog](CHANGELOG.md) · [Governance (PMI-CPMAI)](docs/08-GOVERNANCE.md) · [90-second pitch](docs/07-PITCH.md)
+> **Retired on 2026-10-29.** CallReady was a competition prototype and its purpose is done. The live site and API are shut down and this repository is archived (read-only). The final report, lessons learned and how to revive it are in [docs/09-CLOSEOUT.md](docs/09-CLOSEOUT.md).
+
+**[Demo video](https://www.tella.tv/video/surviving-earnings-day-0dxghs83)** · Made by [Krishnendu](https://krishnendu.me) · [Changelog](CHANGELOG.md) · [Governance (PMI-CPMAI)](docs/08-GOVERNANCE.md) · [90-second pitch](docs/07-PITCH.md)
 
 ## Screenshots
 
@@ -115,7 +117,7 @@ Other limitations, in order of weight: it has not yet been proven on real calls 
 
 ## Documentation
 
-- **Continuing the project:** [docs/11-HANDOFF.md](docs/11-HANDOFF.md) (state, gates, workflow, backlog) · [Edge cases](docs/10-EDGE-CASES.md)
+- **Close-out (retired 2026-10-29):** [docs/09-CLOSEOUT.md](docs/09-CLOSEOUT.md) · **Handoff:** [docs/11-HANDOFF.md](docs/11-HANDOFF.md) (state, gates, workflow, backlog) · [Edge cases](docs/10-EDGE-CASES.md)
 - [PRD](docs/01-PRD.md) · [Architecture](docs/02-ARCHITECTURE.md) · [Data](docs/03-DATA.md) · [Scoring](docs/04-SCORING.md) · [Roadmap](docs/05-ROADMAP.md) · [Decisions and risks](docs/06-DECISIONS-RISKS.md) · [Pitch](docs/07-PITCH.md) · [Governance](docs/08-GOVERNANCE.md)
 - [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md) · [Code of Conduct](CODE_OF_CONDUCT.md) · [Agent rules](AGENTS.md)
 
@@ -131,4 +133,4 @@ Other limitations, in order of weight: it has not yet been proven on real calls 
 - PDF reading: [pdf.js](https://mozilla.github.io/pdf.js/) by Mozilla.
 - Test data: public Q2 FY27 filings by Wipro, Jindal Saw, Tejas Networks, Pitti Engineering, JK Tyre and Nestle India, from NSE and the companies' own sites. CallReady is not affiliated with any of them, and the extracted packs are for testing only.
 
-_Last true: 2026-10-28_
+_Last true: 2026-10-29_

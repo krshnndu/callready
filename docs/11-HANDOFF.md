@@ -1,5 +1,7 @@
 # 11. Handoff: how to continue this project with any agent
 
+> **Retired 2026-10-29.** The service is shut down and the repository archived. Read [09-CLOSEOUT.md](09-CLOSEOUT.md) first; this handoff describes the project as it stood when live.
+
 Written 2026-10-28 so the work can continue without the original session, whether with Hermes, Gemini, Claude or a person. Read this, then `AGENTS.md`. Host-specific details (server paths, ports, secrets locations, deploy commands) are in the gitignored `private/HANDOFF.md` on the build server, not in this public file.
 
 ## 1. State on 2026-10-28
@@ -57,7 +59,7 @@ House rules (also in `AGENTS.md`):
 1. **More rule coverage for tables the rules cannot read yet.** Nestle's garbled table text and Wipro's IFRS million layout fall back to AI today. Add row synonyms and header patterns, with a failing test from their text first.
 2. **Guidance pressure titles from rule-extracted sentences.** They use the first 60 characters of the sentence; derive a short topic instead.
 3. **Margin basis.** CEAT reports a -403 bps margin change; we compute -405 bps from the rounded reported figures. Both are correct. Consider showing the company's own stated change when the document prints it.
-4. **Close-out (governance C11):** a final report and lessons learned, plus the decommissioning plan (see the teardown list in `private/HANDOFF.md`).
+4. ~~**Close-out (governance C11):**~~ Done 2026-10-29, see `09-CLOSEOUT.md`. a final report and lessons learned, plus the decommissioning plan (see the teardown list in `private/HANDOFF.md`).
 
 ## 5. Known limitations
 
